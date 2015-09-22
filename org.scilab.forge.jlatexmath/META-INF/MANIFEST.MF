@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jlatexmath
+Bundle-SymbolicName: org.scilab.forge.jlatexmath
+Bundle-Version: 1.0.0
+Bundle-Vendor: Scilab
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.scilab.forge.jlatexmath,
+ org.scilab.forge.jlatexmath.cache,
+ org.scilab.forge.jlatexmath.cyrillic,
+ org.scilab.forge.jlatexmath.dynamic,
+ org.scilab.forge.jlatexmath.greek
