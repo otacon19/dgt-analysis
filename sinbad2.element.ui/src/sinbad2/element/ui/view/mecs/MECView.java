@@ -501,6 +501,11 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		_changeAggregationButton.setEnabled(false);
 		_changeAxisCombo.setEnabled(false);
 		_changeAxisCombo.select(0);
+		if(campaignsSelected.isEmpty() && _chartType == 1) {
+			_chartType = 0;
+			_changeAggregationButton.setImage(Images.No_aggregation);
+			_chart.initializeBarChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
+		}
 	}
 	
 	@Override
@@ -519,9 +524,10 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	
 	private void checkOptions(List<Campaign> campaignsSelected) {
 		_addFormulaButton.setEnabled(true);
-		if(campaignsSelected.size() == 1) {
+		if(campaignsSelected.size() == 1 || (campaignsSelected.size() == 2 && (campaignsSelected.get(0).isACampaignData() || campaignsSelected.get(1).isACampaignData()))) {
 			if(_chartType == 0) {
 				_changeAxisCombo.setEnabled(true);
+				_changeChartButton.setEnabled(false);
 				if(_changeAggregationButton.isEnabled()) {
 					_changeAggregationButton.setEnabled(false);
 					if(_mecSelected != null) {
@@ -535,14 +541,13 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			} else {
 				_changeAxisCombo.setEnabled(false);
 				_changeAxisCombo.select(0);
-			}
-			
-			if(_mecSelected != null) {
-				_changeChartButton.setEnabled(true);
-			} else {
-				_changeChartButton.setEnabled(false);
-				_changeAggregationButton.setEnabled(false);
-				_changeAxisCombo.setEnabled(false);
+				if(_mecSelected != null) {
+					_chartType = 0;
+					_changeAggregationButton.setImage(Images.No_aggregation);
+					Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
+					campaign.put(campaignsSelected.get(0), _mecSelected);
+					_chart.setMEC(campaign, _chartType, "combine");
+				}
 			}
 			
 			if(_chartType == 0 || _chartType == 1) { //Gráfico de barras o temporal

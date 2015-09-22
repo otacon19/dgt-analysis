@@ -120,7 +120,11 @@ public class Campaign extends ProblemElement {
 	}
 	
 	public int getValue(Criterion c, Alternative a) {
-		return _values.get(c).get(a);
+		if(_values.get(c).get(a) != null) {
+			return _values.get(c).get(a);
+		} else {
+			return -1;
+		}
 	}
 	
 	public Map<Alternative, Integer> getAlternativesWithValues(Criterion c) {

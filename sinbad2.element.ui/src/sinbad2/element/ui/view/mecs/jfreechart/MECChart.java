@@ -260,35 +260,19 @@ public class MECChart {
 	        }
 	        
 	        double valueAcum = 0;
-	        double numeratorAcum = 0, denominatorAcum = 0;
 	        for(Campaign c: campaignsTotalValue.keySet()) {
 	        	List<Double> nAd = campaignsTotalValue.get(c);
-	        	if(nAd.get(0) != 1) {
-	        		numeratorAcum += nAd.get(0);
+	        	if(dataValues.isEmpty()) {
+	        		valueAcum += nAd.get(0) / nAd.get(1);
+	        	} else {
+	        		valueAcum += (nAd.get(0) * dataValues.get(0)) / (nAd.get(1) * dataValues.get(1));
 	        	}
-	        	if(nAd.get(1) != 1) {
-	        		denominatorAcum += nAd.get(1);
-	        	}
 	        }
-	        if(numeratorAcum == 0) {
-	        	numeratorAcum = 1;
-	        }
-	        if(denominatorAcum == 0) {
-	        	denominatorAcum = 1;
-	        }
-	        
-	        if(dataValues.isEmpty()) {
-	        	valueAcum = numeratorAcum / denominatorAcum;
-	        	if(valueAcum == 1) {
-	        		valueAcum = 0;
-	        	}
-	        } else {
-	        	valueAcum = (numeratorAcum * dataValues.get(0)) / (denominatorAcum * dataValues.get(1));
-	        }
-	        if(Double.isInfinite(valueAcum)) {
-	        	valueAcum = 0;
-	        }
-	        
+
+	        if(valueAcum == 1 || Double.isInfinite(valueAcum)) {
+        		valueAcum = 0;
+        	}
+	
 	        category = category.substring(0, category.length() - 1);
 	        dataset.addValue(valueAcum, mec.getId(), category);
 	        
@@ -542,21 +526,18 @@ public class MECChart {
         	}
         	
         	double valueAcum = 0;
-	        double numeratorAcum = 0, denominatorAcum = 0;
-	        for(Campaign c: campaignsTotalValue.keySet()) {
+        	for(Campaign c: campaignsTotalValue.keySet()) {
 	        	List<Double> nAd = campaignsTotalValue.get(c);
-	        	numeratorAcum += nAd.get(0);
-	        	denominatorAcum += nAd.get(1);
+	        	if(dataValues.isEmpty()) {
+	        		valueAcum += nAd.get(0) / nAd.get(1);
+	        	} else {
+	        		valueAcum += (nAd.get(0) * dataValues.get(0)) / (nAd.get(1) * dataValues.get(1));
+	        	}
 	        }
-	        
-	        if(dataValues.isEmpty()) {
-	        	valueAcum += numeratorAcum / denominatorAcum;
-	        } else {
-	        	valueAcum += (numeratorAcum * dataValues.get(0)) / (denominatorAcum * dataValues.get(1));
-	        }
-	        if(Double.isInfinite(valueAcum)) {
-	        	valueAcum = 0;
-	        }
+
+	        if(valueAcum == 1 || Double.isInfinite(valueAcum)) {
+        		valueAcum = 0;
+        	}
 	        
         	dataset.addValue(valueAcum, mec.getId(), province);
         }
@@ -627,10 +608,12 @@ public class MECChart {
 	        				List<Alternative> childrens = a.getChildrens();
 	        				for(Alternative children: childrens) {
 	        					if(alternativesSelected.contains(children)) {
-	        						acumValue = campaign.getValue(c, children);
-	        						weight = (double) data.get(1);
-	        	            		acumValue *= weight;
-	        	            		childrenValue.put(children, acumValue);
+	        						if(campaign.getValue(c, children) != -1) {
+		        						acumValue = campaign.getValue(c, children);
+		        						weight = (double) data.get(1);
+		        	            		acumValue *= weight;
+		        	            		childrenValue.put(children, acumValue);
+	        						}
 	        					}
 	        				}
 	        			}
