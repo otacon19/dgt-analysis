@@ -193,7 +193,9 @@ public class AlternativesSelectedContentProvider implements ITreeContentProvider
 					}
 				}
 			}
-			if(!noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
+			if(availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
+				return availableAlternativesDirect;
+			} else if(!noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
 				availableAlternatives.addAll(availableAlternativesDirect);
 				availableAlternatives.addAll(noAvailableAlternatives);
 				

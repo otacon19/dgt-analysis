@@ -301,6 +301,13 @@ public class CampaignsView extends ViewPart {
 					button.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
+							setEnabledButtonsCampaings(true);
+							if(((Campaign) button.getData("campaign")).isACampaignData()) {
+								checkCompatibleCampaigns((Campaign) button.getData("campaign"), button.getSelection());
+							} else {
+								checkCompatibleDataCampaigns((Campaign) button.getData("campaign"), button.getSelection());
+							}
+							
 							if(((Button) e.widget).getSelection()) {
 								if(!_campaignsSelected.contains((Campaign) button.getData("campaign"))) {
 									_campaignsSelected.add((Campaign) button.getData("campaign"));
@@ -317,6 +324,32 @@ public class CampaignsView extends ViewPart {
 							} else {
 								_elementsSet.notifyCampaignsChanges(new CampaignsChangeEvent(ECampaignsChange.CAMPAIGNS_SELECTED_CHANGES, null, _campaignsSelected, false));
 								_removeCampaigns.setEnabled(true);
+							}
+						}
+
+						private void checkCompatibleCampaigns(Campaign dataCampaign, boolean selection) {
+							if(selection) {
+								for(Button b: _buttons) {
+									Campaign c = (Campaign) b.getData("campaign");
+									if(!c.getProvince().equals(dataCampaign.getProvince())) {
+										b.setEnabled(false);
+									}
+								}
+							} else {
+								setEnabledButtonsCampaings(!selection);
+							}
+						}
+						
+						private void checkCompatibleDataCampaigns(Campaign campaign, boolean selection) {
+							if(selection) {
+								for(Button b: _buttons) {
+									Campaign c = (Campaign) b.getData("campaign");
+									if(!c.getProvince().equals(campaign.getProvince()) && c.isACampaignData()) {
+										b.setEnabled(false);
+									}
+								}
+							} else {
+								setEnabledButtonsCampaings(!selection);
 							}
 						}
 					});
@@ -351,6 +384,12 @@ public class CampaignsView extends ViewPart {
 		List<Button> buttonsAlternatives = AlternativesView.getButtons();
 		for(Button b: buttonsAlternatives) {
 			b.setVisible(state);
+		}
+	}
+	
+	private void setEnabledButtonsCampaings(boolean state) {
+		for(Button b: _buttons) {
+			b.setEnabled(state);
 		}
 	}
 	

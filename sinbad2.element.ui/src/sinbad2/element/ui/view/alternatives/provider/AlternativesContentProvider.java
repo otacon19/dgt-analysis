@@ -14,6 +14,8 @@ import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.alternative.Alternative;
 import sinbad2.element.alternative.listener.AlternativesChangeEvent;
 import sinbad2.element.alternative.listener.IAlternativesChangeListener;
+import sinbad2.element.campaigns.Campaign;
+import sinbad2.element.ui.view.campaigns.dialog.AddCampaignsDialog;
 
 public class AlternativesContentProvider implements IStructuredContentProvider, IAlternativesChangeListener, IProblemElementsSetChangeListener {
 	
@@ -78,17 +80,25 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 						_tableViewer.getTable().getColumn(0).setText("Context");
 					}
 				} else {
-					List<Alternative> alternativesNoDirect = new LinkedList<Alternative>();
-					List<Alternative> alternativesDirect = new LinkedList<Alternative>();
-					for(Alternative a: (List<Alternative>) event.getNewValue()) {
-						if(!a.isDirect()) {
-							alternativesNoDirect.add(a);
-						} else {
-							alternativesDirect.add(a);
+					if(!checkCampaignsData()) {
+						List<Alternative> alternativesNoDirect = new LinkedList<Alternative>();
+						List<Alternative> alternativesDirect = new LinkedList<Alternative>();
+						for(Alternative a: (List<Alternative>) event.getNewValue()) {
+							if(!a.isDirect()) {
+								alternativesNoDirect.add(a);
+							} else {
+								alternativesDirect.add(a);
+							}
+						}
+						alternativesNoDirect.addAll(alternativesDirect);
+						_alternatives.addAll(alternativesNoDirect);
+					} else {
+						for(Alternative a: (List<Alternative>) event.getNewValue()) {
+							if(a.isDirect()) {
+								_alternatives.add(a);
+							}
 						}
 					}
-					alternativesNoDirect.addAll(alternativesDirect);
-					_alternatives.addAll(alternativesNoDirect);
 				}
 				
 				_tableViewer.refresh();
@@ -102,6 +112,17 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 			default:
 				break;
 		}
+	}
+	
+	private boolean checkCampaignsData() {
+		boolean allCampaignsData = true;
+		for(Campaign c: AddCampaignsDialog.getCampaignsSelected()) {
+			if(!c.isACampaignData()) {
+				allCampaignsData = false;
+				break;
+			}
+		}
+		return allCampaignsData;
 	}
 	
 	public void pack() {

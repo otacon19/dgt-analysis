@@ -1,6 +1,7 @@
 package sinbad2.element.campaigns;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class Campaign extends ProblemElement {
 		super();
 		_alternatives = new LinkedList<Alternative>();
 		_criteria = new LinkedList<Criterion>();
-		_values = new HashMap<Criterion, Map<Alternative, Integer>>();
+		_values = new LinkedHashMap<Criterion, Map<Alternative, Integer>>();
 	}
 	
 	public Campaign(String id, String name) {
@@ -33,7 +34,7 @@ public class Campaign extends ProblemElement {
 		_name = name;
 		_alternatives = new LinkedList<>();
 		_criteria = new LinkedList<>();
-		_values = new HashMap<Criterion, Map<Alternative, Integer>>();
+		_values = new LinkedHashMap<Criterion, Map<Alternative, Integer>>();
 	}
 	
 	public void setName(String name) {
@@ -102,10 +103,12 @@ public class Campaign extends ProblemElement {
 	
 	public void addAlternative(Alternative a) {
 		_alternatives.add(a);
+		Collections.sort(_alternatives);
 	}
 	
 	public void addCriterion(Criterion c) {
 		_criteria.add(c);
+		Collections.sort(_criteria);
 	}
 	
 	public void addValue(Criterion c, Alternative a, int value) {
@@ -113,7 +116,7 @@ public class Campaign extends ProblemElement {
 		if(_values.get(c) != null) {
 			valueAlternative = _values.get(c);
 		} else {
-			valueAlternative = new HashMap<Alternative, Integer>();
+			valueAlternative = new LinkedHashMap<Alternative, Integer>();
 		}
 		valueAlternative.put(a, value);
 		_values.put(c, valueAlternative);
@@ -131,11 +134,13 @@ public class Campaign extends ProblemElement {
 		return _values.get(c);
 	}
 	
-	public int getAcumValue(Criterion c) {
+	public int getAcumValue(Criterion c, Alternative aParent, List<Alternative> alternativesSelected) {
 		Map<Alternative, Integer> valueAlternative = _values.get(c);
 		int acum = 0;
 		for(Alternative a: valueAlternative.keySet()) {
-			acum += valueAlternative.get(a);
+			if(aParent.getChildrens().contains(a) && alternativesSelected.contains(a)) {
+				acum += valueAlternative.get(a);
+			}
 		}
 		
 		return acum;

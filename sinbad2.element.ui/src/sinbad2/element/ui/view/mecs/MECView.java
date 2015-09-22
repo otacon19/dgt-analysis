@@ -202,7 +202,6 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 							}
 						}
 					}
-					_changeChartButton.setEnabled(true);
 				}
 			}
 		});
@@ -524,67 +523,80 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	
 	private void checkOptions(List<Campaign> campaignsSelected) {
 		_addFormulaButton.setEnabled(true);
-		if(campaignsSelected.size() == 1 || (campaignsSelected.size() == 2 && (campaignsSelected.get(0).isACampaignData() || campaignsSelected.get(1).isACampaignData()))) {
-			if(_chartType == 0) {
-				_changeAxisCombo.setEnabled(true);
-				_changeChartButton.setEnabled(false);
-				if(_changeAggregationButton.isEnabled()) {
-					_changeAggregationButton.setEnabled(false);
-					if(_mecSelected != null) {
-						_chartType = 0;
-						_changeAggregationButton.setImage(Images.No_aggregation);
-						Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
-						campaign.put(campaignsSelected.get(0), _mecSelected);
-						_chart.setMEC(campaign, _chartType, "combine");
-					}
-				}
+		if(campaignsSelected.size() == 1) {
+			oneCampaignSelectedCheckButtons(campaignsSelected);
+		} else {
+			if(campaignsSelected.size() == 2 && ((campaignsSelected.get(0).isACampaignData() && !campaignsSelected.get(1).isACampaignData()) || 
+					(!campaignsSelected.get(0).isACampaignData() && campaignsSelected.get(1).isACampaignData()))) {
+				oneCampaignSelectedCheckButtons(campaignsSelected);
 			} else {
-				_changeAxisCombo.setEnabled(false);
-				_changeAxisCombo.select(0);
+				moreThanOneCampaignsSelected(campaignsSelected);
+			}
+		}
+	}
+
+	private void oneCampaignSelectedCheckButtons(List<Campaign> campaignsSelected) {
+		if(_chartType == 0) {
+			_changeAxisCombo.setEnabled(true);
+			_changeChartButton.setEnabled(false);
+			if(_changeAggregationButton.isEnabled()) {
+				_changeAggregationButton.setEnabled(false);
 				if(_mecSelected != null) {
 					_chartType = 0;
 					_changeAggregationButton.setImage(Images.No_aggregation);
+					_changeAxisCombo.select(0);
 					Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
 					campaign.put(campaignsSelected.get(0), _mecSelected);
 					_chart.setMEC(campaign, _chartType, "combine");
 				}
 			}
-			
-			if(_chartType == 0 || _chartType == 1) { //Gráfico de barras o temporal
-				if(_aggregationOption == 0) { //Agregada
-					if(_changeAxisCombo.getSelectionIndex() == 0) { //Por campañas o por contextos
-						combineCampaigns(campaignsSelected);
-					} else if(_changeAxisCombo.getSelectionIndex() == 1) {
-						combineCampaignsProvinces(campaignsSelected);
-					} else if(_changeAxisCombo.getSelectionIndex() == 2) {
-						separateCampaigns(campaignsSelected);
-					}
-				}
-			}
 		} else {
-			if(_chartType == 0) { //Gráfico de barras
-				if(_aggregationOption == 0) { //Agregada
-					if(_changeAxisCombo.getSelectionIndex() == 0 || _changeAxisCombo.getSelectionIndex() == 2) { //Por campañas o por contextos
-						combineCampaigns(campaignsSelected);
-					} else if(_changeAxisCombo.getSelectionIndex() == 1) {
-						combineCampaignsProvinces(campaignsSelected);
-					}
-				} else { //Desagregada
-					separateCampaigns(campaignsSelected);
-				}
-				_changeAggregationButton.setEnabled(true);
-			} else { //Gráfico de líneas
-				if((_aggregationOption == 0)) {
-					if(_changeAxisCombo.getSelectionIndex() == 0) { //Por campañas o por contextos
-						combineCampaigns(campaignsSelected);
-					} else if(_changeAxisCombo.getSelectionIndex() == 1 || _changeAxisCombo.getSelectionIndex() == 2) {
-						separateCampaigns(campaignsSelected);
-					}
-				} 
+			if(_mecSelected != null) {
+				_chartType = 0;
+				_changeAggregationButton.setImage(Images.No_aggregation);
+				_changeAxisCombo.setEnabled(false);
+				_changeAxisCombo.select(0);
+				Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
+				campaign.put(campaignsSelected.get(0), _mecSelected);
+				_chart.setMEC(campaign, _chartType, "combine");
+			}
+		}
+		
+		if(_aggregationOption == 0) {
+			if(_changeAxisCombo.getSelectionIndex() == 0) {
+				combineCampaigns(campaignsSelected);
+			} else if(_changeAxisCombo.getSelectionIndex() == 1) {
+				combineCampaignsProvinces(campaignsSelected);
+			} else if(_changeAxisCombo.getSelectionIndex() == 2) {
+				separateCampaigns(campaignsSelected);
 			}
 		}
 	}
-
+	
+	private void moreThanOneCampaignsSelected(List<Campaign> campaignsSelected) {
+		_changeChartButton.setEnabled(true);
+		if(_chartType == 0) {
+			if(_aggregationOption == 0) {
+				if(_changeAxisCombo.getSelectionIndex() == 0 || _changeAxisCombo.getSelectionIndex() == 2) {
+					combineCampaigns(campaignsSelected);
+				} else if(_changeAxisCombo.getSelectionIndex() == 1) {
+					combineCampaignsProvinces(campaignsSelected);
+				}
+			} else {
+				separateCampaigns(campaignsSelected);
+			}
+			_changeAggregationButton.setEnabled(true);
+		} else {
+			if((_aggregationOption == 0)) {
+				if(_changeAxisCombo.getSelectionIndex() == 0) {
+					combineCampaigns(campaignsSelected);
+				} else if(_changeAxisCombo.getSelectionIndex() == 1 || _changeAxisCombo.getSelectionIndex() == 2) {
+					separateCampaigns(campaignsSelected);
+				}
+			} 
+		}
+	}
+	
 	private void combineCampaigns(List<Campaign> campaigns) {
 		Map<Campaign, MEC> campaignsAndMecs = new LinkedHashMap<Campaign, MEC>();
 		for(Campaign c: campaigns) {

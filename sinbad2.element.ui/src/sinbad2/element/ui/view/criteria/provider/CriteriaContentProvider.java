@@ -11,9 +11,11 @@ import org.eclipse.swt.widgets.TableColumn;
 import sinbad2.element.IProblemElementsSetChangeListener;
 import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
+import sinbad2.element.campaigns.Campaign;
 import sinbad2.element.criterion.Criterion;
 import sinbad2.element.criterion.listener.CriteriaChangeEvent;
 import sinbad2.element.criterion.listener.ICriteriaChangeListener;
+import sinbad2.element.ui.view.campaigns.dialog.AddCampaignsDialog;
 
 public class CriteriaContentProvider implements IStructuredContentProvider, ICriteriaChangeListener, IProblemElementsSetChangeListener {
 
@@ -76,17 +78,25 @@ public class CriteriaContentProvider implements IStructuredContentProvider, ICri
 						_tableViewer.getTable().getColumn(0).setText("Index");
 					}
 				} else {
-					List<Criterion> criteriaNoDirect = new LinkedList<Criterion>();
-					List<Criterion> criteriaDirect = new LinkedList<Criterion>();
-					for(Criterion c: (List<Criterion>) event.getNewValue()) {
-						if(!c.isDirect()) {
-							criteriaNoDirect.add(c);
-						} else {
-							criteriaDirect.add(c);
+					if(!checkCampaignsData()) {
+						List<Criterion> criteriaNoDirect = new LinkedList<Criterion>();
+						List<Criterion> criteriaDirect = new LinkedList<Criterion>();
+						for(Criterion c: (List<Criterion>) event.getNewValue()) {
+							if(!c.isDirect()) {
+								criteriaNoDirect.add(c);
+							} else {
+								criteriaDirect.add(c);
+							}
+						}
+						criteriaNoDirect.addAll(criteriaDirect);
+						_criteria.addAll(criteriaNoDirect);
+					} else {
+						for(Criterion c: (List<Criterion>) event.getNewValue()) {
+							if(c.isDirect()) {
+								_criteria.add(c);
+							}
 						}
 					}
-					criteriaNoDirect.addAll(criteriaDirect);
-					_criteria.addAll(criteriaNoDirect);
 				}
 				
 				_tableViewer.refresh();
@@ -100,6 +110,17 @@ public class CriteriaContentProvider implements IStructuredContentProvider, ICri
 			default: 
 				break;
 		}
+	}
+
+	private boolean checkCampaignsData() {
+		boolean allCampaignsData = true;
+		for(Campaign c: AddCampaignsDialog.getCampaignsSelected()) {
+			if(!c.isACampaignData()) {
+				allCampaignsData = false;
+				break;
+			}
+		}
+		return allCampaignsData;
 	}
 
 	public void pack() {

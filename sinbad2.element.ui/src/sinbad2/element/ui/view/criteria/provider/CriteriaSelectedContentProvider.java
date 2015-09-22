@@ -147,7 +147,11 @@ public class CriteriaSelectedContentProvider implements IStructuredContentProvid
 					}
 				}
 			}
-			if(!noAvailableCriterion.isEmpty() && !availableCriterion.isEmpty() && !availableCriterionDirect.isEmpty()) {
+			
+			if(availableCriterion.isEmpty() && !availableCriterionDirect.isEmpty()) {
+				return availableCriterionDirect;
+				
+			} else if(!noAvailableCriterion.isEmpty() && !availableCriterion.isEmpty() && !availableCriterionDirect.isEmpty()) {
 				availableCriterion.addAll(availableCriterionDirect);
 				availableCriterion.addAll(noAvailableCriterion);
 				

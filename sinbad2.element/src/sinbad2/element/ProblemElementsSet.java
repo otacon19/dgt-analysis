@@ -70,6 +70,7 @@ public class ProblemElementsSet implements Cloneable {
 		Validator.notNull(alternatives);
 		
 		_alternatives = alternatives;
+		Collections.sort(_alternatives);
 		
 		notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, _alternatives, false));
 	}
@@ -78,6 +79,7 @@ public class ProblemElementsSet implements Cloneable {
 		Validator.notNull(criteria);
 		
 		_criteria = criteria;
+		Collections.sort(_criteria);
 		
 		notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_CHANGES, null, _criteria, false));
 		

@@ -170,8 +170,35 @@ public class MockModel {
 		campaign_data.setProvince("Jaén");
 		campaign_data.setDate("01" + "/15");
 		elementSet.addCampaign(campaign_data);
+		
+		campaign_data = new Campaign("13", "Campaña");
+		campaign_data.addAlternative(a5);
+		campaign_data.addCriterion(c4);
+		campaign_data.addCriterion(c5);
+		campaign_data.addCriterion(c6);
+		for(Criterion c: campaign_data.getCriteria()) {
+			for(Alternative a: campaign_data.getAlternatives()) {
+				if(a.hasChildrens()) {
+					List<Alternative> childrens = a.getChildrens();
+					for(Alternative children: childrens) {
+						if(c.getId().equals("Habitantes")) {
+							value = 110000 / childrens.size();
+						} else if(c.getId().equals("Censo")) {
+							value = 210000 / childrens.size();
+						} else if(c.getId().equals("Licencias")) {
+							value = 310000 / childrens.size();
+						}
+						campaign_data.addValue(c, children, value);
+					}
+				}
+			}
+		}
+		
+		campaign_data.setProvince("Jaén");
+		campaign_data.setDate("02" + "/15");
+		elementSet.addCampaign(campaign_data);
 			
-		int id = 13;
+		int id = 14;
 		for(int i = 0; i < 12; ++i) {
 			Campaign campaign_1 = new Campaign(Integer.toString(id), "Campaña");
 			for(Criterion cri: elementSet.getCriteria()) {
