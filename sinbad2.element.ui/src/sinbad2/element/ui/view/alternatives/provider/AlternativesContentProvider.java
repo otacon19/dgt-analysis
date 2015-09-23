@@ -63,39 +63,41 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 		switch(event.getChange()) {
 			case ALTERNATIVES_CHANGES:
 				_alternatives.clear();
-				if(event.getNewValue() instanceof Boolean) {
-					if((boolean) event.getNewValue()) {
-						for(Alternative a: _elementSet.getAlternatives()) {
-							if(a.isDirect()) {
-								_alternatives.add(a);
+				if(!AddCampaignsDialog.getCampaignsSelected().isEmpty()) {
+					if(event.getNewValue() instanceof Boolean) {
+						if((boolean) event.getNewValue()) {
+							for(Alternative a: _elementSet.getAlternatives()) {
+								if(a.isDirect()) {
+									_alternatives.add(a);
+								}
 							}
+							_tableViewer.getTable().getColumn(0).setText("Direct context");
+						} else {
+							for(Alternative a: _elementSet.getAlternatives()) {
+								if(!a.isDirect()) {
+									_alternatives.add(a);
+								}
+							}
+							_tableViewer.getTable().getColumn(0).setText("Context");
 						}
-						_tableViewer.getTable().getColumn(0).setText("Direct context");
 					} else {
-						for(Alternative a: _elementSet.getAlternatives()) {
-							if(!a.isDirect()) {
-								_alternatives.add(a);
+						if(!checkCampaignsData()) {
+							List<Alternative> alternativesNoDirect = new LinkedList<Alternative>();
+							List<Alternative> alternativesDirect = new LinkedList<Alternative>();
+							for(Alternative a: (List<Alternative>) event.getNewValue()) {
+								if(!a.isDirect()) {
+									alternativesNoDirect.add(a);
+								} else {
+									alternativesDirect.add(a);
+								}
 							}
-						}
-						_tableViewer.getTable().getColumn(0).setText("Context");
-					}
-				} else {
-					if(!checkCampaignsData()) {
-						List<Alternative> alternativesNoDirect = new LinkedList<Alternative>();
-						List<Alternative> alternativesDirect = new LinkedList<Alternative>();
-						for(Alternative a: (List<Alternative>) event.getNewValue()) {
-							if(!a.isDirect()) {
-								alternativesNoDirect.add(a);
-							} else {
-								alternativesDirect.add(a);
-							}
-						}
-						alternativesNoDirect.addAll(alternativesDirect);
-						_alternatives.addAll(alternativesNoDirect);
-					} else {
-						for(Alternative a: (List<Alternative>) event.getNewValue()) {
-							if(a.isDirect()) {
-								_alternatives.add(a);
+							alternativesNoDirect.addAll(alternativesDirect);
+							_alternatives.addAll(alternativesNoDirect);
+						} else {
+							for(Alternative a: (List<Alternative>) event.getNewValue()) {
+								if(a.isDirect()) {
+									_alternatives.add(a);
+								}
 							}
 						}
 					}

@@ -335,19 +335,23 @@ public class NewMeDialog extends Dialog {
 			            String newS = oldS.substring(0, e.start) + e.text + oldS.substring(e.end);
 
 			            if(!newS.isEmpty()) {
-				            boolean isFloat = true;
-				            float num = 0;
-				            try {
-				                num = Float.parseFloat(newS);
-				            } catch(NumberFormatException ex) {
-				                isFloat = false;
-				            }
-				            
-				            if(!isFloat || num < 0 || num > 1  || newS.length() > 4) {
-				                e.doit = false;
-				            } 
+			            	if(newS.equals("00") || newS.equals("01")) {
+			            		e.doit = false;
+			            	} else {
+					            boolean isFloat = true;
+					            float num = 0;
+					            try {
+					                num = Float.parseFloat(newS);
+					                text.setData("value", newS);
+					            } catch(NumberFormatException ex) {
+					                isFloat = false;
+					            }
+					            
+					            if(!isFloat || num < 0 || num > 1  || newS.length() > 4) {
+					                e.doit = false;
+					            } 
+			            	}
 			            }
-			            text.setData("value", newS);
 			            
 			            validate();
 					}
@@ -371,7 +375,7 @@ public class NewMeDialog extends Dialog {
 
 		return controlDecoration;
 	}
-
+	
 	private boolean validate(ControlDecoration controlDecoration, String text) {
 		controlDecoration.setDescriptionText(text);
 		if (text.isEmpty()) {
@@ -380,12 +384,11 @@ public class NewMeDialog extends Dialog {
 		} else {
 			controlDecoration.show();
 			return false;
-
 		}
 	}
 
 	private void validate() {
-		boolean validId, validValue;
+		boolean validId, validValue, validImage = false;
 
 		String message = ""; //$NON-NLS-1$
 		
@@ -419,11 +422,63 @@ public class NewMeDialog extends Dialog {
 		}
 		if(!(acum == 1.0)) {
 			message = "Values must add 1";
+			weightsNoCorrect();
+		} else {
+			weightsCorrect();
 		}
 		
 		validValue = validate(_nameControlDecoration, message);
 		
-		_okButton.setEnabled(validId && validValue && _formulaImage != null);
+		if(_formulaImage == null) {
+			message = "Empty ME";
+		} else {
+			validImage = true;
+		}
+		
+		validImage = validate(_nameControlDecoration, message);
+		
+		_okButton.setEnabled(validId && validValue && validImage);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void weightsCorrect() {
+		Map<Criterion, Combo> combos = new HashMap<Criterion, Combo>();
+		for(Combo c: _combos) {
+			combos.put((Criterion) c.getData("criterion"), c);
+		}
+		
+		Map<Criterion, Text> texts = new HashMap<Criterion, Text>();
+		for(Text t: _texts) {
+			texts.put((Criterion) t.getData("criterion"), t);
+		}
+		
+		for(Criterion c: (List<Criterion>) _providerCriteria.getInput()) {
+			Combo combo = combos.get(c);
+			if(combo.getSelectionIndex() != 2) {
+				texts.get(c).setBackground(new Color(Display.getCurrent(), 203, 255, 203));
+			}
+		}
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	private void weightsNoCorrect() {
+		Map<Criterion, Combo> combos = new HashMap<Criterion, Combo>();
+		for(Combo c: _combos) {
+			combos.put((Criterion) c.getData("criterion"), c);
+		}
+		
+		Map<Criterion, Text> texts = new HashMap<Criterion, Text>();
+		for(Text t: _texts) {
+			texts.put((Criterion) t.getData("criterion"), t);
+		}
+		
+		for(Criterion c: (List<Criterion>) _providerCriteria.getInput()) {
+			Combo combo = combos.get(c);
+			if(combo.getSelectionIndex() != 2) {
+				texts.get(c).setBackground(new Color(Display.getCurrent(), 255, 203, 203));
+			}
+		}
 	}
 
 	@Override

@@ -61,39 +61,41 @@ public class CriteriaContentProvider implements IStructuredContentProvider, ICri
 		switch(event.getChange()) {
 			case CRITERIA_CHANGES:
 				_criteria.clear();
-				if(event.getNewValue() instanceof Boolean) {
-					if((boolean) event.getNewValue()) {
-						for(Criterion c: _elementSet.getCriteria()) {
-							if(c.isDirect()) {
-								_criteria.add(c);
+				if(!AddCampaignsDialog.getCampaignsSelected().isEmpty()) {
+					if(event.getNewValue() instanceof Boolean) {
+						if((boolean) event.getNewValue()) {
+							for(Criterion c: _elementSet.getCriteria()) {
+								if(c.isDirect()) {
+									_criteria.add(c);
+								}
 							}
+							_tableViewer.getTable().getColumn(0).setText("Direct index");
+						} else {
+							for(Criterion c: _elementSet.getCriteria()) {
+								if(!c.isDirect()) {
+									_criteria.add(c);
+								}
+							}
+							_tableViewer.getTable().getColumn(0).setText("Index");
 						}
-						_tableViewer.getTable().getColumn(0).setText("Direct index");
 					} else {
-						for(Criterion c: _elementSet.getCriteria()) {
-							if(!c.isDirect()) {
-								_criteria.add(c);
+						if(!checkCampaignsData()) {
+							List<Criterion> criteriaNoDirect = new LinkedList<Criterion>();
+							List<Criterion> criteriaDirect = new LinkedList<Criterion>();
+							for(Criterion c: (List<Criterion>) event.getNewValue()) {
+								if(!c.isDirect()) {
+									criteriaNoDirect.add(c);
+								} else {
+									criteriaDirect.add(c);
+								}
 							}
-						}
-						_tableViewer.getTable().getColumn(0).setText("Index");
-					}
-				} else {
-					if(!checkCampaignsData()) {
-						List<Criterion> criteriaNoDirect = new LinkedList<Criterion>();
-						List<Criterion> criteriaDirect = new LinkedList<Criterion>();
-						for(Criterion c: (List<Criterion>) event.getNewValue()) {
-							if(!c.isDirect()) {
-								criteriaNoDirect.add(c);
-							} else {
-								criteriaDirect.add(c);
-							}
-						}
-						criteriaNoDirect.addAll(criteriaDirect);
-						_criteria.addAll(criteriaNoDirect);
-					} else {
-						for(Criterion c: (List<Criterion>) event.getNewValue()) {
-							if(c.isDirect()) {
-								_criteria.add(c);
+							criteriaNoDirect.addAll(criteriaDirect);
+							_criteria.addAll(criteriaNoDirect);
+						} else {
+							for(Criterion c: (List<Criterion>) event.getNewValue()) {
+								if(c.isDirect()) {
+									_criteria.add(c);
+								}
 							}
 						}
 					}

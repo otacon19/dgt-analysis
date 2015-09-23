@@ -462,14 +462,12 @@ public class MECChart {
 	        		
 	        		if(!dataValues.isEmpty()) {
 	        			total = (numerator * dataValues.get(0)) / (denominator * dataValues.get(1));
-			        	if(Double.isInfinite(total)) {
-			        		total = 0;
-			        	}
 		        	} else {
 			        	total = numerator / denominator;
-			        	if(total == 1) {
-			        		total = 0;
-			        	}
+		        	}
+	        		
+	        		if(Double.isInfinite(total) || total == 1) {
+		        		total = 0;
 		        	}
 		        	
 		        	String category = campaign.getName();
@@ -738,7 +736,7 @@ public class MECChart {
 		        		}
 
 				        total = numerator / denominator;
-				        if(Double.isInfinite(total)) {
+				        if(Double.isInfinite(total) || total == 1) {
 				        	total = 0;
 				        }
 		    	        
