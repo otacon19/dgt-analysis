@@ -72,8 +72,7 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 	@Override
 	public void notifyCampaignsChange(CampaignsChangeEvent event) {
 		switch(event.getChange()) {
-			case FINAL_CAMPAIGNS:
-				_mecs.clear();				
+			case FINAL_CAMPAIGNS:	
 				//FIXME cargamos las imágenes de las fórmulas
 				for(MEC m: _elementsSet.getMECs()) {
 					if(m.getFormula() == null) {

@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -48,6 +49,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -517,7 +519,19 @@ public class NewMeDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(600, 600);
+		return new Point(500, 600);
+	}
+	
+	@Override
+	protected void initializeBounds() {
+		super.initializeBounds(); 
+		Shell shell = this.getShell(); 
+		Monitor primary = shell.getMonitor(); 
+	    Rectangle bounds = primary.getBounds (); 
+		Rectangle rect = shell.getBounds (); 
+		int x = bounds.x + (bounds.width - rect.width) / 2; 
+		int y = bounds.y + (bounds.height - rect.height) / 2; 
+		shell.setLocation (x, y);
 	}
 	
 	@Override
