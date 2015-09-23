@@ -266,19 +266,11 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					_chart.initializeLineChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
 					_chartType = 1;
 					_changeAggregationButton.setEnabled(false);
-					if(campaigns.size() > 1) {
-						_changeAxisCombo.setEnabled(true);
-					}
 				} else {
 					_changeChartButton.setImage(Images.LineChart);
 					_chart.initializeBarChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
 					_chartType = 0;
-					if(campaigns.size() > 1) {
-						_changeAggregationButton.setEnabled(true);
-						_changeAxisCombo.setEnabled(false);
-					}
 				}
-				
 				checkOptions(campaigns);
 			}
 		});
@@ -296,21 +288,10 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				if (_aggregationOption == 0) {
 					_changeAggregationButton.setImage(Images.Aggregation);
 					_aggregationOption = 1;
-					_changeAxisCombo.setEnabled(true);
-					
-					if(_chartType == 0) {
-						_changeChartButton.setEnabled(false);
-					}
-					
 				} else {
 					_changeAggregationButton.setImage(Images.No_aggregation);
-					_aggregationOption = 0;
-					_changeAxisCombo.setEnabled(false);
-					
-					if(_chartType == 0) {
-						_changeChartButton.setEnabled(true);
-					}
-					
+					_aggregationOption = 0;	
+					_changeAxisCombo.select(0);
 				}
 				checkOptions(campaigns);
 			}
@@ -572,19 +553,23 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	}
 	
 	private void moreThanOneCampaignsSelected(List<Campaign> campaignsSelected) {
-		_changeChartButton.setEnabled(true);
 		if(_chartType == 0) {
 			if(_aggregationOption == 0) {
+				_changeAxisCombo.setEnabled(false);
+				_changeChartButton.setEnabled(true);
 				if(_changeAxisCombo.getSelectionIndex() == 0 || _changeAxisCombo.getSelectionIndex() == 2) {
 					combineCampaigns(campaignsSelected);
 				} else if(_changeAxisCombo.getSelectionIndex() == 1) {
 					combineCampaignsProvinces(campaignsSelected);
 				}
 			} else {
+				_changeAxisCombo.setEnabled(true);
+				_changeChartButton.setEnabled(false);
 				separateCampaigns(campaignsSelected);
 			}
 			_changeAggregationButton.setEnabled(true);
 		} else {
+			_changeAxisCombo.setEnabled(true);
 			if((_aggregationOption == 0)) {
 				if(_changeAxisCombo.getSelectionIndex() == 0) {
 					combineCampaigns(campaignsSelected);
