@@ -1,9 +1,7 @@
 package sinbad2.element.ui.view.mecs;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -545,9 +543,9 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					_chartType = 0;
 					_changeAggregationButton.setImage(Images.No_aggregation);
 					_changeAxisCombo.select(0);
-					Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
-					campaign.put(campaignsSelected.get(0), _mecSelected);
-					_chart.setMEC(campaign, _chartType, "combine");
+					List<Campaign> campaign = new LinkedList<Campaign>();
+					campaign.add(campaignsSelected.get(0));
+					_chart.setMEC(campaign, _mecSelected, _chartType, "combine");
 				}
 			}
 		} else {
@@ -556,9 +554,9 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				_changeAggregationButton.setImage(Images.No_aggregation);
 				_changeAxisCombo.setEnabled(false);
 				_changeAxisCombo.select(0);
-				Map<Campaign, MEC> campaign = new LinkedHashMap<Campaign, MEC>();
-				campaign.put(campaignsSelected.get(0), _mecSelected);
-				_chart.setMEC(campaign, _chartType, "combine");
+				List<Campaign> campaign = new LinkedList<Campaign>();
+				campaign.add(campaignsSelected.get(0));
+				_chart.setMEC(campaign, _mecSelected, _chartType, "combine");
 			}
 		}
 		
@@ -598,41 +596,41 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	}
 	
 	private void combineCampaigns(List<Campaign> campaigns) {
-		Map<Campaign, MEC> campaignsAndMecs = new LinkedHashMap<Campaign, MEC>();
+		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for(Campaign c: campaigns) {
 			Campaign clone = (Campaign) c.clone();
 			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getDate() + ")");
-			campaignsAndMecs.put(clone, _mecSelected);
+			campaignsWithName.add(clone);
 		}
-		_chart.setMEC(campaignsAndMecs, _chartType, "combine");
+		_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "combine");
 	}
 	
 	private void combineCampaignsProvinces(List<Campaign> campaigns) {
-		Map<Campaign, MEC> campaignsAndMecs = new LinkedHashMap<Campaign, MEC>();
+		List<Campaign> campaignsWithProvinceName = new LinkedList<Campaign>();
 		for(Campaign c: campaigns) {
 			Campaign clone = (Campaign) c.clone();
 			clone.setName(clone.getProvince());
-			campaignsAndMecs.put(clone, _mecSelected);
+			campaignsWithProvinceName.add(clone);
 		}
-		_chart.setMEC(campaignsAndMecs, _chartType, "combine");
+		_chart.setMEC(campaignsWithProvinceName, _mecSelected, _chartType, "combine");
 	}
 
 	private void separateCampaigns(List<Campaign> campaigns) {
-		Map<Campaign, MEC> campaignsAndMecs = new LinkedHashMap<Campaign, MEC>();
+		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for (Campaign c : campaigns) {
 			Campaign clone = (Campaign) c.clone();
 			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getDate() + ")");
-			campaignsAndMecs.put(clone, _mecSelected);
+			campaignsWithName.add(clone);
 		}
 		
 		if(_changeAxisCombo.getSelectionIndex() != 2) {
 			if(_changeAxisCombo.getSelectionIndex() == 1) {
-				_chart.setMEC(campaignsAndMecs, _chartType, "separate_provinces");
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate_provinces");
 			} else {
-			_chart.setMEC(campaignsAndMecs, _chartType, "separate");
+			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
 			}
 		} else {
-			_chart.setMEC(campaignsAndMecs, _chartType, "contexts");
+			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "contexts");
 		}
 	}
 }
