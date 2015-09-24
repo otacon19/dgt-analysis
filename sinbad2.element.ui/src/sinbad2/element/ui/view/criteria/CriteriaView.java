@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -19,6 +20,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -40,8 +43,10 @@ import sinbad2.element.campaigns.listener.ICampaignsChangeListener;
 import sinbad2.element.criterion.Criterion;
 import sinbad2.element.criterion.listener.CriteriaChangeEvent;
 import sinbad2.element.criterion.listener.ECriteriaChange;
+import sinbad2.element.ui.Images;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.criteria.provider.CriteriaSelectedContentProvider;
+import sinbad2.element.ui.view.criteria.provider.CriterionOperationLabelProvider;
 import sinbad2.element.ui.view.criteria.provider.CriterionSelectedIdLabelProvider;
 
 public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
@@ -89,8 +94,14 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 			
 			@Override
 			public void handleEvent(Event event) {
-				event.height = 23;
-				
+				event.height = 23;	
+			}
+		});
+		
+		_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				_tableViewer.getTable().layout();
 			}
 		});
 		
@@ -170,6 +181,11 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 			private void checkMatchingCriteria(TableItem item) {
 				List<Criterion> allCriteria = _elementsSet.getCriteria();
 				
+				Map<Criterion, Button> criteriaButtons = new HashMap<Criterion, Button>();
+				for(Button b: _buttons) {
+					criteriaButtons.put((Criterion) b.getData("criterion"), b);
+				}
+				
 				List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
 				if(campaignsSelected.size() == 1) {
 					Campaign campaignSelected = CampaignsView.getCampaignsSelected().get(0);
@@ -177,23 +193,11 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 						if(!campaignSelected.getCriteria().contains(c)) {
 							if(c.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								for(Button b: _buttons) {
-									if(b.getData("criterion").equals(item.getData())) {
-										b.setEnabled(false);
-									}
-								}
+								criteriaButtons.get(c).setEnabled(false);
 							}
 						} else if(c.equals(item.getData())) {
-							if(!c.isDirect()) {
-								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							} else {
-								item.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							}
-							for(Button b: _buttons) {
-								if(b.getData("criterion").equals(item.getData())) {
-									b.setEnabled(true);
-								}
-							}
+							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+							criteriaButtons.get(c).setEnabled(true);
 						}
 					}
 				} else if(campaignsSelected.size() > 1) {
@@ -221,27 +225,23 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 					for(Criterion dc: dataCriteria) {
 						criteriaRepeat.put(dc, campaignsSelected.size() - numCampaignsData);
 					}
-					for(Criterion cri: criteriaRepeat.keySet()) {
-						int rep = criteriaRepeat.get(cri);
-						if((rep != campaignsSelected.size() - numCampaignsData)) {
+
+					for(Criterion cri: _elementsSet.getCriteria()) {
+						if(!criteriaRepeat.containsKey(cri)) {
 							if(cri.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								for(Button b: _buttons) {
-									if(b.getData("criterion") == item.getData()) {
-										b.setEnabled(false);
-									}
-								}
+								criteriaButtons.get(cri).setEnabled(false);
 							}
-						} else if(cri.equals(item.getData())) {
-							if(!cri.isDirect()) {
+						} else {
+							int rep = criteriaRepeat.get(cri);
+							if((rep != campaignsSelected.size() - numCampaignsData)) {
+								if(cri.equals(item.getData())) {
+									item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
+									criteriaButtons.get(cri).setEnabled(false);
+								}
+							} else if(cri.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							} else {
-								item.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							}
-							for(Button b: _buttons) {
-								if(b.getData("criterion") == item.getData()) {
-									b.setEnabled(true);
-								}
+								criteriaButtons.get(cri).setEnabled(true);
 							}
 						}
 					}
@@ -265,6 +265,53 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 				return criteriaRepeat;
 			}
 		});
+		
+		class TypeLabelProvider extends OwnerDrawLabelProvider {
+
+			@Override
+			protected void measure(Event event, Object element) {}
+
+			@Override
+			protected void paint(Event event, Object element) {
+				TableItem item = (TableItem) event.item;
+				Criterion c = (Criterion) item.getData();
+				Image type;
+				
+				if(c.isDirect()) {
+					type = Images.Direct;
+				} else {
+					type = Images.User;
+				}
+
+				if (type != null) {
+					Rectangle bounds = ((TableItem) event.item).getBounds(event.index);
+					Rectangle imageBounds = type.getBounds();
+					bounds.width /= 2;
+					bounds.width -= imageBounds.width / 2;
+					bounds.height /= 2;
+					bounds.height -= imageBounds.height / 2;
+					
+					int x = bounds.width > 0 ? bounds.x + bounds.width: bounds.x;
+					int y = bounds.height > 0 ? bounds.y + bounds.height: bounds.y;
+			 		
+					event.gc.drawImage(type, x, y);
+				}
+			}
+		}
+		
+		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc.setLabelProvider(new TypeLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Type");
+		tc.setResizable(false);
+		tc.pack();
+		
+		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc.setLabelProvider(new CriterionOperationLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Operation");
+		tc.setResizable(false);
+		tc.pack();
 
 	}
 	

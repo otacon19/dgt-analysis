@@ -94,7 +94,13 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 			@Override
 			public void handleEvent(Event event) {
 				event.height = 25;
-				
+			}
+		});
+		
+		_treeViewer.getTree().addListener(SWT.Paint, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				_treeViewer.getTree().layout();
 			}
 		});
 		
@@ -234,6 +240,11 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 			private void checkMatchingAlternatives(TreeItem item) {
 				List<Alternative> allAlternatives = _elementsSet.getAlternatives();
 				
+				Map<Alternative, Button> buttonsAlternatives = new HashMap<Alternative, Button>();
+				for(Button b: _buttons) {
+					buttonsAlternatives.put((Alternative) b.getData("alternative"), b);
+				}
+				
 				List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
 				if(campaignsSelected.size() == 1) {
 					Campaign campaignSelected = CampaignsView.getCampaignsSelected().get(0);
@@ -241,23 +252,11 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 						if(!campaignSelected.getAlternatives().contains(a)) {
 							if(a.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								for(Button b: _buttons) {
-									if(b.getData("alternative").equals(item.getData())) {
-										b.setEnabled(false);
-									}
-								}
+								buttonsAlternatives.get(item.getData()).setEnabled(false);
 							}
 						} else if(a.equals(item.getData())) {
-							if(!a.isDirect()) {
-								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							} else {
-								item.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							}
-							for(Button b: _buttons) {
-								if(b.getData("alternative").equals(item.getData())) {
-									b.setEnabled(true);
-								}
-							}
+							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+							buttonsAlternatives.get(item.getData()).setEnabled(true);
 						}
 					}
 				} else if(campaignsSelected.size() > 1) {
@@ -290,23 +289,11 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 						if(rep != campaignsSelected.size() - numCampaignsData) {
 							if(alt.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								for(Button b: _buttons) {
-									if(b.getData("alternative").equals(item.getData())) {
-										b.setEnabled(false);
-									}
-								}
+								buttonsAlternatives.get(item.getData()).setEnabled(false);
 							}
 						} else if(alt.equals(item.getData())) {
-							if(!alt.isDirect()) {
-								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							} else {
-								item.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							}
-							for(Button b: _buttons) {
-								if(b.getData("alternative").equals(item.getData())) {
-									b.setEnabled(true);
-								}
-							}
+							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+							buttonsAlternatives.get(item.getData()).setEnabled(true);
 						}
 					}
 				}

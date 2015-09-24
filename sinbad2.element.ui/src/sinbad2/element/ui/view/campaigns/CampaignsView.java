@@ -130,7 +130,13 @@ public class CampaignsView extends ViewPart {
 			@Override
 			public void handleEvent(Event event) {
 				event.height = 23;
-				
+			}
+		});
+		
+		_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				_tableViewer.getTable().layout();
 			}
 		});
 		

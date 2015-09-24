@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -19,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -48,6 +50,7 @@ import sinbad2.element.campaigns.listener.ECampaignsChange;
 import sinbad2.element.criterion.Criterion;
 import sinbad2.element.criterion.listener.CriteriaChangeEvent;
 import sinbad2.element.criterion.listener.ECriteriaChange;
+import sinbad2.element.ui.Images;
 import sinbad2.element.ui.view.alternatives.provider.AlternativeIdLabelProvider;
 import sinbad2.element.ui.view.alternatives.provider.AlternativesContentProvider;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
@@ -302,11 +305,7 @@ public class AddCampaignsDialog extends Dialog {
 				for(Criterion c1: matchingCriterion) {
 					for(TableItem ti: _tableItemsCriteria) {
 						if(c1.equals(ti.getData())) {
-							if(c1.isDirect()) {
-								ti.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							} else {
-								ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							}
+							ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 						}
 					}
 				}
@@ -335,11 +334,7 @@ public class AddCampaignsDialog extends Dialog {
 				for(Alternative a1: matchingAlternatives) {
 					for(TableItem ti: _tableItemsAlternatives) {
 						if(a1.equals(ti.getData())) {
-							if(a1.isDirect()) {
-								ti.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
-							} else {
-								ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							}
+							ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 						} 
 					}
 				}	
@@ -599,6 +594,46 @@ public class AddCampaignsDialog extends Dialog {
 		});
 		TableColumn tc = tvc.getColumn();
 		tc.setText("Index");
+		tc.setResizable(false);
+		tc.pack();
+		
+		class TypeLabelProvider extends OwnerDrawLabelProvider {
+
+			@Override
+			protected void measure(Event event, Object element) {}
+
+			@Override
+			protected void paint(Event event, Object element) {
+				TableItem item = (TableItem) event.item;
+				Criterion c = (Criterion) item.getData();
+				Image type;
+				
+				if(c.isDirect()) {
+					type = Images.Direct;
+				} else {
+					type = Images.User;
+				}
+
+				if (type != null) {
+					Rectangle bounds = ((TableItem) event.item).getBounds(event.index);
+					Rectangle imageBounds = type.getBounds();
+					bounds.width /= 2;
+					bounds.width -= imageBounds.width / 2;
+					bounds.height /= 2;
+					bounds.height -= imageBounds.height / 2;
+					
+					int x = bounds.width > 0 ? bounds.x + bounds.width: bounds.x;
+					int y = bounds.height > 0 ? bounds.y + bounds.height: bounds.y;
+			 		
+					event.gc.drawImage(type, x, y);
+				}
+			}
+		}
+		
+		tvc = new TableViewerColumn(_tableViewerCriteria, SWT.CENTER);
+		tvc.setLabelProvider(new TypeLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Type");
 		tc.setResizable(false);
 		tc.pack();
 	}

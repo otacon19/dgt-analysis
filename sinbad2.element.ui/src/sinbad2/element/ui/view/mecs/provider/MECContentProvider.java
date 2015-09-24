@@ -115,7 +115,7 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 	private void searchMatchingMECs(List<Campaign> campaignsSelected) {
 		TableItem[] tableItems = _tableViewer.getTable().getItems();
 		
-		if(campaignsSelected.size() == 1) {
+		if(campaignsSelected.size() == 1 && !campaignsSelected.get(0).isACampaignData()) {
 			Campaign campaignSelected = campaignsSelected.get(0);
 			List<Criterion> criteria = campaignSelected.getCriteria();
 			for(MEC m: _mecs) {

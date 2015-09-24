@@ -175,11 +175,11 @@ public class NewMeDialog extends Dialog {
 				_frame.repaint();
 				
 				if(!_numerator.isEmpty()) {
-					_numerator += "x"; //$NON-NLS-1$
+					_numerator += "$\\times$"; //$NON-NLS-1$
 				}
 				
 				if(!_denominator.isEmpty()) {
-					_denominator += "x"; //$NON-NLS-1$
+					_denominator += "$\\times$"; //$NON-NLS-1$
 				}
 				
 				int position = 0;
@@ -190,12 +190,12 @@ public class NewMeDialog extends Dialog {
 							position = comb.getSelectionIndex();
 							if(position == 0) {
 								if(!_numerator.contains(c.getId())){
-									_numerator += c.getId() + "x"; //$NON-NLS-1$
+									_numerator += c.getId() + "$\\times$"; //$NON-NLS-1$
 									_criteriaNumerator.add(c);
 								}
 							} else {
 								if(!_denominator.contains(c.getId())){
-									_denominator += c.getId() + "x"; //$NON-NLS-1$
+									_denominator += c.getId() + "$\\times$"; //$NON-NLS-1$
 									_criteriaDenominator.add(c);
 								}
 							}
@@ -203,12 +203,12 @@ public class NewMeDialog extends Dialog {
 					}
 				}
 				
-				if(_numerator.endsWith("x")) { //$NON-NLS-1$
-					 _numerator = _numerator.substring(0, _numerator.length() - 1);
+				if(_numerator.endsWith("$\\times$")) { //$NON-NLS-1$
+					 _numerator = _numerator.substring(0, _numerator.length() - 8);
 				}
 				
-				if(_denominator.endsWith("x")) { //$NON-NLS-1$
-					_denominator = _denominator.substring(0, _denominator.length() - 1);
+				if(_denominator.endsWith("$\\times$")) { //$NON-NLS-1$
+					_denominator = _denominator.substring(0, _denominator.length() - 8);
 				}
 				
 				createFormula();
@@ -544,17 +544,17 @@ public class NewMeDialog extends Dialog {
 		TeXFormula formula;
 		
 		if(_numerator.isEmpty() && !_denominator.isEmpty()) {
-			String formulaText = "ME=\\frac{1}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String formulaText = "MEC=\\frac{1}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
 		} else if(!_numerator.isEmpty() && _denominator.isEmpty()) {
-			formula = new TeXFormula("ME=" + _numerator); //$NON-NLS-1$
+			formula = new TeXFormula("MEC=" + _numerator); //$NON-NLS-1$
 		} else {
-			String formulaText = "ME=\\frac{" + _numerator + "}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String formulaText = "MEC=\\frac{" + _numerator + "}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
 		}
 
 		TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 12);
-		icon.setInsets(new Insets(5, 5 , 5, 5));
+		icon.setInsets(new Insets(5, 5, 5, 5));
 
 		BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphicsImage = image.createGraphics();

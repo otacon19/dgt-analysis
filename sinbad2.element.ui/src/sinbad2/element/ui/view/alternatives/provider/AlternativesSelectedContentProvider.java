@@ -113,18 +113,14 @@ public class AlternativesSelectedContentProvider implements ITreeContentProvider
 			case CAMPAIGNS_SELECTED_CHANGES:
 				_alternatives.clear();
 				List<Campaign> campaignsSelected = (List<Campaign>) event.getNewValue();
-				if(_alternatives.isEmpty()) {
+				if(campaignsSelected.isEmpty()) {
+					_treeViewer.refresh();
+				} else {
 					_alternatives.addAll(orderAvailableAlternatives(campaignsSelected));
 					_treeViewer.refresh();
 					pack();
-				} else {
-					_treeViewer.refresh();
 				}
 				
-				if(campaignsSelected.isEmpty()) {
-					_alternatives.clear();
-					_treeViewer.refresh();
-				}
 				break;
 			case REMOVE_CAMPAIGNS_SELECTED:
 				if(!_alternatives.isEmpty()) {

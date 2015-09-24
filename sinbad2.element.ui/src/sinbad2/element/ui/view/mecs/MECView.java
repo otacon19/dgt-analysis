@@ -127,6 +127,13 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		gd_table.heightHint = 222;
 		table.setLayoutData(gd_table);
 		
+		_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				_tableViewer.getTable().layout();
+			}
+		});
+		
 		_tableViewer.getTable().addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -226,7 +233,9 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		_chartComposite.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 		_chart = new MECChart();
 		_chart.initializeLineChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
+		_chart.initializeStackedChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
 		_chart.initializeBarChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
+		
 
 		_chartComposite.addListener(SWT.Resize, new Listener() {
 			public void handleEvent(Event e) {
@@ -615,7 +624,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
 			}
 		} else {
-			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "contexts");
+			_chart.setMEC(campaignsWithName, _mecSelected, 2, "contexts");
 		}
 	}
 }

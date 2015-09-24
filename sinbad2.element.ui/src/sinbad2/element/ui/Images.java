@@ -70,6 +70,13 @@ public class Images {
 	public static final Image RadioButtonUnselected = AbstractUIPlugin
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/radiobutton_unchecked_15x15.png").createImage(); //$NON-NLS-1$
 	
+	public static final Image Direct = AbstractUIPlugin
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/direct_20x20.png").createImage(); //$NON-NLS-1$
+	
+	public static final Image User = AbstractUIPlugin
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/user_20x20.png").createImage(); //$NON-NLS-1$
+	
+	
 	private Images() {
 	}
 }

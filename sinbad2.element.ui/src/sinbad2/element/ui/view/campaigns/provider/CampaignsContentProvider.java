@@ -6,6 +6,10 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import sinbad2.element.ProblemElementsManager;
@@ -54,9 +58,32 @@ public class CampaignsContentProvider implements IStructuredContentProvider, ICa
 	}
 
 	public void pack() {
-		for(TableColumn c: _tableViewer.getTable().getColumns()) {
-			c.pack();
+		for(int i = 0; i < _tableViewer.getTable().getColumnCount() - 1; ++i) {
+			_tableViewer.getTable().getColumn(i).pack();
 		}
+		
+		Table table = _tableViewer.getTable();
+	    int columnsWidth = 0;
+	    
+	    for (int i = 0; i < table.getColumnCount() - 1; i++) {
+	        columnsWidth += table.getColumn(i).getWidth();
+	    }
+	    TableColumn lastColumn = table.getColumn(table.getColumnCount() - 1);
+	    lastColumn.pack();
+
+	    Rectangle area = table.getClientArea();
+
+	    Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+	    int width = area.width - 2*table.getBorderWidth();
+
+	    if (preferredSize.y > area.height + table.getHeaderHeight()) {
+	        Point vBarSize = table.getVerticalBar().getSize();
+	        width -= vBarSize.x;
+	    }
+
+	    if(lastColumn.getWidth() < width - columnsWidth) {
+	        lastColumn.setWidth(width - columnsWidth + 2);
+	    }
 	}
 
 	@SuppressWarnings("unchecked")
