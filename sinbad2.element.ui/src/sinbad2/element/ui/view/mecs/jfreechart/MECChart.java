@@ -1,8 +1,10 @@
 package sinbad2.element.ui.view.mecs.jfreechart;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Paint;
+import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +16,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.block.LineBorder;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
@@ -33,6 +37,7 @@ import org.jfree.ui.GradientPaintTransformType;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.StandardGradientPaintTransformer;
+import org.jfree.ui.TextAnchor;
 
 import sinbad2.element.alternative.Alternative;
 import sinbad2.element.campaigns.Campaign;
@@ -215,7 +220,7 @@ public class MECChart {
 	
 	private JFreeChart createStacketChart(CategoryDataset dataset) {
 
-        final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "", "", dataset, PlotOrientation.VERTICAL,  false, true, false);
+        final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "", "", dataset, PlotOrientation.HORIZONTAL,  false, true, false);
         
         GroupedStackedBarRenderer renderer = new GroupedStackedBarRenderer();
         
@@ -258,11 +263,15 @@ public class MECChart {
 		plot.setDomainCrosshairVisible(true);
 		plot.setRangeCrosshairVisible(true);
 		BarRenderer br = (BarRenderer) plot.getRenderer();
-		br.setMaximumBarWidth(.05);
-
+		br.setMaximumBarWidth(.1);
+		
 		BarRenderer bsr = (BarRenderer) plot.getRenderer();
-		bsr.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+		bsr.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance()));
 		bsr.setBaseItemLabelsVisible(true);
+		bsr.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
+		bsr.setSeriesPositiveItemLabelPosition(1, new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER,  0));
+		bsr.setBaseItemLabelFont(new java.awt.Font("Times New Roman", Font.PLAIN, 12), false);
+		bsr.setSeriesItemLabelFont(0, new java.awt.Font("Times New Roman", Font.PLAIN, 12));
         
 		return chart;
         

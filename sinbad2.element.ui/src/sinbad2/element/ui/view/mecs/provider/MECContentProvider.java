@@ -250,32 +250,18 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 		Map<MEC, TableItem> mecsTable = new LinkedHashMap<MEC, TableItem>();
 		for(TableItem ti: tableItems) {
 			mecsTable.put((MEC) ti.getData(), ti);
+			FontDescriptor boldDescriptor = FontDescriptor.createFrom(ti.getFont()).setStyle(SWT.NONE);
+			Font boldFont = boldDescriptor.createFont(ti.getDisplay());
+			ti.setFont(boldFont);
 		}
 		
-		if(!criteriaSelected.isEmpty()) {
-			for(MEC m: _mecs) {
-				List<Criterion> mecsCriteria = m.getAvailableCriteria();
-				TableItem ti = mecsTable.get(m);
-				if(!mecsCriteria.containsAll(criteriaSelected)) {
-					if(ti.getData().equals(m) && !ti.getForeground().equals(new Color(Display.getCurrent(), 211, 211, 211)) ) {
-						FontDescriptor normalDescriptor = FontDescriptor.createFrom(ti.getFont()).setStyle(SWT.NONE);
-						Font normalFont = normalDescriptor.createFont(ti.getDisplay());
-						ti.setFont(normalFont);
-						ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-					}
-				} else {
+		for(Criterion c: criteriaSelected) {
+			for(MEC mec: _mecs) {
+				TableItem ti = mecsTable.get(mec);
+				if(mec.getAvailableCriteria().contains(c)  && !ti.getForeground().equals(new Color(Display.getCurrent(), 211, 211, 211))) {
 					FontDescriptor boldDescriptor = FontDescriptor.createFrom(ti.getFont()).setStyle(SWT.BOLD);
 					Font boldFont = boldDescriptor.createFont(ti.getDisplay());
 					ti.setFont(boldFont);
-				}
-			}
-		} else {
-			for(TableItem ti: tableItems) {
-				if(!ti.getForeground().equals(new Color(Display.getCurrent(), 211, 211, 211))) {
-					FontDescriptor normalDescriptor = FontDescriptor.createFrom(ti.getFont()).setStyle(SWT.NONE);
-					Font normalFont = normalDescriptor.createFont(ti.getDisplay());
-					ti.setFont(normalFont);
-					ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 				}
 			}
 		}

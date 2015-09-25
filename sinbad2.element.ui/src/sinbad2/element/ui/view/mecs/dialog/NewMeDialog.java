@@ -544,12 +544,12 @@ public class NewMeDialog extends Dialog {
 		TeXFormula formula;
 		
 		if(_numerator.isEmpty() && !_denominator.isEmpty()) {
-			String formulaText = "MEC=\\frac{1}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String formulaText = "\\mbox{MEC=\\dfrac{1}{" + _denominator + "}}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
 		} else if(!_numerator.isEmpty() && _denominator.isEmpty()) {
-			formula = new TeXFormula("MEC=" + _numerator); //$NON-NLS-1$
+			formula = new TeXFormula("\\mbox{MEC=" + _numerator + "}"); //$NON-NLS-1$
 		} else {
-			String formulaText = "MEC=\\frac{" + _numerator + "}{" + _denominator + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String formulaText = "\\mbox{MEC=\\dfrac{" + _numerator + "}{" + _denominator + "}}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
 		}
 
