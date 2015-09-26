@@ -898,7 +898,7 @@ public class MECChart {
 									a.getId() + campaign.getProvince(), total);
 						}
 
-						dataset.addValue(total, a.getId(), a.getParent());
+						dataset.addValue(total, a.getId(), a.getParent() + "(" + campaign.getProvince() + ")");
 					}
 				}
 			}

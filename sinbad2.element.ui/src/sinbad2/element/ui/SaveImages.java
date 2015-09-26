@@ -52,14 +52,14 @@ public class SaveImages {
 				
 				for(int c = 0; c < formulaCriteria.size(); ++c) {
 					if(c < formulaCriteria.size() - 1) {
-						equationCriteria += formulaCriteria.get(c) + "x";
+						equationCriteria += formulaCriteria.get(c) + "$\\times$";
 					} else {
 						equationCriteria += formulaCriteria.get(c);
 					}
 				}
 
 				if(!equationCriteria.isEmpty()) {
-						formula = new TeXFormula("ME=" + equationCriteria); //$NON-NLS-1$
+						formula = new TeXFormula("\\mbox{ME=" + equationCriteria + "}"); //$NON-NLS-1$
 						nameFile = formulaCriteria.toString();
 				}
 				
@@ -77,7 +77,7 @@ public class SaveImages {
 	
 				ImageLoader loader = new ImageLoader();
 				loader.data = new ImageData[] { formulaImage.getImageData() };
-				loader.save("D:/Álvaro/Escritorio/DGT-Analysis/formulas" + "/" + nameFile + ".png", SWT.IMAGE_PNG);
+				loader.save("D:\\Álvaro\\Escritorio\\Flintstones-DGT\\formulas" + "/" + nameFile + ".png", SWT.IMAGE_PNG);
 			}
 		}
 	}

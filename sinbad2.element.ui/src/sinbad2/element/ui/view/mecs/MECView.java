@@ -301,6 +301,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					_changeAggregationButton.setImage(Images.No_aggregation);
 					_aggregationOption = 0;	
 					_changeAxisCombo.select(0);
+					_changeAxisCombo.setEnabled(false);
 				}
 				checkOptions(campaigns);
 			}
@@ -524,19 +525,12 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	}
 
 	private void oneCampaignSelectedCheckButtons(List<Campaign> campaignsSelected) {
+		_changeAggregationButton.setEnabled(true);
+		
 		if(_chartType == 0) {
-			_changeAxisCombo.setEnabled(true);
 			_changeChartButton.setEnabled(false);
-			if(_changeAggregationButton.isEnabled()) {
-				_changeAggregationButton.setEnabled(false);
-				if(_mecSelected != null) {
-					_chartType = 0;
-					_changeAggregationButton.setImage(Images.No_aggregation);
-					_changeAxisCombo.select(0);
-					List<Campaign> campaign = new LinkedList<Campaign>();
-					campaign.add(campaignsSelected.get(0));
-					_chart.setMEC(campaign, _mecSelected, _chartType, "combine");
-				}
+			if(_aggregationOption == 1) {
+				_changeAxisCombo.setEnabled(true);
 			}
 		} else {
 			if(_mecSelected != null) {
@@ -549,8 +543,8 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				_chart.setMEC(campaign, _mecSelected, _chartType, "combine");
 			}
 		}
-		
-		if(_aggregationOption == 0) {
+
+		if(_aggregationOption == 1) {
 			if(_changeAxisCombo.getSelectionIndex() == 0) {
 				combineCampaigns(campaignsSelected);
 			} else if(_changeAxisCombo.getSelectionIndex() == 1) {
@@ -558,6 +552,8 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			} else if(_changeAxisCombo.getSelectionIndex() == 2) {
 				separateCampaigns(campaignsSelected);
 			}
+		} else {
+			combineCampaigns(campaignsSelected);
 		}
 	}
 	
@@ -566,10 +562,15 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			if(_aggregationOption == 0) {
 				_changeAxisCombo.setEnabled(false);
 				_changeChartButton.setEnabled(true);
-				if(_changeAxisCombo.getSelectionIndex() == 0 || _changeAxisCombo.getSelectionIndex() == 2) {
+				if(_changeAxisCombo.getSelectionIndex() == 0 ) {
 					combineCampaigns(campaignsSelected);
 				} else if(_changeAxisCombo.getSelectionIndex() == 1) {
 					combineCampaignsProvinces(campaignsSelected);
+				} else {
+					_changeAggregationButton.setImage(Images.Aggregation);
+					_changeAxisCombo.setEnabled(true);
+					_aggregationOption = 1;
+					separateCampaigns(campaignsSelected);
 				}
 			} else {
 				_changeAxisCombo.setEnabled(true);
@@ -624,7 +625,11 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
 			}
 		} else {
-			_chart.setMEC(campaignsWithName, _mecSelected, 2, "contexts");
+			if(_chartType == 0) {
+				_chart.setMEC(campaignsWithName, _mecSelected, 2, "contexts");
+			} else {
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "contexts");
+			}
 		}
 	}
 }
