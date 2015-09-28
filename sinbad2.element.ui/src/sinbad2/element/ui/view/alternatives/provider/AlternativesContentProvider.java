@@ -6,8 +6,6 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -18,7 +16,6 @@ import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.alternative.Alternative;
 import sinbad2.element.alternative.listener.AlternativesChangeEvent;
 import sinbad2.element.alternative.listener.IAlternativesChangeListener;
-import sinbad2.element.campaigns.Campaign;
 import sinbad2.element.ui.view.campaigns.dialog.AddCampaignsDialog;
 
 public class AlternativesContentProvider implements IStructuredContentProvider, IAlternativesChangeListener, IProblemElementsSetChangeListener {
@@ -68,41 +65,7 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 			case ALTERNATIVES_CHANGES:
 				_alternatives.clear();
 				if(!AddCampaignsDialog.getCampaignsSelected().isEmpty()) {
-					if(event.getNewValue() instanceof Boolean) {
-						if((boolean) event.getNewValue()) {
-							for(Alternative a: _elementSet.getAlternatives()) {
-								if(a.isDirect()) {
-									_alternatives.add(a);
-								}
-							}
-						} else {
-							for(Alternative a: _elementSet.getAlternatives()) {
-								if(!a.isDirect()) {
-									_alternatives.add(a);
-								}
-							}
-						}
-					} else {
-						if(!checkCampaignsData()) {
-							List<Alternative> alternativesNoDirect = new LinkedList<Alternative>();
-							List<Alternative> alternativesDirect = new LinkedList<Alternative>();
-							for(Alternative a: (List<Alternative>) event.getNewValue()) {
-								if(!a.isDirect()) {
-									alternativesNoDirect.add(a);
-								} else {
-									alternativesDirect.add(a);
-								}
-							}
-							alternativesNoDirect.addAll(alternativesDirect);
-							_alternatives.addAll(alternativesNoDirect);
-						} else {
-							for(Alternative a: (List<Alternative>) event.getNewValue()) {
-								if(a.isDirect()) {
-									_alternatives.add(a);
-								}
-							}
-						}
-					}
+					_alternatives.addAll((List<Alternative>) event.getNewValue()); 
 				}
 				
 				_tableViewer.refresh();
@@ -117,18 +80,7 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 				break;
 		}
 	}
-	
-	private boolean checkCampaignsData() {
-		boolean allCampaignsData = true;
-		for(Campaign c: AddCampaignsDialog.getCampaignsSelected()) {
-			if(!c.isACampaignData()) {
-				allCampaignsData = false;
-				break;
-			}
-		}
-		return allCampaignsData;
-	}
-	
+
 	public void pack() {
 		for(int i = 0; i < _tableViewer.getTable().getColumnCount() - 1; ++i) {
 			_tableViewer.getTable().getColumn(i).pack();
@@ -145,16 +97,10 @@ public class AlternativesContentProvider implements IStructuredContentProvider, 
 
 	    Rectangle area = table.getClientArea();
 
-	    Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 	    int width = area.width - 2*table.getBorderWidth();
 
-	    if (preferredSize.y > area.height + table.getHeaderHeight()) {
-	        Point vBarSize = table.getVerticalBar().getSize();
-	        width -= vBarSize.x;
-	    }
-
 	    if(lastColumn.getWidth() < width - columnsWidth) {
-	        lastColumn.setWidth(width - columnsWidth);
+	        lastColumn.setWidth(width - columnsWidth + 3);
 	    }
 	}
 

@@ -138,17 +138,8 @@ public class AlternativesSelectedContentProvider implements ITreeContentProvider
 		Campaign campaignSelected = null;
 		if(campaignsSelected.size() == 1) {
 			campaignSelected = campaignsSelected.get(0);
-			if(campaignSelected.isACampaignData()) {
-				return campaignSelected.getAlternatives();
-			} else {
-				LinkedList<Alternative> alternativesWithoutDirect = new LinkedList<Alternative>();
-				for(Alternative a: _elementsSet.getAlternatives()) {
-					if(!a.isDirect()) {
-						alternativesWithoutDirect.add(a);
-					}
-				}
-				return alternativesWithoutDirect;
-			}
+			
+			return campaignSelected.getAlternatives();
 		} else {
 			boolean data = false;
 			int numCampaignsData = 0;
@@ -163,24 +154,29 @@ public class AlternativesSelectedContentProvider implements ITreeContentProvider
 					allAlternativesCampaigns.add(alt);
 				}
 			}
+			
 			Map<Alternative, Integer> alternativesRepeat;
-			alternativesRepeat = checkMatchingData(allAlternativesCampaigns);
 			List<Alternative> availableAlternatives = new LinkedList<Alternative>();
-			List<Alternative> availableAlternativesDirect = new LinkedList<Alternative>();
-			List<Alternative> noAvailableAlternatives = new LinkedList<Alternative>();
-			for(Alternative a: _elementsSet.getAlternatives()) {
-				if(data) {
-					if((alternativesRepeat.get(a) != null && (alternativesRepeat.get(a) == campaignsSelected.size() - numCampaignsData)) || a.isDirect()) {
-						if(a.isDirect()) {
-							availableAlternativesDirect.add(a);
-						} else {
+			alternativesRepeat = checkMatchingData(allAlternativesCampaigns);
+			if(numCampaignsData == campaignsSelected.size()) {
+				for(Alternative a: alternativesRepeat.keySet()) {
+					if(alternativesRepeat.get(a) == numCampaignsData) {
+						if(!availableAlternatives.contains(a)) {
 							availableAlternatives.add(a);
 						}
-					} else {
-						noAvailableAlternatives.add(a);
 					}
-				} else {
-					if(!a.isDirect()) {
+				}
+				return availableAlternatives;
+			} else {
+				List<Alternative> noAvailableAlternatives = new LinkedList<Alternative>();
+				for(Alternative a: _elementsSet.getAlternatives()) {
+					if(data) {
+						if((alternativesRepeat.get(a) != null && (alternativesRepeat.get(a) == campaignsSelected.size() - numCampaignsData))) {
+							availableAlternatives.add(a);
+						} else {
+							noAvailableAlternatives.add(a);
+						}
+					} else {
 						if(alternativesRepeat.get(a) != null) {
 							availableAlternatives.add(a);
 						} else {
@@ -188,46 +184,19 @@ public class AlternativesSelectedContentProvider implements ITreeContentProvider
 						}
 					}
 				}
-			}
-			if(availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
-				return availableAlternativesDirect;
-			} else if(!noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
-				availableAlternatives.addAll(availableAlternativesDirect);
-				availableAlternatives.addAll(noAvailableAlternatives);
 				
-				return availableAlternatives;
-			} else if(noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty() && !availableAlternativesDirect.isEmpty()) {
-				availableAlternatives.addAll(availableAlternativesDirect);
-				
-				return availableAlternatives;
-			} else if(!noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty()) {
-				availableAlternatives.addAll(noAvailableAlternatives);
-				
-				return availableAlternatives;	
-			} else {
-				List<Alternative> orderByKindOfAlternatives = new LinkedList<Alternative>();
-				List<Alternative> lastAlternatives = new LinkedList<Alternative>();
-				if(!availableAlternatives.isEmpty()) {
-					for(Alternative a: availableAlternatives) {
-						if(!a.isDirect()) {
-							orderByKindOfAlternatives.add(a);
-						} else {
-							lastAlternatives.add(a);
-						}
-					}
-					orderByKindOfAlternatives.addAll(lastAlternatives);
+				if(!noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty()) {
+					availableAlternatives.addAll(noAvailableAlternatives);
+					
+					return availableAlternatives;
+				} else if(noAvailableAlternatives.isEmpty() && !availableAlternatives.isEmpty()) {
+					
+					return availableAlternatives;
 				} else {
-					for(Alternative a: noAvailableAlternatives) {
-						if(!a.isDirect()) {
-							orderByKindOfAlternatives.add(a);
-						} else {
-							lastAlternatives.add(a);
-						}
-					}
-					orderByKindOfAlternatives.addAll(lastAlternatives);
+					availableAlternatives.addAll(noAvailableAlternatives);
+					
+					return availableAlternatives;	
 				}
-				
-				return orderByKindOfAlternatives;
 			}
 		}
 	}

@@ -6,8 +6,6 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -71,16 +69,10 @@ public class CampaignsAddedContentProvider implements IStructuredContentProvider
 
 	    Rectangle area = table.getClientArea();
 
-	    Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 	    int width = area.width - 2*table.getBorderWidth();
 
-	    if (preferredSize.y > area.height + table.getHeaderHeight()) {
-	        Point vBarSize = table.getVerticalBar().getSize();
-	        width -= vBarSize.x;
-	    }
-
 	    if(lastColumn.getWidth() < width - columnsWidth) {
-	        lastColumn.setWidth(width - columnsWidth + 2);
+	        lastColumn.setWidth(width - columnsWidth + 3);
 	    }
 	}
 

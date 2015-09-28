@@ -1,6 +1,5 @@
 package sinbad2.element.ui.view.alternatives;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -88,7 +87,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 		_provider = new AlternativesSelectedContentProvider(_treeViewer);
 		_treeViewer.setContentProvider(_provider);
 		
-		_treeViewer.getTree().setHeaderVisible(false);
+		_treeViewer.getTree().setHeaderVisible(true);
 		_treeViewer.getTree().addListener(SWT.MeasureItem, new Listener() {
 			
 			@Override
@@ -217,7 +216,6 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 									}
 								}
 							}
-							Collections.sort(_alternativesSelected);
 							
 							_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_SELECTED_CHANGES, null, _alternativesSelected, false));
 						}

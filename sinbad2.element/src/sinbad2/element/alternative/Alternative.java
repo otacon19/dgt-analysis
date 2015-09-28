@@ -1,6 +1,5 @@
 package sinbad2.element.alternative;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +13,6 @@ public class Alternative extends ProblemElement {
 	
 	private Alternative _parent;
 	private List<Alternative> _childrens;
-	private boolean _isDirect;
 	
 	public Alternative() {
 		super();
@@ -37,14 +35,6 @@ public class Alternative extends ProblemElement {
 		return _parent;
 	}
 	
-	public void setIsDirect(boolean isDirect) {
-		_isDirect = isDirect;
-	}
-	
-	public boolean isDirect() {
-		return _isDirect;
-	}
-	
 	public void addChildren(Alternative children) {
 		Validator.notNull(children);
 		Validator.notSameElement(this, children);
@@ -54,9 +44,6 @@ public class Alternative extends ProblemElement {
 		}
 		_childrens.add(children);
 		children.setParent(this);
-		children.setIsDirect(_isDirect);
-		
-		Collections.sort(_childrens);
 	}
 	
 	public void removeChildren(Alternative children) {
@@ -65,9 +52,6 @@ public class Alternative extends ProblemElement {
 			_childrens.remove(children);
 			children.setParent(null);
 		}
-		
-		Collections.sort(_childrens);
-			
 	}
 	
 	public List<Alternative> getChildrens() {

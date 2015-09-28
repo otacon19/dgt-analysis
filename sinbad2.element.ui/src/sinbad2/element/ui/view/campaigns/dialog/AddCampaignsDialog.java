@@ -5,8 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -54,7 +56,8 @@ import sinbad2.element.ui.Images;
 import sinbad2.element.ui.view.alternatives.provider.AlternativeIdLabelProvider;
 import sinbad2.element.ui.view.alternatives.provider.AlternativesContentProvider;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
-import sinbad2.element.ui.view.campaigns.provider.CampaignDateLabelProvider;
+import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider;
+import sinbad2.element.ui.view.campaigns.provider.CampaignInitialDateLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignIdLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignProvinceLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignsContentProvider;
@@ -193,11 +196,10 @@ public class AddCampaignsDialog extends Dialog {
 	        		Campaign campaign = (Campaign) selection[selection.length - 1].getData();
 	        		if(campaign.isACampaignData()) {
 	        			_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_CHANGES, null, true, false));
-	        			_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, true, false));
 	        		} else {
 	        			_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_CHANGES, null, false, false));
-	        			_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, false, false));
 	        		}
+	        		_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, _elementsSet.getAlternatives(), false));
 	        		selectAvailableDataCampaign(selection[selection.length - 1]);
 	        	} else {
 	        		boolean data = false;
@@ -209,11 +211,10 @@ public class AddCampaignsDialog extends Dialog {
 	        		}
 	        		if(data) {
 	        			_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_CHANGES, null, _elementsSet.getCriteria(), false));
-			        	_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, _elementsSet.getAlternatives(), false));
 	        		} else {
 	        			_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_CHANGES, null, false, false));
-	        			_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, false, false));
 	        		}
+	        		_elementsSet.notifyAlternativesChanges(new AlternativesChangeEvent(EAlternativesChange.ALTERNATIVES_CHANGES, null, _elementsSet.getAlternatives(), false));
 	        		selectMatchingInformationAvailable(selection);
 	        	}
 	        	
@@ -225,17 +226,22 @@ public class AddCampaignsDialog extends Dialog {
 			private void selectAvailableDataCampaign(TableItem tableItem) {
 				clearAvailableDataCampaign();
 				
+				Map<Criterion, TableItem> criteriaItems = new HashMap<Criterion, TableItem>();
+				for(TableItem ti: _tableItemsCriteria) {
+					criteriaItems.put((Criterion) ti.getData(), ti);
+				}
+				Map<Alternative, TableItem> alternativesItems = new HashMap<Alternative, TableItem>();
+				for(TableItem ti: _tableItemsAlternatives) {
+					alternativesItems.put((Alternative) ti.getData(), ti);
+				}
+				
 				Campaign campaignSelected = (Campaign) tableItem.getData();
 				List<Criterion> criteria = campaignSelected.getCriteria();
 				List<Criterion> allCriteria = _elementsSet.getCriteria();
 				for(Criterion c1: allCriteria) {
 					for(Criterion c2: criteria) {
 						if(c1.equals(c2)) {
-							for(TableItem ti: _tableItemsCriteria) {
-								if(ti.getData().equals(c1)) {
-									ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-								}
-							}
+							criteriaItems.get(c1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 						}
 					}
 				}
@@ -244,11 +250,7 @@ public class AddCampaignsDialog extends Dialog {
 				for(Alternative a1: allAlternatives) {
 					for(Alternative a2: alternatives) {
 						if(a1.equals(a2)) {
-							for(TableItem ti: _tableItemsAlternatives) {
-								if(ti.getData().equals(a1)) {
-									ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-								}
-							}
+							alternativesItems.get(a1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 						}
 					}
 				}			
@@ -279,6 +281,15 @@ public class AddCampaignsDialog extends Dialog {
 			private void selectMatchingInformationAvailable(TableItem[] selection) {	
 				clearAvailableDataCampaign();
 				
+				Map<Criterion, TableItem> criteriaItems = new HashMap<Criterion, TableItem>();
+				for(TableItem ti: _tableItemsCriteria) {
+					criteriaItems.put((Criterion) ti.getData(), ti);
+				}
+				Map<Alternative, TableItem> alternativesItems = new HashMap<Alternative, TableItem>();
+				for(TableItem ti: _tableItemsAlternatives) {
+					alternativesItems.put((Alternative) ti.getData(), ti);
+				}
+				
 				List<Criterion> directCriteria = new LinkedList<Criterion>();
 				List<Criterion> allCriteriaCampaigns = new LinkedList<Criterion>();
 				int numCampaignsData = 0;
@@ -303,11 +314,7 @@ public class AddCampaignsDialog extends Dialog {
 				matchingCriterion = checkMatchingCriteria(allCriteriaCampaigns, selection.length - numCampaignsData);
 				matchingCriterion.addAll(directCriteria);
 				for(Criterion c1: matchingCriterion) {
-					for(TableItem ti: _tableItemsCriteria) {
-						if(c1.equals(ti.getData())) {
-							ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-						}
-					}
+					criteriaItems.get(c1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 				}
 				
 				List<Alternative> directAlternatives = new LinkedList<Alternative>();
@@ -329,14 +336,10 @@ public class AddCampaignsDialog extends Dialog {
 					}
 				}
 				List<Alternative> matchingAlternatives;
-				matchingAlternatives = checkMatchingAlternatives(allAlternativesCampaigns, selection.length - numCampaignsData);
+				matchingAlternatives = checkMatchingAlternatives(allAlternativesCampaigns, selection.length);
 				matchingAlternatives.addAll(directAlternatives);
 				for(Alternative a1: matchingAlternatives) {
-					for(TableItem ti: _tableItemsAlternatives) {
-						if(a1.equals(ti.getData())) {
-							ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-						} 
-					}
+					alternativesItems.get(a1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 				}	
 			}
 			
@@ -417,7 +420,7 @@ public class AddCampaignsDialog extends Dialog {
 		_providerCriteria = new CriteriaContentProvider(_tableViewerCriteria);
 		_tableViewerCriteria.setContentProvider(_providerCriteria);
 		gd_table = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
-		gd_table.widthHint = 200;
+		gd_table.widthHint = 180;
 		gd_table.heightHint = 100;
 		_tableViewerCriteria.getTable().setLayoutData(gd_table);
 		_tableViewerCriteria.getTable().setHeaderVisible(true);
@@ -441,7 +444,7 @@ public class AddCampaignsDialog extends Dialog {
 		_providerAlternatives = new AlternativesContentProvider(_tableViewerAlternatives);
 		_tableViewerAlternatives.setContentProvider(_providerAlternatives);
 		gd_table = new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1);
-		gd_table.widthHint = 200;
+		gd_table.widthHint = 180;
 		gd_table.heightHint = 100;
 		_tableViewerAlternatives.getTable().setLayoutData(gd_table);
 		_tableViewerAlternatives.getTable().setHeaderVisible(true);
@@ -574,9 +577,16 @@ public class AddCampaignsDialog extends Dialog {
 		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
-		tvc.setLabelProvider(new CampaignDateLabelProvider());
+		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Date");
+		tc.setText("Initial date");
+		tc.setResizable(false);
+		tc.pack();
+		
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
+		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Final date");
 		tc.setResizable(false);
 		tc.pack();
 	}
@@ -697,7 +707,7 @@ public class AddCampaignsDialog extends Dialog {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewerCampaignsSelected, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaignsSelected, SWT.LEFT);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -708,8 +718,8 @@ public class AddCampaignsDialog extends Dialog {
 						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
 				    	Date date1 = null, date2 = null;
 				    	try {
-				    		date1 = formatter.parse(c1.getDate());
-				    		date2 = formatter.parse(c2.getDate());
+				    		date1 = formatter.parse(c1.getInitialDate());
+				    		date2 = formatter.parse(c2.getInitialDate());
 				    	} catch (ParseException e) {
 				    		e.printStackTrace();
 				    	}
@@ -720,9 +730,38 @@ public class AddCampaignsDialog extends Dialog {
 				_tableViewerCampaignsSelected.refresh();
 			}
 		});
-		tvc.setLabelProvider(new CampaignDateLabelProvider());
+		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Date");
+		tc.setText("Initial date");
+		tc.setResizable(false);
+		tc.pack();
+		
+		tvc = new TableViewerColumn(_tableViewerCampaignsSelected, SWT.LEFT);
+		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
+					@Override
+					public int compare(Campaign c1, Campaign c2) {
+						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
+				    	Date date1 = null, date2 = null;
+				    	try {
+				    		date1 = formatter.parse(c1.getFinalDate());
+				    		date2 = formatter.parse(c2.getFinalDate());
+				    	} catch (ParseException e) {
+				    		e.printStackTrace();
+				    	}
+				        return date1.compareTo(date2);
+					}
+				};
+				Collections.sort((List<Campaign>) _providerCampaignsSelected.getInput(), comparatorByDate);
+				_tableViewerCampaignsSelected.refresh();
+			}
+		});
+		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Final date");
 		tc.setResizable(false);
 		tc.pack();
 	}

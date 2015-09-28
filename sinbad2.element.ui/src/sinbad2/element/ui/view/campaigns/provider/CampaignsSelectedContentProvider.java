@@ -1,16 +1,13 @@
 package sinbad2.element.ui.view.campaigns.provider;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import sinbad2.element.ProblemElementsManager;
@@ -57,9 +54,26 @@ public class CampaignsSelectedContentProvider implements IStructuredContentProvi
 	}
 	
 	public void pack() {
-		for(TableColumn tc: _tableViewer.getTable().getColumns()) {
-			tc.pack();
+		for(int i = 0; i < _tableViewer.getTable().getColumnCount() - 1; ++i) {
+			_tableViewer.getTable().getColumn(i).pack();
 		}
+		
+		Table table = _tableViewer.getTable();
+	    int columnsWidth = 0;
+	    
+	    for (int i = 0; i < table.getColumnCount() - 1; i++) {
+	        columnsWidth += table.getColumn(i).getWidth();
+	    }
+	    TableColumn lastColumn = table.getColumn(table.getColumnCount() - 1);
+	    lastColumn.pack();
+
+	    Rectangle area = table.getClientArea();
+
+	    int width = area.width - 2*table.getBorderWidth();
+
+	    if(lastColumn.getWidth() < width - columnsWidth) {
+	        lastColumn.setWidth(width - columnsWidth + 3);
+	    }
 	}
 
 	@SuppressWarnings("unchecked")
@@ -73,20 +87,6 @@ public class CampaignsSelectedContentProvider implements IStructuredContentProvi
 					_campaignsSelected.add(c);
 				}
 			}
-			
-			Collections.sort(_campaignsSelected, new Comparator<Campaign>() {
-			    public int compare(Campaign c1, Campaign c2) {
-			    	SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
-			    	Date date1 = null, date2 = null;
-			    	try {
-			    		date1 = formatter.parse(c1.getDate());
-			    		date2 = formatter.parse(c2.getDate());
-			    	} catch (ParseException e) {
-			    		e.printStackTrace();
-			    	}
-			        return date1.compareTo(date2);
-			    }
-			});
 			
 			_tableViewer.refresh();
 			pack();

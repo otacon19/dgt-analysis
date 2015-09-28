@@ -6,8 +6,6 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -73,16 +71,10 @@ public class CampaignsContentProvider implements IStructuredContentProvider, ICa
 
 	    Rectangle area = table.getClientArea();
 
-	    Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 	    int width = area.width - 2*table.getBorderWidth();
 
-	    if (preferredSize.y > area.height + table.getHeaderHeight()) {
-	        Point vBarSize = table.getVerticalBar().getSize();
-	        width -= vBarSize.x;
-	    }
-
 	    if(lastColumn.getWidth() < width - columnsWidth) {
-	        lastColumn.setWidth(width - columnsWidth + 2);
+	        lastColumn.setWidth(width - columnsWidth + 3);
 	    }
 	}
 
@@ -106,19 +98,21 @@ public class CampaignsContentProvider implements IStructuredContentProvider, ICa
 	}
 
 	private void searchCampaignsByProvinceAndDate(List<String> dataCampaigns) {
-		String date1, date2, ano1, ano2, month1, month2;
+		String dateInitial, dateFinal, dateCalendar, anoInitial, anoFinal, ano, month;
 		List<Campaign> campaigns = _elementsSet.getCampaigns();
 		for(Campaign c : campaigns) {
 			if(c.getProvince().equals(dataCampaigns.get(0))) {
 				if(dataCampaigns.size() > 1) {
-					date1 = c.getDate();
-					date2 = dataCampaigns.get(1);
-					ano1 = date1.substring(date1.length() - 2, date1.length());
-					ano2 = date2.substring(date2.length() - 2, date2.length());
-					if(ano1.equals(ano2)) {
-						month1 = date1.substring(date1.length() - 5, date1.length() - 3);
-						month2 = date2.substring(date2.length() - 5, date2.length() - 3);
-						if(month1.equals(month2)) {
+					dateInitial = c.getInitialDate();
+					dateFinal = c.getFinalDate();
+					anoInitial = dateInitial.substring(dateInitial.length() - 2, dateInitial.length());
+					anoFinal = dateInitial.substring(dateFinal.length() - 2, dateFinal.length());
+					dateCalendar = dataCampaigns.get(1);
+					ano = dateCalendar.substring(dateCalendar.length() - 2, dateCalendar.length());
+					if(anoInitial.equals(ano) || anoFinal.equals(ano)) {
+						List<String> intervalMonth = c.getIntervalDate();
+						month = dateCalendar.substring(dateCalendar.length() - 5, dateCalendar.length() - 3);
+						if(intervalMonth.contains(month)) {
 							_campaignsSelected.add(c);
 						}
 					}

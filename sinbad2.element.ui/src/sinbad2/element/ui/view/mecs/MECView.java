@@ -275,6 +275,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					_chart.initializeLineChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
 					_chartType = 1;
 					_changeAggregationButton.setEnabled(false);
+					_changeAxisCombo.setEnabled(true);
 				} else {
 					_changeChartButton.setImage(Images.LineChart);
 					_chart.initializeBarChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
@@ -525,26 +526,18 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 	}
 
 	private void oneCampaignSelectedCheckButtons(List<Campaign> campaignsSelected) {
-		_changeAggregationButton.setEnabled(true);
+		_changeChartButton.setEnabled(true);
 		
 		if(_chartType == 0) {
-			_changeChartButton.setEnabled(false);
+			_changeAggregationButton.setEnabled(true);
 			if(_aggregationOption == 1) {
 				_changeAxisCombo.setEnabled(true);
 			}
 		} else {
-			if(_mecSelected != null) {
-				_chartType = 0;
-				_changeAggregationButton.setImage(Images.No_aggregation);
-				_changeAxisCombo.setEnabled(false);
-				_changeAxisCombo.select(0);
-				List<Campaign> campaign = new LinkedList<Campaign>();
-				campaign.add(campaignsSelected.get(0));
-				_chart.setMEC(campaign, _mecSelected, _chartType, "combine");
-			}
+			_changeAxisCombo.setEnabled(true);
 		}
 
-		if(_aggregationOption == 1) {
+		if(_aggregationOption == 1 || _chartType == 1) {
 			if(_changeAxisCombo.getSelectionIndex() == 0) {
 				combineCampaigns(campaignsSelected);
 			} else if(_changeAxisCombo.getSelectionIndex() == 1) {
@@ -594,7 +587,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for(Campaign c: campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getDate() + ")");
+			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")");
 			campaignsWithName.add(clone);
 		}
 		_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "combine");
@@ -614,7 +607,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for (Campaign c : campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getDate() + ")");
+			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")");
 			campaignsWithName.add(clone);
 		}
 		
@@ -622,7 +615,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			if(_changeAxisCombo.getSelectionIndex() == 1) {
 				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate_provinces");
 			} else {
-			_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
 			}
 		} else {
 			if(_chartType == 0) {

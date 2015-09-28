@@ -29,6 +29,7 @@ import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.UnknownKeyException;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -69,7 +70,7 @@ public class MECChart {
 		if (_barChart == null) {
 			_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
 		} else {
-			if (_action.equals("separate")) {
+			if(_action.equals("separate")) {
 				_barChart.getCategoryPlot().setDataset(
 						createBarChartDatasetSeparateCampaigns());
 			} else if (_action.equals("combine")) {
@@ -97,9 +98,6 @@ public class MECChart {
 			if (_action.equals("contexts")) {
 				_lineChart.getXYPlot().setDataset(
 						createLineChartDatasetSeparateContexts());
-			} else if (_action.equals("separate")) {
-				_lineChart.getXYPlot().setDataset(
-						createLineChartDatasetSeparateCampaigns());
 			} else if (_action.equals("combine")) {
 				_lineChart.getXYPlot().setDataset(
 						createLineChartDatasetCombineCampaigns());
@@ -319,7 +317,7 @@ public class MECChart {
 		if (!_categoriesAndSeries.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
 			List<Campaign> noDataCampaigns = getNoDataCampaigns();
-			List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
+			List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 
 			double acumValue, value, numerator, denominator, weight;
 			int pos = -1;
@@ -338,11 +336,11 @@ public class MECChart {
 						value = 0;
 						acumValue = 0;
 						data = criteriaData.get(c);
-						for (Alternative a : noDataAlternativesCampaigns) {
+						for (Alternative a : alternativesSelected) {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (noDataAlternativesCampaigns
+									if (alternativesSelected
 											.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
@@ -452,8 +450,7 @@ public class MECChart {
 					acumValue = 0;
 					if (mecCriteria.containsKey(c)) {
 						for (Alternative alternativeSelected : alternativesSelected) {
-							if (!alternativeSelected.hasChildrens()
-									&& alternativeSelected.isDirect()) {
+							if (!alternativeSelected.hasChildrens()) {
 								acumValue += dataCampaign.getValue(c,
 										alternativeSelected);
 							}
@@ -496,50 +493,16 @@ public class MECChart {
 			return new LinkedList<Double>();
 		}
 	}
-
-	private List<Campaign> getNoDataCampaigns() {
-		List<Campaign> result = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
-			if (!c.isACampaignData()) {
-				result.add(c);
-			}
-		}
-		return result;
-	}
-
-	private List<Campaign> getDataCampaigns() {
-		List<Campaign> result = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
-			if (c.isACampaignData()) {
-				result.add(c);
-			}
-		}
-		return result;
-	}
-
-	private List<Alternative> getNoDataAlternativesCampaigns() {
-		List<Alternative> result = new LinkedList<Alternative>();
-		List<Alternative> alternativesSelected = AlternativesView
-				.getAlternativesSelected();
-		for (Alternative a : alternativesSelected) {
-			if (!a.isDirect()) {
-				result.add(a);
-			}
-		}
-
-		return result;
-	}
-
+	
 	private CategoryDataset createBarChartDatasetSeparateCampaigns() {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
 		double acumValue, value, numerator, denominator, weight, total;
 		int pos = -1;
 
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
 		if (!noDataCampaigns.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
-			List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
+			List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 			for (Campaign campaign : noDataCampaigns) {
 				Map<Criterion, List<Object>> criteriaData = _mecSelected
 						.getCriteria();
@@ -550,11 +513,11 @@ public class MECChart {
 						acumValue = 0;
 						value = 0;
 						List<Object> data = criteriaData.get(c);
-						for (Alternative a : noDataAlternativesCampaigns) {
-							if (a.hasChildrens() && !a.isDirect()) {
+						for (Alternative a : alternativesSelected) {
+							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (noDataAlternativesCampaigns
+									if (alternativesSelected
 											.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
@@ -622,6 +585,26 @@ public class MECChart {
 		return dataset;
 	}
 
+	private List<Campaign> getNoDataCampaigns() {
+		List<Campaign> result = new LinkedList<Campaign>();
+		for (Campaign c : _categoriesAndSeries) {
+			if (!c.isACampaignData()) {
+				result.add(c);
+			}
+		}
+		return result;
+	}
+
+	private List<Campaign> getDataCampaigns() {
+		List<Campaign> result = new LinkedList<Campaign>();
+		for (Campaign c : _categoriesAndSeries) {
+			if (c.isACampaignData()) {
+				result.add(c);
+			}
+		}
+		return result;
+	}
+
 	private Map<Campaign, Double> loadCampaignsDataDirectNoAggregation() {
 		List<Alternative> alternativesSelected = AlternativesView
 				.getAlternativesSelected();
@@ -651,8 +634,7 @@ public class MECChart {
 					acumValue = 0;
 					if (mecCriteria.containsKey(c)) {
 						for (Alternative alternativeSelected : alternativesSelected) {
-							if (!alternativeSelected.hasChildrens()
-									&& alternativeSelected.isDirect()) {
+							if (!alternativeSelected.hasChildrens()) {
 								acumValue += dataCampaign.getValue(c,
 										alternativeSelected);
 							}
@@ -680,7 +662,7 @@ public class MECChart {
 		Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
 		List<String> provinces = getProvincesCampaigns();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		List<Double> numeratorAndDenominator;
 
 		double acumValue, value, numerator = 1, denominator = 1, weight;
@@ -699,11 +681,11 @@ public class MECChart {
 						acumValue = 0;
 						value = 0;
 						List<Object> data = criteriaData.get(c);
-						for (Alternative a : noDataAlternativesCampaigns) {
-							if (a.hasChildrens() && !a.isDirect()) {
+						for (Alternative a : alternativesSelected) {
+							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (noDataAlternativesCampaigns
+									if (alternativesSelected
 											.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
@@ -933,7 +915,7 @@ public class MECChart {
 		Map<Integer, List<Double>> monthValues = new LinkedHashMap<Integer, List<Double>>();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
-		List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		List<Double> numeratorAndDenominator;
 		XYSeries campaignSerie;
 
@@ -948,11 +930,11 @@ public class MECChart {
 				acumValue = 0;
 				value = 0;
 				List<Object> data = criteriaData.get(c);
-				for (Alternative a : noDataAlternativesCampaigns) {
-					if (a.hasChildrens() && !a.isDirect()) {
+				for (Alternative a : alternativesSelected) {
+					if (a.hasChildrens()) {
 						List<Alternative> childrens = a.getChildrens();
 						for (Alternative children : childrens) {
-							if (noDataAlternativesCampaigns.contains(children)) {
+							if (alternativesSelected.contains(children)) {
 								acumValue += campaign.getValue(c, children);
 							}
 						}
@@ -979,20 +961,28 @@ public class MECChart {
 			numeratorAndDenominator.add(numerator);
 			numeratorAndDenominator.add(denominator);
 
-			String date = campaign.getDate();
-			String month = date.substring(date.length() - 5, date.length() - 3);
-			int category = Integer.parseInt(month);
 			double numeratorAcum = 0, denominatorAcum = 0;
-			if (monthValues.get(category - 1) != null) {
-				List<Double> nAd = monthValues.get(category - 1);
-				List<Double> total = new LinkedList<Double>();
-				numeratorAcum = nAd.get(0) + numeratorAndDenominator.get(0);
-				denominatorAcum = nAd.get(1) + numeratorAndDenominator.get(1);
-				total.add(numeratorAcum);
-				total.add(denominatorAcum);
-				monthValues.put(category - 1, total);
-			} else {
-				monthValues.put(category - 1, numeratorAndDenominator);
+			for(String month: campaign.getIntervalDate()) {
+				int monthNum = Integer.parseInt(month);
+				if (monthValues.get(monthNum - 1) != null) {
+					List<Double> nAd = monthValues.get(monthNum - 1);
+					List<Double> total = new LinkedList<Double>();
+					if(numeratorAndDenominator.get(0) != 1) {
+						numeratorAcum = nAd.get(0) + numeratorAndDenominator.get(0);
+					} else {
+						numeratorAcum = nAd.get(0);
+					}
+					if(numeratorAndDenominator.get(1) != 1) {
+						denominatorAcum = nAd.get(1) + numeratorAndDenominator.get(1);
+					} else {
+						denominatorAcum = nAd.get(1);
+					}
+					total.add(numeratorAcum);
+					total.add(denominatorAcum);
+					monthValues.put(monthNum - 1, total);
+				} else {
+					monthValues.put(monthNum - 1, numeratorAndDenominator);
+				}
 			}
 		}
 
@@ -1003,13 +993,9 @@ public class MECChart {
 			campaignSerie = new XYSeries(serieNameNoData);
 			for (Integer month : monthValues.keySet()) {
 				if (dataValues.isEmpty()) {
-					valueAcum = monthValues.get(month).get(0)
-							/ monthValues.get(month).get(1);
+					valueAcum = monthValues.get(month).get(0) / monthValues.get(month).get(1);
 				} else {
-					valueAcum = (monthValues.get(month).get(0) * dataValues
-							.get(0))
-							/ (monthValues.get(month).get(1) * dataValues
-									.get(1));
+					valueAcum = (monthValues.get(month).get(0) * dataValues.get(0)) / (monthValues.get(month).get(1) * dataValues.get(1));
 				}
 				if (Double.isInfinite(valueAcum)) {
 					valueAcum = 0;
@@ -1027,9 +1013,8 @@ public class MECChart {
 			Map<Integer, Double> monthDataValues = new LinkedHashMap<Integer, Double>();
 			Map<Integer, Integer> campaignsDataForEachMonth = new LinkedHashMap<Integer, Integer>();
 			for (Campaign campaignData : mecCampaignsDataValue.keySet()) {
-				String date = campaignData.getDate();
-				String month = date.substring(date.length() - 5,
-						date.length() - 3);
+				String date = campaignData.getInitialDate();
+				String month = date.substring(date.length() - 5, date.length() - 3);
 				int category = Integer.parseInt(month);
 				if (monthDataValues.get(category - 1) != null) {
 					double acumValueData = mecCampaignsDataValue
@@ -1065,100 +1050,13 @@ public class MECChart {
 		return dataset;
 	}
 
-	private XYDataset createLineChartDatasetSeparateCampaigns() {
-		XYSeriesCollection dataset = new XYSeriesCollection();
-
-		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Campaign> noDataCampaigns = getNoDataCampaigns();
-		List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
-
-		double acumValue, value, numerator, denominator, weight, total;
-		int pos = -1;
-		for (Campaign campaign : noDataCampaigns) {
-			XYSeries campaignSerie = new XYSeries(campaign.getName());
-			Map<Criterion, List<Object>> criteriaData = _mecSelected
-					.getCriteria();
-			numerator = 1;
-			denominator = 1;
-			for (Criterion c : criteriaData.keySet()) {
-				acumValue = 0;
-				value = 0;
-				List<Object> data = criteriaData.get(c);
-				for (Alternative a : noDataAlternativesCampaigns) {
-					if (a.hasChildrens() && !a.isDirect()) {
-						List<Alternative> childrens = a.getChildrens();
-						for (Alternative children : childrens) {
-							if (noDataAlternativesCampaigns.contains(children)) {
-								acumValue += campaign.getValue(c, children);
-							}
-						}
-						if (value == 0) {
-							value = acumValue;
-						} else if (acumValue < value) {
-							value = acumValue;
-						}
-					}
-					weight = (double) data.get(1);
-					value *= weight;
-					if (!c.isDirect()) {
-						pos = (int) data.get(0);
-						if (pos == 0) {
-							numerator *= value;
-							if (numerator == 0) {
-								numerator = 1;
-							}
-						} else {
-							denominator *= value;
-							if (denominator == 0) {
-								denominator = 1;
-							}
-						}
-					}
-				}
-			}
-
-			if (!dataValues.isEmpty()) {
-				total = (numerator * dataValues.get(0))
-						/ (denominator * dataValues.get(1));
-				if (Double.isInfinite(total)) {
-					total = 0;
-				}
-			} else {
-				total = numerator / denominator;
-				if (total == 1) {
-					total = 0;
-				}
-			}
-
-			String date = campaign.getDate();
-			String month = date.substring(date.length() - 5, date.length() - 3);
-			int category = Integer.parseInt(month);
-			campaignSerie.add(category - 1, total);
-
-			dataset.addSeries(campaignSerie);
-		}
-
-		if (_lineChart != null) {
-			if (_lineChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_lineChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_lineChart.addLegend(legend);
-			}
-		}
-
-		return dataset;
-	}
-
 	private XYDataset createLineChartDatasetSeparateProvinces() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
 		Map<String, List<Campaign>> campaignsForProvinces = campaignsSameProvince(false);
 		List<String> provinces = getProvincesCampaigns();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Alternative> noDataAlternativesCampaigns = getNoDataAlternativesCampaigns();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		Map<Campaign, Double> campaignsTotalValue = new LinkedHashMap<Campaign, Double>();
 
 		double acumValue, value, numerator, denominator, weight, total;
@@ -1180,11 +1078,11 @@ public class MECChart {
 						acumValue = 0;
 						value = 0;
 						List<Object> data = criteriaData.get(c);
-						for (Alternative a : noDataAlternativesCampaigns) {
-							if (a.hasChildrens() && !a.isDirect()) {
+						for (Alternative a : alternativesSelected) {
+							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (noDataAlternativesCampaigns
+									if (alternativesSelected
 											.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
@@ -1227,38 +1125,39 @@ public class MECChart {
 						}
 					}
 
-					String date = campaign.getDate();
-					String month = date.substring(date.length() - 5,
-							date.length() - 3);
-					int category = Integer.parseInt(month);
-					campaignSerie.add(category - 1, total);
+					for(String month: campaign.getIntervalDate()) {
+						int monthNum = Integer.parseInt(month);
+						if(!campaignSerie.isEmpty()) {
+							if(campaignSerie.getKey().equals(month)) {
+								XYDataItem item = campaignSerie.getDataItem(monthNum - 1);
+								campaignSerie.clear();
+								total += item.getYValue();
+							}
+						}
+						campaignSerie.addOrUpdate(monthNum - 1, total);
+					}
 				}
 			} else {
 				Map<Campaign, Double> mecCampaignsDataValue = loadCampaignsDataDirectNoAggregation();
 				Map<Integer, Double> monthDataValues = new LinkedHashMap<Integer, Double>();
 				Map<Integer, Integer> campaignsDataForEachMonth = new LinkedHashMap<Integer, Integer>();
 				for (Campaign campaignData : mecCampaignsDataValue.keySet()) {
-					String date = campaignData.getDate();
-					String month = date.substring(date.length() - 5,
-							date.length() - 3);
+					String date = campaignData.getInitialDate();
+					String month = date.substring(date.length() - 5, date.length() - 3);
 					int category = Integer.parseInt(month);
 					if (monthDataValues.get(category - 1) != null) {
-						double acumValueData = mecCampaignsDataValue
-								.get(campaignData);
+						double acumValueData = mecCampaignsDataValue.get(campaignData);
 						acumValueData += monthDataValues.get(category - 1);
 						monthDataValues.put(category - 1, acumValueData);
-						int numRep = campaignsDataForEachMonth
-								.get(category - 1) + 1;
+						int numRep = campaignsDataForEachMonth.get(category - 1) + 1;
 						campaignsDataForEachMonth.put(category - 1, numRep);
 					} else {
-						monthDataValues.put(category - 1,
-								mecCampaignsDataValue.get(campaignData));
+						monthDataValues.put(category - 1, mecCampaignsDataValue.get(campaignData));
 						campaignsDataForEachMonth.put(category - 1, 1);
 					}
 				}
 				for (int month : monthDataValues.keySet()) {
-					campaignSerie.add(month, monthDataValues.get(month)
-							/ campaignsDataForEachMonth.get(month));
+					campaignSerie.add(month, monthDataValues.get(month) / campaignsDataForEachMonth.get(month));
 				}
 			}
 			dataset.addSeries(campaignSerie);
@@ -1362,12 +1261,17 @@ public class MECChart {
 						double total = 0;
 						total = numerator / denominator;
 
-						String date = campaign.getDate();
-						String month = date.substring(date.length() - 5,
-								date.length() - 3);
-						int category = Integer.parseInt(month);
-
-						serie.add(category - 1, total);
+						for(String month: campaign.getIntervalDate()) {
+							int monthNum = Integer.parseInt(month);
+							if(!serie.isEmpty()) {
+								if(serie.getKey().equals(month)) {
+									XYDataItem item = serie.getDataItem(monthNum - 1);
+									serie.clear();
+									total += item.getYValue();
+								}
+							}					
+							serie.add(monthNum - 1, total);
+						}
 					}
 				}
 			}

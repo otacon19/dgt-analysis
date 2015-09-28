@@ -20,7 +20,8 @@ public class Campaign extends ProblemElement {
 	private List<Criterion> _criteria;
 	private Map<Criterion, Map<Alternative, Integer>> _values;
 	private String _province;
-	private String _date;
+	private String _initialDate;
+	private String _finalDate;
 	
 	public Campaign() {
 		super();
@@ -85,8 +86,39 @@ public class Campaign extends ProblemElement {
 		_values = values;
 	}
 	
-	public void setDate(String date) {
-		_date = date;
+	public void setInitialDate(String initialDate) {
+		_initialDate = initialDate;
+	}
+	
+	public String getInitialDate() {
+		return _initialDate;
+	}
+	
+	public void setFinalDate(String finalDate) {
+		_finalDate = finalDate;
+	}
+	
+	public String getFinalDate() {
+		return _finalDate;
+	}
+	
+	public List<String> getIntervalDate() {
+		List<String> months = new LinkedList<String>();
+		int monthInitialDate = Integer.parseInt(_initialDate.substring(_initialDate.length() - 5, _initialDate.length() - 3));
+		int monthFinalDate = Integer.parseInt(_finalDate.substring(_finalDate.length() - 5, _finalDate.length() - 3));
+		for(int i = monthInitialDate; i <= monthFinalDate; ++i) {
+			if(i <= 9) {
+				months.add("0" + Integer.toString(i));
+			} else {
+				months.add(Integer.toString(i));
+			}
+		}
+		return months;
+	}
+	
+	public void setDates(String initialDate, String finalDate) {
+		_initialDate = initialDate;
+		_finalDate = finalDate;
 	}
 	
 	public String getProvince() {
@@ -95,10 +127,6 @@ public class Campaign extends ProblemElement {
 	
 	public void setProvince(String province) {
 		_province = province;
-	}
-	
-	public String getDate() {
-		return _date;
 	}
 	
 	public void addAlternative(Alternative a) {
@@ -126,7 +154,7 @@ public class Campaign extends ProblemElement {
 		if(_values.get(c).get(a) != null) {
 			return _values.get(c).get(a);
 		} else {
-			return -1;
+			return 0;
 		}
 	}
 	
@@ -196,7 +224,8 @@ public class Campaign extends ProblemElement {
 		result.setCriteria(_criteria);
 		result.setAlternatives(_alternatives);
 		result.setProvince(_province);
-		result.setDate(_date) ;
+		result.setInitialDate(_initialDate) ;
+		result.setFinalDate(_finalDate);
 		result.setValues(_values);
 		
 		return result;

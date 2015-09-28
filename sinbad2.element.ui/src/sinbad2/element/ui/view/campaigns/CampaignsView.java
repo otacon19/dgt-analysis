@@ -45,7 +45,8 @@ import sinbad2.element.campaigns.listener.CampaignsChangeEvent;
 import sinbad2.element.campaigns.listener.ECampaignsChange;
 import sinbad2.element.ui.view.alternatives.AlternativesView;
 import sinbad2.element.ui.view.campaigns.dialog.AddCampaignsDialog;
-import sinbad2.element.ui.view.campaigns.provider.CampaignDateLabelProvider;
+import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider;
+import sinbad2.element.ui.view.campaigns.provider.CampaignInitialDateLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignIdLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignProvinceLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignsSelectedContentProvider;
@@ -268,8 +269,8 @@ public class CampaignsView extends ViewPart {
 						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
 				    	Date date1 = null, date2 = null;
 				    	try {
-				    		date1 = formatter.parse(c1.getDate());
-				    		date2 = formatter.parse(c2.getDate());
+				    		date1 = formatter.parse(c1.getInitialDate());
+				    		date2 = formatter.parse(c2.getInitialDate());
 				    	} catch (ParseException e) {
 				    		e.printStackTrace();
 				    	}
@@ -280,9 +281,38 @@ public class CampaignsView extends ViewPart {
 				_tableViewer.refresh();
 			}
 		});
-		tvc.setLabelProvider(new CampaignDateLabelProvider());
+		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Date");
+		tc.setText("Initial date");
+		tc.setResizable(false);
+		tc.pack();
+		
+		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
+					@Override
+					public int compare(Campaign c1, Campaign c2) {
+						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
+				    	Date date1 = null, date2 = null;
+				    	try {
+				    		date1 = formatter.parse(c1.getFinalDate());
+				    		date2 = formatter.parse(c2.getFinalDate());
+				    	} catch (ParseException e) {
+				    		e.printStackTrace();
+				    	}
+				        return date1.compareTo(date2);
+					}
+				};
+				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByDate);
+				_tableViewer.refresh();
+			}
+		});
+		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
+		tc = tvc.getColumn();
+		tc.setText("Final date");
 		tc.setResizable(false);
 		tc.pack();
 		
