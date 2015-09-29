@@ -2,6 +2,22 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="flintstones.menu.file"
+               label="File"
+               mnemonic="A">
+            <command
+                  commandId="sinbad2.element.pdf"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
          point="org.eclipse.ui.views">
       <category
             id="flintstones.elements.category"
@@ -98,6 +114,10 @@
             id="flintstones.element.campaign.deselectAll"
             name="%command.campaign.deselectAll">
       </command>
+      <command
+            id="sinbad2.element.pdf"
+            name="Generate PDF">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -124,6 +144,10 @@
       <image
             commandId="flintstones.element.campaign.deselectAll"
             icon="icons/uncheck.png">
+      </image>
+      <image
+            commandId="sinbad2.element.pdf"
+            icon="icons/pdf_16x16.png">
       </image>
    </extension>
    <extension
@@ -152,6 +176,19 @@
             class="sinbad2.element.ui.handler.campaign.select.DeselectAllCampaignHandler"
             commandId="flintstones.element.campaign.deselectAll">
       </handler>
+      <handler
+            class="sinbad2.element.ui.handler.pdf.generate.GenerataPDFHandler"
+            commandId="sinbad2.element.pdf">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="sinbad2.element.pdf"
+            contextId="flintstones.core.ui"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+P">
+      </key>
    </extension>
 
 </plugin>

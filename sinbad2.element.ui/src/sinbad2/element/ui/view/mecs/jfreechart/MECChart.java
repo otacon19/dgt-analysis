@@ -2,8 +2,6 @@ package sinbad2.element.ui.view.mecs.jfreechart;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Paint;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -13,6 +11,7 @@ import java.util.Map;
 import org.eclipse.swt.widgets.Composite;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.block.LineBorder;
@@ -23,7 +22,6 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.GroupedStackedBarRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.UnknownKeyException;
@@ -34,10 +32,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.experimental.chart.swt.ChartComposite;
-import org.jfree.ui.GradientPaintTransformType;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
-import org.jfree.ui.StandardGradientPaintTransformer;
 import org.jfree.ui.TextAnchor;
 
 import sinbad2.element.alternative.Alternative;
@@ -55,7 +51,7 @@ public class MECChart {
 
 	private List<Campaign> _categoriesAndSeries;
 	private MEC _mecSelected;
-	String _action;
+	private String _action;
 
 	public MECChart() {
 		_barChart = null;
@@ -70,7 +66,7 @@ public class MECChart {
 		if (_barChart == null) {
 			_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
 		} else {
-			if(_action.equals("separate")) {
+			if (_action.equals("separate")) {
 				_barChart.getCategoryPlot().setDataset(
 						createBarChartDatasetSeparateCampaigns());
 			} else if (_action.equals("combine")) {
@@ -82,12 +78,13 @@ public class MECChart {
 			}
 		}
 	}
-	
+
 	public void refreshStackedChart() {
 		if (_stackedChart == null) {
 			_stackedChart = createStacketChart(createBarChartDatasetCombineCampaigns());
 		} else {
-			_stackedChart.getCategoryPlot().setDataset(createBarChartDatasetSeparateContexts());
+			_stackedChart.getCategoryPlot().setDataset(
+					createBarChartDatasetSeparateContexts());
 		}
 	}
 
@@ -117,7 +114,7 @@ public class MECChart {
 		if (typeChart == 0) {
 			_chartComposite.setChart(_barChart);
 			refreshBarChart();
-		} else if(typeChart == 1) {
+		} else if (typeChart == 1) {
 			_chartComposite.setChart(_lineChart);
 			refreshLineChart();
 		} else {
@@ -139,14 +136,14 @@ public class MECChart {
 		_chartComposite.redraw();
 		_chartComposite.setSize(width, height);
 	}
-	
-	public void initializeStackedChart(Composite container, int width, int height,
-			int style) {
+
+	public void initializeStackedChart(Composite container, int width,
+			int height, int style) {
 		refreshStackedChart();
 
 		if (_chartComposite == null) {
-			_chartComposite = new ChartComposite(container, style, _stackedChart,
-					true);
+			_chartComposite = new ChartComposite(container, style,
+					_stackedChart, true);
 		}
 
 		_chartComposite.setChart(_stackedChart);
@@ -177,9 +174,10 @@ public class MECChart {
 		if (_lineChart != null) {
 			_lineChart.getXYPlot().setDataset(new XYSeriesCollection());
 		}
-		
+
 		if (_stackedChart != null) {
-			_stackedChart.getCategoryPlot().setDataset(new DefaultCategoryDataset());
+			_stackedChart.getCategoryPlot().setDataset(
+					new DefaultCategoryDataset());
 		}
 	}
 
@@ -208,51 +206,22 @@ public class MECChart {
 		// rangeAxis.setTickUnit(new NumberTickUnit(0.1));
 		rangeAxis.setAutoRange(true);
 
-		BarRenderer renderer = (BarRenderer) plot.getRenderer();
-		renderer.setDrawBarOutline(false);
-		renderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
-		renderer.setBaseItemLabelsVisible(true);
+		br.setDrawBarOutline(false);
+		br.setSeriesItemLabelGenerator(0, new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance())); 
+		br.setSeriesItemLabelsVisible(0, true);
+		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.TOP_CENTER));
+		plot.setRenderer(br);
 		
 		return chart;
 	}
-	
+
 	private JFreeChart createStacketChart(CategoryDataset dataset) {
 
-        final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "", "", dataset, PlotOrientation.HORIZONTAL,  false, true, false);
-        
-        GroupedStackedBarRenderer renderer = new GroupedStackedBarRenderer();
-        
-        renderer.setItemMargin(0.0);
-        Paint p1 = new GradientPaint(0.0f, 0.0f, new Color(0x22, 0x22, 0xFF), 0.0f, 0.0f, new Color(0x88, 0x88, 0xFF));
-        renderer.setSeriesPaint(0, p1);
-        renderer.setSeriesPaint(4, p1);
-        renderer.setSeriesPaint(8, p1);
-         
-        Paint p2 = new GradientPaint(
-            0.0f, 0.0f, new Color(0x22, 0xFF, 0x22), 0.0f, 0.0f, new Color(0x88, 0xFF, 0x88)
-        );
-        renderer.setSeriesPaint(1, p2); 
-        renderer.setSeriesPaint(5, p2); 
-        renderer.setSeriesPaint(9, p2); 
-        
-        Paint p3 = new GradientPaint(
-            0.0f, 0.0f, new Color(0xFF, 0x22, 0x22), 0.0f, 0.0f, new Color(0xFF, 0x88, 0x88)
-        );
-        renderer.setSeriesPaint(2, p3);
-        renderer.setSeriesPaint(6, p3);
-        renderer.setSeriesPaint(10, p3);
-            
-        Paint p4 = new GradientPaint(
-            0.0f, 0.0f, new Color(0xFF, 0xFF, 0x22), 0.0f, 0.0f, new Color(0xFF, 0xFF, 0x88)
-        );
-        renderer.setSeriesPaint(3, p4);
-        renderer.setSeriesPaint(7, p4);
-        renderer.setSeriesPaint(11, p4);
-        renderer.setGradientPaintTransformer(
-            new StandardGradientPaintTransformer(GradientPaintTransformType.HORIZONTAL)
-        );
-        
-        chart.setBackgroundPaint(Color.white);
+		final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "",
+				"", dataset, PlotOrientation.HORIZONTAL, false, true, false);
+
+		chart.setBackgroundPaint(Color.white);
 
 		CategoryPlot plot = chart.getCategoryPlot();
 		plot.setBackgroundPaint(Color.lightGray);
@@ -260,21 +229,22 @@ public class MECChart {
 		plot.setRangeGridlinePaint(Color.white);
 		plot.setDomainCrosshairVisible(true);
 		plot.setRangeCrosshairVisible(true);
+		
 		BarRenderer br = (BarRenderer) plot.getRenderer();
 		br.setMaximumBarWidth(.1);
+		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance()));
+		br.setBaseItemLabelsVisible(true);
+		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
+		br.setSeriesPositiveItemLabelPosition(1, new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
+		br.setBaseItemLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 12), false);
+		br.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 12));
 		
-		BarRenderer bsr = (BarRenderer) plot.getRenderer();
-		bsr.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance()));
-		bsr.setBaseItemLabelsVisible(true);
-		bsr.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
-		bsr.setSeriesPositiveItemLabelPosition(1, new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER,  0));
-		bsr.setBaseItemLabelFont(new java.awt.Font("Times New Roman", Font.PLAIN, 12), false);
-		bsr.setSeriesItemLabelFont(0, new java.awt.Font("Times New Roman", Font.PLAIN, 12));
-        
-		return chart;
-        
-    }
+		CategoryAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 5));
 
+		return chart;
+
+	}
 
 	private static JFreeChart createLineChart(XYDataset dataset) {
 
@@ -317,7 +287,8 @@ public class MECChart {
 		if (!_categoriesAndSeries.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
 			List<Campaign> noDataCampaigns = getNoDataCampaigns();
-			List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
+			List<Alternative> alternativesSelected = AlternativesView
+					.getAlternativesSelected();
 
 			double acumValue, value, numerator, denominator, weight;
 			int pos = -1;
@@ -340,8 +311,7 @@ public class MECChart {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (alternativesSelected
-											.contains(children)) {
+									if (alternativesSelected.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
 									}
@@ -493,7 +463,7 @@ public class MECChart {
 			return new LinkedList<Double>();
 		}
 	}
-	
+
 	private CategoryDataset createBarChartDatasetSeparateCampaigns() {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		double acumValue, value, numerator, denominator, weight, total;
@@ -502,7 +472,8 @@ public class MECChart {
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
 		if (!noDataCampaigns.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
-			List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
+			List<Alternative> alternativesSelected = AlternativesView
+					.getAlternativesSelected();
 			for (Campaign campaign : noDataCampaigns) {
 				Map<Criterion, List<Object>> criteriaData = _mecSelected
 						.getCriteria();
@@ -517,8 +488,7 @@ public class MECChart {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (alternativesSelected
-											.contains(children)) {
+									if (alternativesSelected.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
 									}
@@ -662,7 +632,8 @@ public class MECChart {
 		Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
 		List<String> provinces = getProvincesCampaigns();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView
+				.getAlternativesSelected();
 		List<Double> numeratorAndDenominator;
 
 		double acumValue, value, numerator = 1, denominator = 1, weight;
@@ -685,8 +656,7 @@ public class MECChart {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (alternativesSelected
-											.contains(children)) {
+									if (alternativesSelected.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
 									}
@@ -899,7 +869,6 @@ public class MECChart {
 
 		return dataset;
 	}
-
 	private XYDataset createLineChartDatasetCombineCampaigns() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
@@ -915,7 +884,8 @@ public class MECChart {
 		Map<Integer, List<Double>> monthValues = new LinkedHashMap<Integer, List<Double>>();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
-		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView
+				.getAlternativesSelected();
 		List<Double> numeratorAndDenominator;
 		XYSeries campaignSerie;
 
@@ -962,18 +932,20 @@ public class MECChart {
 			numeratorAndDenominator.add(denominator);
 
 			double numeratorAcum = 0, denominatorAcum = 0;
-			for(String month: campaign.getIntervalDate()) {
+			for (String month : campaign.getIntervalDate()) {
 				int monthNum = Integer.parseInt(month);
 				if (monthValues.get(monthNum - 1) != null) {
 					List<Double> nAd = monthValues.get(monthNum - 1);
 					List<Double> total = new LinkedList<Double>();
-					if(numeratorAndDenominator.get(0) != 1) {
-						numeratorAcum = nAd.get(0) + numeratorAndDenominator.get(0);
+					if (numeratorAndDenominator.get(0) != 1) {
+						numeratorAcum = nAd.get(0)
+								+ numeratorAndDenominator.get(0);
 					} else {
 						numeratorAcum = nAd.get(0);
 					}
-					if(numeratorAndDenominator.get(1) != 1) {
-						denominatorAcum = nAd.get(1) + numeratorAndDenominator.get(1);
+					if (numeratorAndDenominator.get(1) != 1) {
+						denominatorAcum = nAd.get(1)
+								+ numeratorAndDenominator.get(1);
 					} else {
 						denominatorAcum = nAd.get(1);
 					}
@@ -993,9 +965,13 @@ public class MECChart {
 			campaignSerie = new XYSeries(serieNameNoData);
 			for (Integer month : monthValues.keySet()) {
 				if (dataValues.isEmpty()) {
-					valueAcum = monthValues.get(month).get(0) / monthValues.get(month).get(1);
+					valueAcum = monthValues.get(month).get(0)
+							/ monthValues.get(month).get(1);
 				} else {
-					valueAcum = (monthValues.get(month).get(0) * dataValues.get(0)) / (monthValues.get(month).get(1) * dataValues.get(1));
+					valueAcum = (monthValues.get(month).get(0) * dataValues
+							.get(0))
+							/ (monthValues.get(month).get(1) * dataValues
+									.get(1));
 				}
 				if (Double.isInfinite(valueAcum)) {
 					valueAcum = 0;
@@ -1014,7 +990,8 @@ public class MECChart {
 			Map<Integer, Integer> campaignsDataForEachMonth = new LinkedHashMap<Integer, Integer>();
 			for (Campaign campaignData : mecCampaignsDataValue.keySet()) {
 				String date = campaignData.getInitialDate();
-				String month = date.substring(date.length() - 5, date.length() - 3);
+				String month = date.substring(date.length() - 5,
+						date.length() - 3);
 				int category = Integer.parseInt(month);
 				if (monthDataValues.get(category - 1) != null) {
 					double acumValueData = mecCampaignsDataValue
@@ -1056,7 +1033,8 @@ public class MECChart {
 		Map<String, List<Campaign>> campaignsForProvinces = campaignsSameProvince(false);
 		List<String> provinces = getProvincesCampaigns();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView
+				.getAlternativesSelected();
 		Map<Campaign, Double> campaignsTotalValue = new LinkedHashMap<Campaign, Double>();
 
 		double acumValue, value, numerator, denominator, weight, total;
@@ -1082,8 +1060,7 @@ public class MECChart {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
-									if (alternativesSelected
-											.contains(children)) {
+									if (alternativesSelected.contains(children)) {
 										acumValue += campaign.getValue(c,
 												children);
 									}
@@ -1125,11 +1102,12 @@ public class MECChart {
 						}
 					}
 
-					for(String month: campaign.getIntervalDate()) {
+					for (String month : campaign.getIntervalDate()) {
 						int monthNum = Integer.parseInt(month);
-						if(!campaignSerie.isEmpty()) {
-							if(campaignSerie.getKey().equals(month)) {
-								XYDataItem item = campaignSerie.getDataItem(monthNum - 1);
+						if (!campaignSerie.isEmpty()) {
+							if (campaignSerie.getKey().equals(month)) {
+								XYDataItem item = campaignSerie
+										.getDataItem(monthNum - 1);
 								campaignSerie.clear();
 								total += item.getYValue();
 							}
@@ -1143,21 +1121,26 @@ public class MECChart {
 				Map<Integer, Integer> campaignsDataForEachMonth = new LinkedHashMap<Integer, Integer>();
 				for (Campaign campaignData : mecCampaignsDataValue.keySet()) {
 					String date = campaignData.getInitialDate();
-					String month = date.substring(date.length() - 5, date.length() - 3);
+					String month = date.substring(date.length() - 5,
+							date.length() - 3);
 					int category = Integer.parseInt(month);
 					if (monthDataValues.get(category - 1) != null) {
-						double acumValueData = mecCampaignsDataValue.get(campaignData);
+						double acumValueData = mecCampaignsDataValue
+								.get(campaignData);
 						acumValueData += monthDataValues.get(category - 1);
 						monthDataValues.put(category - 1, acumValueData);
-						int numRep = campaignsDataForEachMonth.get(category - 1) + 1;
+						int numRep = campaignsDataForEachMonth
+								.get(category - 1) + 1;
 						campaignsDataForEachMonth.put(category - 1, numRep);
 					} else {
-						monthDataValues.put(category - 1, mecCampaignsDataValue.get(campaignData));
+						monthDataValues.put(category - 1,
+								mecCampaignsDataValue.get(campaignData));
 						campaignsDataForEachMonth.put(category - 1, 1);
 					}
 				}
 				for (int month : monthDataValues.keySet()) {
-					campaignSerie.add(month, monthDataValues.get(month) / campaignsDataForEachMonth.get(month));
+					campaignSerie.add(month, monthDataValues.get(month)
+							/ campaignsDataForEachMonth.get(month));
 				}
 			}
 			dataset.addSeries(campaignSerie);
@@ -1261,15 +1244,16 @@ public class MECChart {
 						double total = 0;
 						total = numerator / denominator;
 
-						for(String month: campaign.getIntervalDate()) {
+						for (String month : campaign.getIntervalDate()) {
 							int monthNum = Integer.parseInt(month);
-							if(!serie.isEmpty()) {
-								if(serie.getKey().equals(month)) {
-									XYDataItem item = serie.getDataItem(monthNum - 1);
+							if (!serie.isEmpty()) {
+								if (serie.getKey().equals(month)) {
+									XYDataItem item = serie
+											.getDataItem(monthNum - 1);
 									serie.clear();
 									total += item.getYValue();
 								}
-							}					
+							}
 							serie.add(monthNum - 1, total);
 						}
 					}
@@ -1289,5 +1273,5 @@ public class MECChart {
 		}
 		return dataset;
 	}
-	
+
 }

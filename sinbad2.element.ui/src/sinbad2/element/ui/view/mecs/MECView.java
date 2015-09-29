@@ -324,6 +324,13 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				checkOptions(CampaignsView.getCampaignsSelected());
 			}
 		});
+
+		_changeAxisCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				checkOptions(CampaignsView.getCampaignsSelected());
+			}
+		});
 	}
 
 	private void addColumns() {
