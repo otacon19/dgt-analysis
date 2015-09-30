@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: sinbad2.element.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: sinbad2.element.ui.Activator
+Require-Bundle: sinbad2.element;bundle-version="1.0.0";visibility:=reexport,
+ sinbad2.core.ui;bundle-version="1.0.0";visibility:=reexport,
+ org.eclipse.nebula.widgets.cdatetime;bundle-version="0.14.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Export-Package: sinbad2.element.ui,
+ sinbad2.element.ui.view.alternatives,
+ sinbad2.element.ui.view.mecs
