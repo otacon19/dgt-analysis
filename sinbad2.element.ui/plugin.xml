@@ -177,7 +177,7 @@
             commandId="flintstones.element.campaign.deselectAll">
       </handler>
       <handler
-            class="sinbad2.element.ui.handler.pdf.generate.GenerataPDFHandler"
+            class="sinbad2.element.ui.handler.pdf.generate.GeneratePDFHandler"
             commandId="sinbad2.element.pdf">
       </handler>
    </extension>

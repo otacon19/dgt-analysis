@@ -110,7 +110,6 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 		_treeViewer.setInput(_provider.getInput());
 		_provider.pack();
 		getSite().setSelectionProvider(_treeViewer);
-		
 	}
 	
 	private void hookFocusListener() {

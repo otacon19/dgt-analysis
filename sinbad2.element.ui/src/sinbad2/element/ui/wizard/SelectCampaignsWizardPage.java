@@ -35,20 +35,24 @@ import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider
 import sinbad2.element.ui.view.campaigns.provider.CampaignIdLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignInitialDateLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignProvinceLabelProvider;
-import sinbad2.element.ui.view.campaigns.provider.CampaignsSelectedContentProvider;
+import sinbad2.element.ui.view.campaigns.provider.CampaignsWizardContentProvider;
 
 public class SelectCampaignsWizardPage extends WizardPage {
 	
-	private TableViewer _tableViewer;
-	private CampaignsSelectedContentProvider _provider;
+	private TableViewer _tableViewerCampaigns;
+	private CampaignsWizardContentProvider _provider;
 	
-	private List<Campaign> _campaignsSelected;
+	private static List<Campaign> _campaignsSelected;
 
 	protected SelectCampaignsWizardPage() {
 		super("Select campaigns");
 		setDescription("Select the campaigns you want");
 		
 		_campaignsSelected = new LinkedList<Campaign>();
+	}
+	
+	public static List<Campaign> getInformationCampaigns() {
+		return _campaignsSelected;
 	}
 
 	@Override
@@ -60,46 +64,46 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		campaigns.setLayout(layout);
 		campaigns.setBackground(new Color(Display.getCurrent(), 255, 255, 255));	
 		
-		_tableViewer = new TableViewer(campaigns, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
-		_tableViewer.getTable().addListener(SWT.Selection, new Listener() {
+		_tableViewerCampaigns = new TableViewer(campaigns, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
+		_tableViewerCampaigns.getTable().addListener(SWT.Selection, new Listener() {
 	        @Override
 	        public void handleEvent(Event event) {
-	        	_tableViewer.getTable().deselectAll();
+	        	_tableViewerCampaigns.getTable().deselectAll();
 	        }
 	    });
 		
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		_tableViewer.getTable().setLayoutData(gridData);
+		_tableViewerCampaigns.getTable().setLayoutData(gridData);
 		
-		_provider = new CampaignsSelectedContentProvider(_tableViewer);
-		_tableViewer.setContentProvider(_provider);
+		_provider = new CampaignsWizardContentProvider(_tableViewerCampaigns);
+		_tableViewerCampaigns.setContentProvider(_provider);
+		_tableViewerCampaigns.getTable().setHeaderVisible(true);
 		
-		_tableViewer.getTable().setHeaderVisible(true);
-		_tableViewer.getTable().addListener(SWT.MeasureItem, new Listener() {
-			
+		_tableViewerCampaigns.getTable().addListener(SWT.MeasureItem, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				event.height = 23;
+				event.height = 25;
 			}
 		});
-		
-		_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
+		_tableViewerCampaigns.getTable().addListener(SWT.Paint, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				_tableViewer.getTable().layout();
+				_tableViewerCampaigns.getTable().layout();
 			}
 		});
 		
 		addColumns();
 		
-		_tableViewer.setInput(_provider.getInput());
+		_tableViewerCampaigns.setInput(_provider.getInput());
 		
 		setControl(campaigns);
 		setPageComplete(false);
+		
+		_provider.pack();
 	}
 	
 	private void addColumns() {
-		TableViewerColumn tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		TableViewerColumn tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -111,7 +115,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 				    }
 				};
 				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByName);
-				_tableViewer.refresh();
+				_tableViewerCampaigns.refresh();
 			}
 		});
 		tvc.setLabelProvider(new CampaignIdLabelProvider());
@@ -120,7 +124,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -132,7 +136,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 				    }
 				};
 				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByProvinces);
-				_tableViewer.refresh();
+				_tableViewerCampaigns.refresh();
 			}
 		});
 		tvc.setLabelProvider(new CampaignProvinceLabelProvider());
@@ -141,7 +145,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -161,7 +165,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 					}
 				};
 				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByDate);
-				_tableViewer.refresh();
+				_tableViewerCampaigns.refresh();
 			}
 		});
 		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
@@ -170,7 +174,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -190,7 +194,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 					}
 				};
 				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByDate);
-				_tableViewer.refresh();
+				_tableViewerCampaigns.refresh();
 			}
 		});
 		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
@@ -199,10 +203,9 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
 		tc = tvc.getColumn();
 		tc.setText("Selection");
-		tc.setResizable(false);
 		tc.pack();
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			Map<Object, Button> buttons = new HashMap<Object, Button>();
@@ -210,27 +213,34 @@ public class SelectCampaignsWizardPage extends WizardPage {
 			@Override
 			public void update(ViewerCell cell) {
 				TableItem item = (TableItem) cell.getItem();
-				
+
 				final Button button;
-				if (buttons.containsKey(cell.getElement()) && !((Button) buttons.get(cell.getElement())).isDisposed()) {
+				if (buttons.containsKey(cell.getElement())) {
 					button = buttons.get(cell.getElement());
 				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
 					button.setData("campaign", (Campaign) item.getData()); 
+					buttons.put(cell.getElement(), button);
+					
 					button.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
 							if(((Button) e.widget).getSelection()) {
-								if(!_campaignsSelected.contains((Campaign) button.getData("campaign"))) {
-									_campaignsSelected.add((Campaign) button.getData("campaign"));
-								}
+								_campaignsSelected.add((Campaign) button.getData("campaign"));
 							} else {
-								_campaignsSelected.remove((Campaign) button.getData("campaign"));
+								if(!_campaignsSelected.isEmpty()) {
+									_campaignsSelected.remove((Campaign) button.getData("campaign"));
+								}
+							}
+							if(!_campaignsSelected.isEmpty()) {
+								setPageComplete(true);
+							} else {
+								setPageComplete(false);
 							}
 						}
 					});
-					buttons.put(cell.getElement(), button);				
 				}
+
 				TableEditor editor = new TableEditor(item.getParent());
 				button.pack();
 				editor.minimumWidth = button.getSize().x;
@@ -242,3 +252,4 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 	}
 }
+

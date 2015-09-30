@@ -45,21 +45,35 @@ import sinbad2.element.ui.view.alternatives.AlternativesView;
 public class MECChart {
 
 	private JFreeChart _barChart;
-	private JFreeChart _stackedChart;
-	private JFreeChart _lineChart;
+	private static JFreeChart _stackedChart;
+	private static JFreeChart _lineChart;
 	private ChartComposite _chartComposite;
 
-	private List<Campaign> _categoriesAndSeries;
+	private List<Campaign> _campaignsSeries;
 	private MEC _mecSelected;
 	private String _action;
+	
+	private List<Alternative> _alternativesSelectedPDF;
 
 	public MECChart() {
 		_barChart = null;
 		_lineChart = null;
 		_stackedChart = null;
 		_chartComposite = null;
-
-		_categoriesAndSeries = new LinkedList<Campaign>();
+		_campaignsSeries = new LinkedList<Campaign>();
+		_alternativesSelectedPDF = new LinkedList<Alternative>();
+	}
+	
+	public JFreeChart getBarChart() {
+		return _barChart;
+	}
+	
+	public static JFreeChart getLineChart() {
+		return _lineChart;
+	}
+	
+	public static JFreeChart getStackedChart() {
+		return _stackedChart;
 	}
 
 	public void refreshBarChart() {
@@ -105,9 +119,9 @@ public class MECChart {
 		}
 	}
 
-	public void setMEC(List<Campaign> categoriesAndSeries, MEC mec,
+	public void setMEC(List<Campaign> campaignsSeries, MEC mec,
 			int typeChart, String action) {
-		_categoriesAndSeries = categoriesAndSeries;
+		_campaignsSeries = campaignsSeries;
 		_mecSelected = mec;
 		_action = action;
 
@@ -122,6 +136,22 @@ public class MECChart {
 			refreshStackedChart();
 		}
 	}
+	
+	public void createChartByPDF(List<Campaign> campaignsSeries, MEC mec, int typeChart, String action, List<Alternative> alternativesSelectedPDF) {
+		_campaignsSeries = campaignsSeries;
+		_mecSelected = mec;
+		_action = action;
+		_alternativesSelectedPDF = alternativesSelectedPDF;
+
+		if (typeChart == 0) {
+			refreshBarChart();
+		} else if (typeChart == 1) {
+			refreshLineChart();
+		} else {
+			refreshStackedChart();
+		}
+	}
+
 
 	public void initializeBarChart(Composite container, int width, int height,
 			int style) {
@@ -284,16 +314,20 @@ public class MECChart {
 	private CategoryDataset createBarChartDatasetCombineCampaigns() {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-		if (!_categoriesAndSeries.isEmpty()) {
+		if (!_campaignsSeries.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
 			List<Campaign> noDataCampaigns = getNoDataCampaigns();
-			List<Alternative> alternativesSelected = AlternativesView
-					.getAlternativesSelected();
+			List<Alternative> alternativesSelected;
+			if(_alternativesSelectedPDF.isEmpty()) {
+				alternativesSelected = AlternativesView.getAlternativesSelected();
+			} else {
+				alternativesSelected = _alternativesSelectedPDF;
+			}
 
 			double acumValue, value, numerator, denominator, weight;
 			int pos = -1;
 			String category = "";
-
+			
 			List<Object> data;
 			Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
 			List<Double> numeratorAndDenominator;
@@ -399,7 +433,7 @@ public class MECChart {
 		double numerator = 1, denominator = 1;
 
 		List<Campaign> dataCampaigns = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
+		for (Campaign c : _campaignsSeries) {
 			if (c.isACampaignData()) {
 				dataCampaigns.add(c);
 			}
@@ -557,7 +591,7 @@ public class MECChart {
 
 	private List<Campaign> getNoDataCampaigns() {
 		List<Campaign> result = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
+		for (Campaign c : _campaignsSeries) {
 			if (!c.isACampaignData()) {
 				result.add(c);
 			}
@@ -567,7 +601,7 @@ public class MECChart {
 
 	private List<Campaign> getDataCampaigns() {
 		List<Campaign> result = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
+		for (Campaign c : _campaignsSeries) {
 			if (c.isACampaignData()) {
 				result.add(c);
 			}
@@ -582,7 +616,7 @@ public class MECChart {
 		int pos = -1;
 
 		List<Campaign> dataCampaigns = new LinkedList<Campaign>();
-		for (Campaign c : _categoriesAndSeries) {
+		for (Campaign c : _campaignsSeries) {
 			if (c.isACampaignData()) {
 				dataCampaigns.add(c);
 			}
@@ -730,7 +764,7 @@ public class MECChart {
 		Map<String, List<Campaign>> campaignsProvince = new LinkedHashMap<String, List<Campaign>>();
 		for (String province : provinces) {
 			List<Campaign> campaignsSameProvince = new LinkedList<Campaign>();
-			for (Campaign c : _categoriesAndSeries) {
+			for (Campaign c : _campaignsSeries) {
 				if (!withCampaignsData) {
 					if (province.equals(c.getProvince())
 							&& !c.isACampaignData()) {
@@ -749,7 +783,7 @@ public class MECChart {
 
 	private List<String> getProvincesCampaigns() {
 		List<String> provinces = new LinkedList<String>();
-		for (Campaign c : _categoriesAndSeries) {
+		for (Campaign c : _campaignsSeries) {
 			String province = c.getProvince();
 			if (!provinces.contains(province)) {
 				provinces.add(province);
@@ -768,7 +802,7 @@ public class MECChart {
 		Map<Criterion, Integer> criteriaPos = new LinkedHashMap<Criterion, Integer>();
 		Map<Criterion, Map<Alternative, Double>> alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
 		Map<Campaign, Map<Criterion, Map<Alternative, Double>>> campaignsAlternativesWithValues = new LinkedHashMap<Campaign, Map<Criterion, Map<Alternative, Double>>>();
-		for (Campaign campaign : _categoriesAndSeries) {
+		for (Campaign campaign : _campaignsSeries) {
 			alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
 			Map<Criterion, List<Object>> criteriaData = _mecSelected
 					.getCriteria();
@@ -873,7 +907,7 @@ public class MECChart {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
 		String serieNameNoData = "", serieNameData = "";
-		for (Campaign campaign : _categoriesAndSeries) {
+		for (Campaign campaign : _campaignsSeries) {
 			if (!campaign.isACampaignData()) {
 				serieNameNoData += campaign.getName() + "-";
 			} else {
@@ -1170,7 +1204,7 @@ public class MECChart {
 		Map<Criterion, Integer> criteriaPos = new LinkedHashMap<Criterion, Integer>();
 		Map<Criterion, Map<Alternative, Double>> alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
 		Map<Campaign, Map<Criterion, Map<Alternative, Double>>> campaignsAlternativesWithValues = new LinkedHashMap<Campaign, Map<Criterion, Map<Alternative, Double>>>();
-		for (Campaign campaign : _categoriesAndSeries) {
+		for (Campaign campaign : _campaignsSeries) {
 			Map<Criterion, List<Object>> criteriaData = _mecSelected
 					.getCriteria();
 			alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
