@@ -98,6 +98,13 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 			}
 		});
 		
+		_tableViewer.getTable().addListener(SWT.Selection, new Listener() {
+	        @Override
+	        public void handleEvent(Event event) {
+	        	_tableViewer.getTable().deselectAll();
+	        }
+	    });
+		
 		_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
 			@Override
 			public void handleEvent(Event event) {

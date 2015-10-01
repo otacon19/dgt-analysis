@@ -165,7 +165,6 @@ public class SelectAlternativesWizardPage extends WizardPage {
 									}
 								}
 							}
-							System.out.println(_alternativesSelected);
 							if(!_alternativesSelected.isEmpty()) {
 								setPageComplete(true);
 							} else {

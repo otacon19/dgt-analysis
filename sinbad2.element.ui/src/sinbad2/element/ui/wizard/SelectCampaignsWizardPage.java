@@ -41,14 +41,22 @@ public class SelectCampaignsWizardPage extends WizardPage {
 	private TableViewer _tableViewerCampaigns;
 	private CampaignsWizardContentProvider _provider;
 	
+	private Button _aggregateButton;
+	private Button _desaggregateButton;
+	private Button _campaignsButton;
+	private Button _provincesButton;
+	private Button _contextsButton;
+	
 	private static List<Campaign> _campaignsSelected;
 	private static int _aggregationSelected;
+	private static List<String> _desaggregationOption;
 
 	protected SelectCampaignsWizardPage() {
 		super("Select campaigns");
 		setDescription("Select the campaigns you want");
 		
 		_campaignsSelected = new LinkedList<Campaign>();
+		_desaggregationOption = new LinkedList<String>();
 	}
 	
 	public static List<Campaign> getInformationCampaigns() {
@@ -57,6 +65,10 @@ public class SelectCampaignsWizardPage extends WizardPage {
 	
 	public static int getInformationAggregation() {
 		return _aggregationSelected;
+	}
+	
+	public static List<String> getInformationDesaggregationOption() {
+		return _desaggregationOption;
 	}
 
 	@Override
@@ -104,25 +116,85 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		containerAggregation.setLayout(layout);
 		Label aggregationLabel = new Label(containerAggregation, SWT.LEFT);
 		aggregationLabel.setText("Aggregate");
-		Button aggregateButton = new Button(containerAggregation, SWT.RADIO);
-		aggregateButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				_aggregationSelected = 0;
-			}
-		});
-		aggregateButton.setSelection(false);
+		_aggregateButton = new Button(containerAggregation, SWT.RADIO);
+		_aggregateButton.setSelection(false);
 		
 		Label desaggregationLabel = new Label(containerAggregation, SWT.LEFT);
 		desaggregationLabel.setText("Desaggregate");
-		Button desaggregateButton = new Button(containerAggregation, SWT.RADIO);
-		desaggregateButton.addSelectionListener(new SelectionAdapter() {
+		_desaggregateButton = new Button(containerAggregation, SWT.RADIO);
+		_desaggregateButton.setSelection(false);
+		
+		Composite containerDesaggregationOptions = new Composite(campaigns, SWT.CENTER);
+		layout = new GridLayout(2, false);
+		layout.marginLeft = 100;
+		containerDesaggregationOptions.setLayout(layout);
+		
+		final Label labelCampaigns = new Label(containerDesaggregationOptions, SWT.LEFT);
+		labelCampaigns.setText("- By Campaigns");
+		labelCampaigns.setVisible(false);
+		_campaignsButton = new Button(containerDesaggregationOptions, SWT.CHECK);
+		_campaignsButton.setVisible(false);
+		_campaignsButton.setSelection(false);
+		_campaignsButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				validate();
+			}
+		});
+		final Label labelProvinces = new Label(containerDesaggregationOptions, SWT.LEFT);
+		labelProvinces.setVisible(false);
+		labelProvinces.setText("- By Provinces");
+		_provincesButton = new Button(containerDesaggregationOptions, SWT.CHECK);
+		_provincesButton.setVisible(false);
+		_provincesButton.setSelection(false);
+		_provincesButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				validate();
+			}
+		});
+		final Label labelContexts = new Label(containerDesaggregationOptions, SWT.LEFT);
+		labelContexts.setVisible(false);
+		labelContexts.setText("- By Contexts");
+		_contextsButton = new Button(containerDesaggregationOptions, SWT.CHECK);
+		_contextsButton.setSelection(false);
+		_contextsButton.setVisible(false);
+		_contextsButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				validate();
+			}
+		});
+		
+		_aggregateButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				_aggregationSelected = 0;
+				
+				labelCampaigns.setVisible(false);
+				_campaignsButton.setVisible(false);
+				labelProvinces.setVisible(false);
+				_provincesButton.setVisible(false);
+				labelContexts.setVisible(false);
+				_contextsButton.setVisible(false);
+				
+				validate();
+			}
+		});
+		
+		_desaggregateButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				_aggregationSelected = 1;
+				
+				labelCampaigns.setVisible(true);
+				_campaignsButton.setVisible(true);
+				labelProvinces.setVisible(true);
+				_provincesButton.setVisible(true);
+				labelContexts.setVisible(true);
+				_contextsButton.setVisible(true);
 			}
 		});
-		desaggregateButton.setSelection(false);
 		
 		setControl(campaigns);
 		setPageComplete(false);
@@ -260,11 +332,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 									_campaignsSelected.remove((Campaign) button.getData("campaign"));
 								}
 							}
-							if(!_campaignsSelected.isEmpty()) {
-								setPageComplete(true);
-							} else {
-								setPageComplete(false);
-							}
+							validate();
 						}
 					});
 				}
@@ -278,6 +346,37 @@ public class SelectCampaignsWizardPage extends WizardPage {
 				button.setData("editor", editor);
 			}
 		});
+	}
+	
+	private void validate() {
+		if(_aggregateButton.getSelection()) {
+			setPageComplete(!_campaignsSelected.isEmpty());
+		} else {
+			if(_campaignsButton.getSelection()) {
+				if(!_desaggregationOption.contains("separate")) {
+					_desaggregationOption.add("separate");
+				}
+			} else {
+				_desaggregationOption.remove("separate");
+			}
+			
+			if(_provincesButton.getSelection()) {
+				if(!_desaggregationOption.contains("separate_provinces")) {
+					_desaggregationOption.add("separate_provinces");
+				}
+			} else {
+				_desaggregationOption.remove("separate_provinces");
+			}
+			
+			if(_contextsButton.getSelection()) {
+				if(!_desaggregationOption.contains("contexts")) {
+					_desaggregationOption.add("contexts");
+				}
+			} else {
+				_desaggregationOption.remove("contexts");
+			}
+			setPageComplete((_campaignsButton.getSelection() || _provincesButton.getSelection() || _contextsButton.getSelection()) && !_campaignsSelected.isEmpty());
+		}
 	}
 	
 	@Override

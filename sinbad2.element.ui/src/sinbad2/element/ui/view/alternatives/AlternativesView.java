@@ -96,6 +96,13 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 			}
 		});
 		
+		_treeViewer.getTree().addListener(SWT.Selection, new Listener() {
+	        @Override
+	        public void handleEvent(Event event) {
+	        	_treeViewer.getTree().deselectAll();
+	        }
+	    });
+		
 		_treeViewer.getTree().addListener(SWT.Paint, new Listener() {
 			@Override
 			public void handleEvent(Event event) {

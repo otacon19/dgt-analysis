@@ -69,11 +69,11 @@ public class MECChart {
 		return _barChart;
 	}
 	
-	public static JFreeChart getLineChart() {
+	public JFreeChart getLineChart() {
 		return _lineChart;
 	}
 	
-	public static JFreeChart getStackedChart() {
+	public JFreeChart getStackedChart() {
 		return _stackedChart;
 	}
 
@@ -104,10 +104,9 @@ public class MECChart {
 
 	public void refreshStackedChart() {
 		if (_stackedChart == null) {
-			_stackedChart = createStacketChart(createBarChartDatasetCombineCampaigns());
+			_stackedChart = createStacketChart(createBarChartDatasetSeparateContexts());
 		} else {
-			_stackedChart.getCategoryPlot().setDataset(
-					createBarChartDatasetSeparateContexts());
+			_stackedChart.getCategoryPlot().setDataset(createBarChartDatasetSeparateContexts());
 		}
 	}
 

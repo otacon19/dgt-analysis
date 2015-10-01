@@ -35,8 +35,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.List;
-import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Section;
@@ -53,6 +51,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static java.util.List<String> _chartsSelected;
 	private static java.util.List<Campaign> _campaignsSelected;
 	private static int _aggregationSelected;
+	private static java.util.List<String> _desaggregationOption;
 	private static java.util.List<Alternative> _alternativesSelected;
 	private static java.util.List<MEC> _mecsSelected;
 	
@@ -73,6 +72,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 		_chartsSelected = SelectChartWizardPage.getInformationCharts();
 		_campaignsSelected = SelectCampaignsWizardPage.getInformationCampaigns();
 		_aggregationSelected = SelectCampaignsWizardPage.getInformationAggregation();
+		_desaggregationOption = SelectCampaignsWizardPage.getInformationDesaggregationOption();
 		_alternativesSelected = SelectAlternativesWizardPage.getInformationAlternatives();
 		_mecsSelected = SelectMEsWizardPage.getInformationMECs();
 		
@@ -277,27 +277,36 @@ public class GeneratePDFHandler extends AbstractHandler {
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for(Campaign campaign: _campaignsSelected) {
-				campaigns.add(campaign);
+				Campaign clone = (Campaign) campaign.clone();
+				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")");
+				campaigns.add(clone);
 			}
-			System.out.println("entra");
-			chart.createChartByPDF(campaigns, mec, 0, "separate", _alternativesSelected);
-		}
-		
-		JFreeChart barChart = chart.getBarChart();
-		
-		File file = new File(System.getProperty("user.home") + NAME_FILE);
-		try {
-			ChartUtilities.saveChartAsPNG(file, barChart, 500, 180);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-		Image pdfImage;
-		try {
-			pdfImage = com.itextpdf.text.Image.getInstance(System.getProperty("user.home") + NAME_FILE);
-			subCatPart.add(pdfImage);
-		} catch (IOException e) {
-			e.printStackTrace();
+			
+			JFreeChart barChart = null;
+			for(String action: _desaggregationOption) {
+				if(!action.equals("contexts")) {
+					chart.createChartByPDF(campaigns, mec, 0, action, _alternativesSelected);
+					barChart = chart.getBarChart();
+				} else {
+					chart.createChartByPDF(campaigns, mec, 2, action, _alternativesSelected);
+					barChart = chart.getStackedChart();
+				}
+				
+				File file = new File(System.getProperty("user.home") + NAME_FILE);
+				try {
+					ChartUtilities.saveChartAsPNG(file, barChart, 500, 180);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+				Image pdfImage;
+				try {
+					pdfImage = com.itextpdf.text.Image.getInstance(System.getProperty("user.home") + NAME_FILE);
+					subCatPart.add(pdfImage);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -323,14 +332,6 @@ public class GeneratePDFHandler extends AbstractHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-	}
-
-	private static void createList(Section subCatPart) {
-		List list = new List(true, false, 10);
-		list.add(new ListItem("First point"));
-		list.add(new ListItem("Second point"));
-		list.add(new ListItem("Third point"));
-		subCatPart.add(list);
 	}
 
 	private static void addEmptyLine(Paragraph paragraph, int number) {

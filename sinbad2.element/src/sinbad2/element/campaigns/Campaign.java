@@ -150,7 +150,7 @@ public class Campaign extends ProblemElement {
 		_values.put(c, valueAlternative);
 	}
 	
-	public int getValue(Criterion c, Alternative a) {
+	public double getValue(Criterion c, Alternative a) {
 		if(_values.get(c).get(a) != null) {
 			return _values.get(c).get(a);
 		} else {
