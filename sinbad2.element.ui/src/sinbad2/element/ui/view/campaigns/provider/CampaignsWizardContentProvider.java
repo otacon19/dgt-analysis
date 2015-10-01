@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.campaigns.Campaign;
+import sinbad2.element.ui.view.campaigns.CampaignsView;
 
 public class CampaignsWizardContentProvider implements IStructuredContentProvider {
 	
@@ -33,7 +34,7 @@ public class CampaignsWizardContentProvider implements IStructuredContentProvide
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	
 	public Object getInput() {
-		return _elementsSet.getCampaigns();
+		return CampaignsView.getCampaignsSelected();
 	}
 	
 	@SuppressWarnings("unchecked")

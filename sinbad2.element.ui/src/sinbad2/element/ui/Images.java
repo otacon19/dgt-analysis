@@ -52,8 +52,17 @@ public class Images {
 	public static final Image BarChart = AbstractUIPlugin
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/barchart_16x14.png").createImage(); //$NON-NLS-1$
 	
+	public static final Image BarChart2 = AbstractUIPlugin
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/barchart2.png").createImage(); //$NON-NLS-1$
+	
 	public static final Image LineChart = AbstractUIPlugin
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/linechart_16x16.png").createImage(); //$NON-NLS-1$
+	
+	public static final Image LineChart2 = AbstractUIPlugin
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/linechart2.png").createImage(); //$NON-NLS-1$
+	
+	public static final Image Table = AbstractUIPlugin
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/table2.png").createImage(); //$NON-NLS-1$
 	
 	public static final Image Aggregation = AbstractUIPlugin
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/aggregation_18x18.png").createImage(); //$NON-NLS-1$

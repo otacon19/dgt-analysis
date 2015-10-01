@@ -1,5 +1,6 @@
 package sinbad2.element.ui.view.alternatives.provider;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -13,6 +14,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.alternative.Alternative;
+import sinbad2.element.ui.view.alternatives.AlternativesView;
 
 public class AlternativesWizardContentProvider implements ITreeContentProvider {
 
@@ -66,7 +68,13 @@ public class AlternativesWizardContentProvider implements ITreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	public Object getInput() {
-		return _alternatives;
+		List<Alternative> alternativesParent = new LinkedList<Alternative>();
+		for(Alternative parent: AlternativesView.getAlternativesSelected()) {
+			if(parent.hasChildrens()) {
+				alternativesParent.add(parent);
+			}
+		}
+		return alternativesParent;
 	}
 	
 	@SuppressWarnings("unchecked")

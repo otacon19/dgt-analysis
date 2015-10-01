@@ -14,12 +14,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -59,7 +57,6 @@ public class SelectAlternativesWizardPage extends WizardPage {
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		alternatives.setLayoutData(gridData);
 		alternatives.setLayout(layout);
-		alternatives.setBackground(new Color(Display.getCurrent(), 255, 255, 255));	
 		_treeViewerAlternatives = new TreeViewer(alternatives, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
 		gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		_treeViewerAlternatives.getTree().setLayoutData(gridData);
@@ -145,7 +142,9 @@ public class SelectAlternativesWizardPage extends WizardPage {
 										}
 									}
 									for(Alternative children: childrens) {
-										_buttons.get(children).setSelection(true);
+										if(_buttons.get(children) != null) {
+											_buttons.get(children).setSelection(true);
+										}
 									}
 								}
 							} else {
@@ -166,7 +165,7 @@ public class SelectAlternativesWizardPage extends WizardPage {
 									}
 								}
 							}
-							
+							System.out.println(_alternativesSelected);
 							if(!_alternativesSelected.isEmpty()) {
 								setPageComplete(true);
 							} else {

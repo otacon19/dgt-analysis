@@ -43,7 +43,11 @@ TableViewer _tableViewer;
 	
 	public void pack() {
 		for(int i = 0; i < _tableViewer.getTable().getColumnCount() - 1; ++i) {
-			_tableViewer.getTable().getColumn(i).pack();
+			if(i != _tableViewer.getTable().getColumnCount() - 2) {
+				_tableViewer.getTable().getColumn(i).pack();
+			} else {
+				_tableViewer.getTable().getColumn(i).setWidth(270);
+			}
 		}
 		
 		Table table = _tableViewer.getTable();

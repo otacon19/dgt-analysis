@@ -62,6 +62,7 @@ public class MECChart {
 		_chartComposite = null;
 		_campaignsSeries = new LinkedList<Campaign>();
 		_alternativesSelectedPDF = new LinkedList<Alternative>();
+		_action = "";
 	}
 	
 	public JFreeChart getBarChart() {
@@ -78,7 +79,15 @@ public class MECChart {
 
 	public void refreshBarChart() {
 		if (_barChart == null) {
-			_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
+			if(_action.isEmpty()) {
+				_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
+			} else if(_action.equals("combine")) {
+				_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
+			} else if(_action.equals("separate")) {
+				_barChart = createBarChart(createBarChartDatasetSeparateCampaigns());
+			} else if(_action.equals("separate_provinces")) {
+				_barChart = createBarChart(createBarChartDatasetSeparateProvinces());
+			}
 		} else {
 			if (_action.equals("separate")) {
 				_barChart.getCategoryPlot().setDataset(

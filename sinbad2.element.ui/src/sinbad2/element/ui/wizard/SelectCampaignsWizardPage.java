@@ -19,13 +19,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -43,6 +42,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 	private CampaignsWizardContentProvider _provider;
 	
 	private static List<Campaign> _campaignsSelected;
+	private static int _aggregationSelected;
 
 	protected SelectCampaignsWizardPage() {
 		super("Select campaigns");
@@ -54,6 +54,10 @@ public class SelectCampaignsWizardPage extends WizardPage {
 	public static List<Campaign> getInformationCampaigns() {
 		return _campaignsSelected;
 	}
+	
+	public static int getInformationAggregation() {
+		return _aggregationSelected;
+	}
 
 	@Override
 	public void createControl(Composite parent) {
@@ -62,7 +66,6 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		campaigns.setLayoutData(gridData);
 		campaigns.setLayout(layout);
-		campaigns.setBackground(new Color(Display.getCurrent(), 255, 255, 255));	
 		
 		_tableViewerCampaigns = new TableViewer(campaigns, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
 		_tableViewerCampaigns.getTable().addListener(SWT.Selection, new Listener() {
@@ -95,6 +98,31 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		addColumns();
 		
 		_tableViewerCampaigns.setInput(_provider.getInput());
+		
+		Composite containerAggregation = new Composite(campaigns, SWT.CENTER);
+		layout = new GridLayout(4, false);
+		containerAggregation.setLayout(layout);
+		Label aggregationLabel = new Label(containerAggregation, SWT.LEFT);
+		aggregationLabel.setText("Aggregate");
+		Button aggregateButton = new Button(containerAggregation, SWT.RADIO);
+		aggregateButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				_aggregationSelected = 0;
+			}
+		});
+		aggregateButton.setSelection(false);
+		
+		Label desaggregationLabel = new Label(containerAggregation, SWT.LEFT);
+		desaggregationLabel.setText("Desaggregate");
+		Button desaggregateButton = new Button(containerAggregation, SWT.RADIO);
+		desaggregateButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				_aggregationSelected = 1;
+			}
+		});
+		desaggregateButton.setSelection(false);
 		
 		setControl(campaigns);
 		setPageComplete(false);

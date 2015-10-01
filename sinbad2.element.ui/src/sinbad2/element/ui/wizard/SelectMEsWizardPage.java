@@ -15,13 +15,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
@@ -56,7 +54,6 @@ public class SelectMEsWizardPage extends WizardPage {
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		campaigns.setLayoutData(gridData);
 		campaigns.setLayout(layout);
-		campaigns.setBackground(new Color(Display.getCurrent(), 255, 255, 255));	
 		
 		_tableViewerMEs = new TableViewer(campaigns, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
 		_tableViewerMEs.getTable().addListener(SWT.Selection, new Listener() {
@@ -76,7 +73,7 @@ public class SelectMEsWizardPage extends WizardPage {
 		_tableViewerMEs.getTable().addListener(SWT.MeasureItem, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				event.height = 25;
+				event.height = 55;
 			}
 		});
 		
