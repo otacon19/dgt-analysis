@@ -59,8 +59,9 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static String NAME_FILE = "/prueba.png";
 	
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+	private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
 	private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
-	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 13, Font.BOLD);
 	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 
 	@Override
@@ -173,15 +174,15 @@ public class GeneratePDFHandler extends AbstractHandler {
 		if(_aggregationSelected == 0) {
 			PdfPTable table = new PdfPTable(3);
 
-			PdfPCell c1 = new PdfPCell(new Phrase("Criterion"));
+			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Alternative"));
+			c1 = new PdfPCell(new Phrase("Alternative", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Value"));
+			c1 = new PdfPCell(new Phrase("Value", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 			table.setHeaderRows(1);
@@ -219,12 +220,20 @@ public class GeneratePDFHandler extends AbstractHandler {
 				}
 			}
 		}
+		
+		PdfPCell cell;
 		for(Criterion c: criteriaWithValueAcumAlternatives.keySet()) {
 			Map<Alternative, Double> aValues = criteriaWithValueAcumAlternatives.get(c);
 			for(Alternative a: aValues.keySet()) {
-				table.addCell(c.getId());
-				table.addCell(a.getId());
-				table.addCell(Double.toString(aValues.get(a)));
+				cell = new PdfPCell(new Phrase(c.getId(), normalFont));
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+				cell = new PdfPCell(new Phrase(a.getId(), normalFont));
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+				cell = new PdfPCell(new Phrase(Double.toString(aValues.get(a)), normalFont));
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
 			}
 		}
 	}
@@ -233,28 +242,37 @@ public class GeneratePDFHandler extends AbstractHandler {
 		for(Campaign campaign: _campaignsSelected) {
 			PdfPTable table = new PdfPTable(3);
 
-			PdfPCell c1 = new PdfPCell(new Phrase("Criterion"));
+			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Alternative"));
+			c1 = new PdfPCell(new Phrase("Alternative", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Value"));
+			c1 = new PdfPCell(new Phrase("Value", normalFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(c1);
 			table.setHeaderRows(1);
 			
+			PdfPCell cell;
 			java.util.List<Criterion> criteriaMEC = mec.getAvailableCriteria();
 			for(Criterion criterion: criteriaMEC) {
 				for(Alternative alternative: _alternativesSelected) {
-					table.addCell(criterion.getId());
-					table.addCell(alternative.getId());
+					cell = new PdfPCell(new Phrase(criterion.getId(), normalFont));
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table.addCell(cell);
+					cell = new PdfPCell(new Phrase(alternative.getId(), normalFont));
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table.addCell(cell);
 					if(campaign.getValue(criterion, alternative) != 0) {
-						table.addCell(Double.toString(campaign.getValue(criterion, alternative)));
+						cell = new PdfPCell(new Phrase(Double.toString(campaign.getValue(criterion, alternative)), normalFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
 					} else {
-						table.addCell(Double.toString(campaign.getAcumValue(criterion, alternative, _alternativesSelected)));
+						cell = new PdfPCell(new Phrase(Double.toString(campaign.getAcumValue(criterion, alternative, _alternativesSelected)), normalFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
 					}
 				}
 			}
@@ -274,6 +292,8 @@ public class GeneratePDFHandler extends AbstractHandler {
 				campaigns.add(campaign);
 			}
 			chart.createChartByPDF(campaigns, mec, 0, "combine", _alternativesSelected);
+			JFreeChart barChart = chart.getBarChart();
+			generatePNGCharts(barChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for(Campaign campaign: _campaignsSelected) {
@@ -281,7 +301,6 @@ public class GeneratePDFHandler extends AbstractHandler {
 				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")");
 				campaigns.add(clone);
 			}
-			
 			JFreeChart barChart = null;
 			for(String action: _desaggregationOption) {
 				if(!action.equals("contexts")) {
@@ -291,36 +310,15 @@ public class GeneratePDFHandler extends AbstractHandler {
 					chart.createChartByPDF(campaigns, mec, 2, action, _alternativesSelected);
 					barChart = chart.getStackedChart();
 				}
-				
-				File file = new File(System.getProperty("user.home") + NAME_FILE);
-				try {
-					ChartUtilities.saveChartAsPNG(file, barChart, 500, 180);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				
-				Image pdfImage;
-				try {
-					pdfImage = com.itextpdf.text.Image.getInstance(System.getProperty("user.home") + NAME_FILE);
-					subCatPart.add(pdfImage);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				generatePNGCharts(barChart, subCatPart);
 			}
 		}
 	}
 	
-	private static void createLineCharts(Section subCatPart, MEC mec) throws BadElementException {
-		/*MECChart chart = new MECChart();
-		
-		java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
-		campaigns.add(campaign);
-		chart.createChartByPDF(campaigns, mec, 0, "combine", _alternativesSelected);
-		JFreeChart barChart = chart.getBarChart();
-		
+	private static void generatePNGCharts(JFreeChart chart, Section subCatPart) {
 		File file = new File(System.getProperty("user.home") + NAME_FILE);
 		try {
-			ChartUtilities.saveChartAsPNG(file, barChart, 500, 180);
+			ChartUtilities.saveChartAsPNG(file, chart, 500, 220);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -331,7 +329,40 @@ public class GeneratePDFHandler extends AbstractHandler {
 			subCatPart.add(pdfImage);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		} catch (BadElementException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void createLineCharts(Section subCatPart, MEC mec) throws BadElementException {
+		MECChart chart = new MECChart();
+		
+		if(_aggregationSelected == 0) {
+			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
+			for(Campaign campaign: _campaignsSelected) {
+				campaigns.add(campaign);
+			}
+			chart.createChartByPDF(campaigns, mec, 1, "combine", _alternativesSelected);
+			JFreeChart lineChart = chart.getLineChart();
+			generatePNGCharts(lineChart, subCatPart);
+		} else {
+			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
+			for(Campaign campaign: _campaignsSelected) {
+				Campaign clone = (Campaign) campaign.clone();
+				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")");
+				campaigns.add(clone);
+			}
+			
+			JFreeChart lineChart = null;
+			for(String action: _desaggregationOption) {
+				if(action.equals("separate")) {
+					action = "combine";
+				}
+				chart.createChartByPDF(campaigns, mec, 1, action, _alternativesSelected);
+				lineChart = chart.getLineChart();
+				generatePNGCharts(lineChart, subCatPart);
+			}
+		}
 	}
 
 	private static void addEmptyLine(Paragraph paragraph, int number) {

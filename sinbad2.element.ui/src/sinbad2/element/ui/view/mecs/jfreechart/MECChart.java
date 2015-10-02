@@ -112,7 +112,13 @@ public class MECChart {
 
 	public void refreshLineChart() {
 		if (_lineChart == null) {
-			_lineChart = createLineChart(createLineChartDatasetCombineCampaigns());
+			if(_action.equals("combine")) {
+				_lineChart = createLineChart(createLineChartDatasetCombineCampaigns());
+			} else if(_action.equals("separate_provinces")) {
+				_lineChart = createLineChart(createLineChartDatasetSeparateProvinces());
+			} else if(_action.equals("contexts")) {
+				_lineChart = createLineChart(createLineChartDatasetSeparateContexts());
+			}
 		} else {
 			if (_action.equals("contexts")) {
 				_lineChart.getXYPlot().setDataset(
@@ -309,11 +315,16 @@ public class MECChart {
 		months[10] = "November";
 		months[11] = "December";
 		SymbolAxis rangeAxis = new SymbolAxis("", months);
+		rangeAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 5));
 		plot.setDomainAxis(rangeAxis);
-
+		
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
 		renderer.setSeriesLinesVisible(1, true);
 		renderer.setSeriesShapesVisible(0, true);
+		
+		
+		renderer.setBaseItemLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 6), false);
+		renderer.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 6));
 		plot.setRenderer(renderer);
 
 		return chart;
@@ -578,8 +589,7 @@ public class MECChart {
 		} else {
 			Map<Campaign, Double> mecCampaignsDataValue = loadCampaignsDataDirectNoAggregation();
 			for (Campaign c : mecCampaignsDataValue.keySet()) {
-				dataset.addValue(mecCampaignsDataValue.get(c), _mecSelected,
-						c.getName());
+				dataset.addValue(mecCampaignsDataValue.get(c), _mecSelected, c.getName());
 			}
 		}
 
@@ -1147,14 +1157,16 @@ public class MECChart {
 					for (String month : campaign.getIntervalDate()) {
 						int monthNum = Integer.parseInt(month);
 						if (!campaignSerie.isEmpty()) {
-							if (campaignSerie.getKey().equals(month)) {
-								XYDataItem item = campaignSerie
-										.getDataItem(monthNum - 1);
-								campaignSerie.clear();
+							if (campaignSerie.indexOf(monthNum - 1) >= 0) {
+								XYDataItem item = campaignSerie.getDataItem(campaignSerie.indexOf(monthNum - 1));
 								total += item.getYValue();
+								campaignSerie.getDataItem(campaignSerie.indexOf(monthNum - 1)).setY(total);
+							} else {
+								campaignSerie.addOrUpdate(monthNum - 1, total);
 							}
+						} else {
+							campaignSerie.addOrUpdate(monthNum - 1, total);
 						}
-						campaignSerie.addOrUpdate(monthNum - 1, total);
 					}
 				}
 			} else {
@@ -1289,14 +1301,16 @@ public class MECChart {
 						for (String month : campaign.getIntervalDate()) {
 							int monthNum = Integer.parseInt(month);
 							if (!serie.isEmpty()) {
-								if (serie.getKey().equals(month)) {
-									XYDataItem item = serie
-											.getDataItem(monthNum - 1);
-									serie.clear();
+								if (serie.indexOf(monthNum - 1) >= 0) {
+									XYDataItem item = serie.getDataItem(serie.indexOf(monthNum - 1));
 									total += item.getYValue();
+									serie.getDataItem(serie.indexOf(monthNum - 1)).setY(total);
+								} else {
+									serie.addOrUpdate(monthNum - 1, total);
 								}
+							} else {
+								serie.addOrUpdate(monthNum - 1, total);
 							}
-							serie.add(monthNum - 1, total);
 						}
 					}
 				}

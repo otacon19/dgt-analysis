@@ -151,9 +151,9 @@ public class Campaign extends ProblemElement {
 	}
 	
 	public double getValue(Criterion c, Alternative a) {
-		if(_values.get(c).get(a) != null) {
+		try {
 			return _values.get(c).get(a);
-		} else {
+		} catch(NullPointerException e) {
 			return 0;
 		}
 	}
@@ -163,14 +163,18 @@ public class Campaign extends ProblemElement {
 	}
 	
 	public int getAcumValue(Criterion c, Alternative aParent, List<Alternative> alternativesSelected) {
-		Map<Alternative, Integer> valueAlternative = _values.get(c);
-		int acum = 0;
-		for(Alternative a: valueAlternative.keySet()) {
-			if(aParent.getChildrens().contains(a) && alternativesSelected.contains(a)) {
-				acum += valueAlternative.get(a);
-			}
-		}
+		int acum = 0;;
 		
+		try {
+			Map<Alternative, Integer> valueAlternative = _values.get(c);
+			for(Alternative a: valueAlternative.keySet()) {
+				if(aParent.getChildrens().contains(a) && alternativesSelected.contains(a)) {
+					acum += valueAlternative.get(a);
+				}
+			}
+		} catch(NullPointerException e) {
+			acum = 0;
+		}
 		return acum;
 	}
 	
