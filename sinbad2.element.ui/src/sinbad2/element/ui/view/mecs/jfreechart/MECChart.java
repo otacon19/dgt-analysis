@@ -1,7 +1,9 @@
 package sinbad2.element.ui.view.mecs.jfreechart;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Stroke;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -53,6 +55,8 @@ public class MECChart {
 	private MEC _mecSelected;
 	private String _action;
 	
+	private static boolean _fontPDF;
+	
 	private List<Alternative> _alternativesSelectedPDF;
 
 	public MECChart() {
@@ -63,6 +67,7 @@ public class MECChart {
 		_campaignsSeries = new LinkedList<Campaign>();
 		_alternativesSelectedPDF = new LinkedList<Alternative>();
 		_action = "";
+		_fontPDF = false;
 	}
 	
 	public JFreeChart getBarChart() {
@@ -75,6 +80,10 @@ public class MECChart {
 	
 	public JFreeChart getStackedChart() {
 		return _stackedChart;
+	}
+	
+	public void setFontPDF(boolean state) {
+		_fontPDF = state;
 	}
 
 	public void refreshBarChart() {
@@ -138,6 +147,7 @@ public class MECChart {
 		_campaignsSeries = campaignsSeries;
 		_mecSelected = mec;
 		_action = action;
+		_fontPDF = false;
 
 		if (typeChart == 0) {
 			_chartComposite.setChart(_barChart);
@@ -156,6 +166,7 @@ public class MECChart {
 		_mecSelected = mec;
 		_action = action;
 		_alternativesSelectedPDF = alternativesSelectedPDF;
+		_fontPDF = true;
 
 		if (typeChart == 0) {
 			refreshBarChart();
@@ -290,6 +301,7 @@ public class MECChart {
 
 	}
 
+	@SuppressWarnings("serial")
 	private static JFreeChart createLineChart(XYDataset dataset) {
 
 		JFreeChart chart = ChartFactory.createXYLineChart(null, null, null,
@@ -314,18 +326,28 @@ public class MECChart {
 		months[9] = "October";
 		months[10] = "November";
 		months[11] = "December";
-		SymbolAxis rangeAxis = new SymbolAxis("", months);
-		rangeAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 5));
+	
+		SymbolAxis rangeAxis = new SymbolAxis("", months) {
+			@Override
+			public Font getTickLabelFont() {
+				if(!_fontPDF) {
+					return new java.awt.Font("Cantarell", Font.PLAIN, 10);
+				} else {
+					return new java.awt.Font("Cantarell", Font.PLAIN, 6);
+				}
+			}
+		};
+		rangeAxis.setTickLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 10));
 		plot.setDomainAxis(rangeAxis);
-		
-		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-		renderer.setSeriesLinesVisible(1, true);
-		renderer.setSeriesShapesVisible(0, true);
-		
-		
-		renderer.setBaseItemLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 6), false);
-		renderer.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 6));
+
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer() {
+			@Override
+			public Stroke getItemStroke(int row, int column) {
+				return new BasicStroke(4);
+			}
+		};
 		plot.setRenderer(renderer);
+		renderer.setBaseStroke(new BasicStroke(4));
 
 		return chart;
 	}

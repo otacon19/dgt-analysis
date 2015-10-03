@@ -293,7 +293,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 			}
 			chart.createChartByPDF(campaigns, mec, 0, "combine", _alternativesSelected);
 			JFreeChart barChart = chart.getBarChart();
-			generatePNGCharts(barChart, subCatPart);
+			generatePNGChart(barChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for(Campaign campaign: _campaignsSelected) {
@@ -310,15 +310,15 @@ public class GeneratePDFHandler extends AbstractHandler {
 					chart.createChartByPDF(campaigns, mec, 2, action, _alternativesSelected);
 					barChart = chart.getStackedChart();
 				}
-				generatePNGCharts(barChart, subCatPart);
+				generatePNGChart(barChart, subCatPart);
 			}
 		}
 	}
 	
-	private static void generatePNGCharts(JFreeChart chart, Section subCatPart) {
+	private static void generatePNGChart(JFreeChart chart, Section subCatPart) {
 		File file = new File(System.getProperty("user.home") + NAME_FILE);
 		try {
-			ChartUtilities.saveChartAsPNG(file, chart, 500, 220);
+			ChartUtilities.saveChartAsPNG(file, chart, 530, 200);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -344,7 +344,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 			}
 			chart.createChartByPDF(campaigns, mec, 1, "combine", _alternativesSelected);
 			JFreeChart lineChart = chart.getLineChart();
-			generatePNGCharts(lineChart, subCatPart);
+			generatePNGChart(lineChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for(Campaign campaign: _campaignsSelected) {
@@ -360,7 +360,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 				}
 				chart.createChartByPDF(campaigns, mec, 1, action, _alternativesSelected);
 				lineChart = chart.getLineChart();
-				generatePNGCharts(lineChart, subCatPart);
+				generatePNGChart(lineChart, subCatPart);
 			}
 		}
 	}
