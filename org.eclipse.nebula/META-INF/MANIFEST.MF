@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Nebula
+Bundle-SymbolicName: org.eclipse.nebula
+Bundle-Version: 1.0.0
+Bundle-ClassPath: .
+Bundle-Vendor: Nebula
+Export-Package: org.eclipse.nebula.cwt.animation,
+ org.eclipse.nebula.cwt.animation.effects,
+ org.eclipse.nebula.cwt.animation.movement,
+ org.eclipse.nebula.cwt.base,
+ org.eclipse.nebula.cwt.svg,
+ org.eclipse.nebula.cwt.v,
+ org.eclipse.nebula.widgets.cdatetime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
