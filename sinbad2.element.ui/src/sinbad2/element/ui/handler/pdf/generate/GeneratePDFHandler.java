@@ -62,7 +62,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static java.util.List<Alternative> _alternativesSelected;
 	private static java.util.List<MEC> _mecsSelected;
 
-	private static String PATH_FILE = "D:/Álvaro/Escritorio/DGT-Analysis/pdf.pdf";
+	private static String PATH_FILE = "";
 	private static String NAME_FILE = "/prueba.png";
 
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
@@ -92,11 +92,9 @@ public class GeneratePDFHandler extends AbstractHandler {
                 table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
                 table.addCell("");
                 table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-                table.addCell(String.format("Page %d of", writer.getPageNumber()));
-                PdfPCell cell = new PdfPCell(Image.getInstance(total));
-                cell.setBorder(Rectangle.NO_BORDER);
-                table.addCell(cell);
-                table.writeSelectedRows(0, -1, 34, 803, writer.getDirectContent());
+                table.addCell("");
+                table.addCell(String.format("%d", writer.getPageNumber()));
+                table.writeSelectedRows(0, -1, 34, 78, writer.getDirectContent());
             }
             catch(DocumentException de) {
                 de.printStackTrace();
@@ -129,22 +127,23 @@ public class GeneratePDFHandler extends AbstractHandler {
 
 		try {
 			_document = new Document(PageSize.A4, 36, 36, 54, 36);
-
+			
 			FileDialog dialogSave = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.SAVE);
 			dialogSave.setFilterNames(new String[] { "PDF Files", "All Files (*.*)" });
 			dialogSave.setFilterExtensions(new String[] { "*.pdf", "*.*" });
 			dialogSave.setFilterPath(System.getProperty("user.name"));
 			dialogSave.setFileName("Analysis.pdf");
-			PATH_FILE = dialogSave.open();
-			
-			PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(PATH_FILE));
-			writer.setPageEvent(new PageStamper());
+			if(!_alternativesSelected.isEmpty()) {
+				PATH_FILE = dialogSave.open();
+				PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(PATH_FILE));
+				writer.setPageEvent(new PageStamper());
 
-			_document.open();
-			addMetaData();
-			addTitlePage();
-			addContent();
-			_document.close();
+				_document.open();
+				addMetaData();
+				addTitlePage();
+				addContent();
+				_document.close();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

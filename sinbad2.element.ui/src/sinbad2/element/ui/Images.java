@@ -59,7 +59,7 @@ public class Images {
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/linechart_16x16.png").createImage(); //$NON-NLS-1$
 	
 	public static final Image LineChart2 = AbstractUIPlugin
-			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/linechart2.png").createImage(); //$NON-NLS-1$
+			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/linechart_wizard.png").createImage(); //$NON-NLS-1$
 	
 	public static final Image Table = AbstractUIPlugin
 			.imageDescriptorFromPlugin(PLUGIN_ID, "icons/table2.png").createImage(); //$NON-NLS-1$
