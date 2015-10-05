@@ -946,14 +946,14 @@ public class MECChart {
 	private XYDataset createLineChartDatasetCombineCampaigns() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
-		String serieNameNoData = "", serieNameData = "";
+		/*String serieNameNoData = "", serieNameData = "";
 		for (Campaign campaign : _campaignsSeries) {
 			if (!campaign.isACampaignData()) {
 				serieNameNoData += campaign.getName() + "-";
 			} else {
 				serieNameData += campaign.getName() + "-";
 			}
-		}
+		}*/
 
 		Map<Integer, List<Double>> monthValues = new LinkedHashMap<Integer, List<Double>>();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
@@ -1034,9 +1034,7 @@ public class MECChart {
 
 		double valueAcum = 0;
 		if (!monthValues.isEmpty()) {
-			serieNameNoData = serieNameNoData.substring(0,
-					serieNameNoData.length() - 1);
-			campaignSerie = new XYSeries(serieNameNoData);
+			campaignSerie = new XYSeries(_mecSelected.getId());
 			for (Integer month : monthValues.keySet()) {
 				if (dataValues.isEmpty()) {
 					valueAcum = monthValues.get(month).get(0)
@@ -1053,11 +1051,7 @@ public class MECChart {
 				campaignSerie.add((int) month, valueAcum);
 			}
 		} else {
-			if (!serieNameData.isEmpty()) {
-				serieNameData = serieNameData.substring(0,
-						serieNameData.length() - 1);
-			}
-			campaignSerie = new XYSeries(serieNameData);
+			campaignSerie = new XYSeries(_mecSelected.getId());
 
 			Map<Campaign, Double> mecCampaignsDataValue = loadCampaignsDataDirectNoAggregation();
 			Map<Integer, Double> monthDataValues = new LinkedHashMap<Integer, Double>();
@@ -1107,8 +1101,7 @@ public class MECChart {
 		Map<String, List<Campaign>> campaignsForProvinces = campaignsSameProvince(false);
 		List<String> provinces = getProvincesCampaigns();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
-		List<Alternative> alternativesSelected = AlternativesView
-				.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		Map<Campaign, Double> campaignsTotalValue = new LinkedHashMap<Campaign, Double>();
 
 		double acumValue, value, numerator, denominator, weight, total;
@@ -1116,7 +1109,7 @@ public class MECChart {
 
 		XYSeries campaignSerie = null;
 		for (String province : provinces) {
-			campaignSerie = new XYSeries(province);
+			campaignSerie = new XYSeries(_mecSelected.getId() + "(" + province + ")");
 			List<Campaign> campaignsProvinces = campaignsForProvinces
 					.get(province);
 			campaignsTotalValue.clear();
@@ -1269,8 +1262,7 @@ public class MECChart {
 				}
 				alternativesWithValues.put(c, childrenValue);
 			}
-			campaignsAlternativesWithValues.put(campaign,
-					alternativesWithValues);
+			campaignsAlternativesWithValues.put(campaign, alternativesWithValues);
 		}
 
 		double numerator, denominator;

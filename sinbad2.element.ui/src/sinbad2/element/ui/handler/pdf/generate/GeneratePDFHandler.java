@@ -3,12 +3,16 @@ package sinbad2.element.ui.handler.pdf.generate;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.osgi.framework.Bundle;
 
 import sinbad2.element.alternative.Alternative;
 import sinbad2.element.campaigns.Campaign;
@@ -24,6 +28,7 @@ import sinbad2.element.ui.wizard.SelectMEsWizardPage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -62,8 +67,8 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static java.util.List<Alternative> _alternativesSelected;
 	private static java.util.List<MEC> _mecsSelected;
 
-	private static String PATH_FILE = "";
 	private static String NAME_FILE = "/prueba.png";
+	public static final String RESOURCE = "icons/%s.png";
 
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
 			Font.BOLD);
@@ -83,22 +88,58 @@ public class GeneratePDFHandler extends AbstractHandler {
 
 		@Override
 		public void onEndPage(PdfWriter writer, Document document) {
-			PdfPTable table = new PdfPTable(3);
-            try {
-                table.setWidths(new int[]{24, 24, 2});
-                table.setTotalWidth(527);
-                table.setLockedWidth(true);
-                table.getDefaultCell().setFixedHeight(20);
-                table.getDefaultCell().setBorder(Rectangle.NO_BORDER);
-                table.addCell("");
-                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-                table.addCell("");
-                table.addCell(String.format("%d", writer.getPageNumber()));
-                table.writeSelectedRows(0, -1, 34, 78, writer.getDirectContent());
-            }
-            catch(DocumentException de) {
-                de.printStackTrace();
-            }
+			
+			if(writer.getPageNumber() == 1) {
+				try {
+					Bundle bundle = Platform.getBundle("sinbad2.element.ui");
+					Path path = new Path("/icons/ministerio_del_interior.png");
+					Path path_logo = new Path("/icons/logo_esquina.png");
+					URL fileURL = FileLocator.find(bundle, path, null);
+					URL fileLogoURL = FileLocator.find(bundle, path_logo, null);
+					URL resolved = null, resolvedLogo = null;
+					try {
+					    resolved = FileLocator.resolve(fileURL);
+					    resolvedLogo = FileLocator.resolve(fileLogoURL);
+					} catch (IOException e) {
+					    throw new RuntimeException(e);
+					}
+					
+					Image[] img = {Image.getInstance(String.format(resolved.getPath(), "")), Image.getInstance(String.format(resolvedLogo.getPath(), "")) };
+					PdfPTable table_header = new PdfPTable(2);
+					table_header.setHeaderRows(12);
+					table_header.setWidths(new int[]{12, 12});
+	            	table_header.setTotalWidth(803);
+	            	table_header.setLockedWidth(true);
+	            	table_header.getDefaultCell().setFixedHeight(10);
+	                table_header.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+	                PdfPCell cell = new PdfPCell(Image.getInstance(img[0]));
+	                cell.setBorder(Rectangle.NO_BORDER);
+	                table_header.addCell(cell);
+	                cell = new PdfPCell(Image.getInstance(img[1]));
+	                cell.setBorder(Rectangle.NO_BORDER);
+	                table_header.addCell(cell);
+	                table_header.writeSelectedRows(0, -1, 34, 803, writer.getDirectContent());
+				} catch (IOException | DocumentException e) {
+					e.printStackTrace();
+				}
+			} else {
+				PdfPTable table_pages = new PdfPTable(3);
+	            try {           	
+	                table_pages.setWidths(new int[]{24, 24, 2});
+	                table_pages.setTotalWidth(527);
+	                table_pages.setLockedWidth(true);
+	                table_pages.getDefaultCell().setFixedHeight(20);
+	                table_pages.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+	                table_pages.addCell("");
+	                table_pages.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
+	                table_pages.addCell("");
+	                table_pages.addCell(String.format("%d", writer.getPageNumber()));
+	                table_pages.writeSelectedRows(0, -1, 34, 78, writer.getDirectContent());
+	            }
+	            catch(DocumentException de) {
+	                de.printStackTrace();
+	            }
+			}
 		}
 
 		@Override
@@ -134,8 +175,8 @@ public class GeneratePDFHandler extends AbstractHandler {
 			dialogSave.setFilterPath(System.getProperty("user.name"));
 			dialogSave.setFileName("Analysis.pdf");
 			if(!_alternativesSelected.isEmpty()) {
-				PATH_FILE = dialogSave.open();
-				PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(PATH_FILE));
+				String path = dialogSave.open();
+				PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(path));
 				writer.setPageEvent(new PageStamper());
 
 				_document.open();
@@ -161,23 +202,25 @@ public class GeneratePDFHandler extends AbstractHandler {
 
 	private static void addTitlePage() throws DocumentException {
 		Paragraph preface = new Paragraph();
-		addEmptyLine(preface, 1);
-		preface.add(new Paragraph("Decision-MEC Analysis", catFont));
 
-		addEmptyLine(preface, 1);
-		preface.add(new Paragraph("Report generated by: "
-				+ System.getProperty("user.name") + ", " + new Date(),
-				smallBold));
-		addEmptyLine(preface, 3);
-		preface.add(new Paragraph(
-				"This document describes something which is very important ",
-				smallBold));
-
-		addEmptyLine(preface, 8);
-
-		preface.add(new Paragraph(
-				"This document is a preliminary version of dgt analysis ;-).",
-				redFont));
+		addEmptyLine(preface, 13);
+		
+		Bundle bundle = Platform.getBundle("sinbad2.element.ui");
+		Path path = new Path("/icons/logo.png");
+		URL fileURL = FileLocator.find(bundle, path, null);
+		URL resolved = null;
+		try {
+		    resolved = FileLocator.resolve(fileURL);
+		    Image logo = Image.getInstance(String.format(resolved.getPath(), ""));
+		    preface.add(logo);
+		} catch (IOException e) {
+		    throw new RuntimeException(e);
+		}
+		
+		addEmptyLine(preface, 13);
+		
+		preface.add(new Paragraph("Report generated by: " + System.getProperty("user.name") + ", " + new Date(), smallBold));
+		
 
 		_document.add(preface);
 		_document.newPage();
