@@ -38,7 +38,7 @@ public class MockModel {
 		a3.addChildren(new Alternative("22:00-6:00"));
 		elementSet.addAlternative(a3, true);
 		Alternative a4 = new Alternative("Periodo semanal");
-		a4.addChildren(new Alternative("Entresemana"));
+		a4.addChildren(new Alternative("Entre semana"));
 		a4.addChildren(new Alternative("Fin de semana"));
 		elementSet.addAlternative(a4, true);
 		Alternative a5 = new Alternative("Permisos");

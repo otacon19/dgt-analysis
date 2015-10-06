@@ -162,7 +162,7 @@ public class Campaign extends ProblemElement {
 		return _values.get(c);
 	}
 	
-	public int getAcumValue(Criterion c, Alternative aParent, List<Alternative> alternativesSelected) {
+	public double getAcumValue(Criterion c, Alternative aParent, List<Alternative> alternativesSelected) {
 		int acum = 0;;
 		
 		try {

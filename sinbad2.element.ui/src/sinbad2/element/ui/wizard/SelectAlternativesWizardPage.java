@@ -160,7 +160,9 @@ public class SelectAlternativesWizardPage extends WizardPage {
 											}
 										}
 										for(Alternative children: childrens) {
-											_buttons.get(children).setSelection(false);
+											if(_buttons.get(children) != null) {
+												_buttons.get(children).setSelection(false);
+											}
 										}
 									}
 								}

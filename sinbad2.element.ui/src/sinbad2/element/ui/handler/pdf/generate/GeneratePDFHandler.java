@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -30,9 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.List;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BadElementException;
@@ -68,21 +68,16 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static java.util.List<MEC> _mecsSelected;
 
 	private static String NAME_FILE = "/prueba.png";
-	public static final String RESOURCE = "icons/%s.png";
 
-	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
-			Font.BOLD);
-	private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-			Font.NORMAL);
-	private static Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-			Font.BOLD);
-	private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-			Font.NORMAL, BaseColor.RED);
-	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 13,
-			Font.BOLD);
-	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-			Font.BOLD);
+	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+	private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
+	private static Font whiteFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.WHITE);
+	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 15, Font.BOLD);
+	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 
+	private static final BaseColor COLOR_HEADER_TABLE = new BaseColor(65, 50, 186);
+	private static final BaseColor COLOR_PARENT_TABLE = new BaseColor(197, 214, 255);
+	
 	public class PageStamper extends PdfPageEventHelper {
 		PdfTemplate total;
 
@@ -134,7 +129,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 	                table_pages.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
 	                table_pages.addCell("");
 	                table_pages.addCell(String.format("%d", writer.getPageNumber()));
-	                table_pages.writeSelectedRows(0, -1, 34, 78, writer.getDirectContent());
+	                table_pages.writeSelectedRows(0, -1, 34, 60, writer.getDirectContent());
 	            }
 	            catch(DocumentException de) {
 	                de.printStackTrace();
@@ -156,7 +151,6 @@ public class GeneratePDFHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), new GeneratePDFWizard());
-		dialog.open();
 
 		_tableSelected = SelectChartWizardPage.getInformationTable();
 		_chartsSelected = SelectChartWizardPage.getInformationCharts();
@@ -167,17 +161,18 @@ public class GeneratePDFHandler extends AbstractHandler {
 		_mecsSelected = SelectMEsWizardPage.getInformationMECs();
 
 		try {
-			_document = new Document(PageSize.A4, 36, 36, 54, 36);
+			_document = new Document(PageSize.A4, 36, 36, 54, 70);
 			
 			FileDialog dialogSave = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.SAVE);
 			dialogSave.setFilterNames(new String[] { "PDF Files", "All Files (*.*)" });
 			dialogSave.setFilterExtensions(new String[] { "*.pdf", "*.*" });
 			dialogSave.setFilterPath(System.getProperty("user.name"));
 			dialogSave.setFileName("Analysis.pdf");
-			if(!_alternativesSelected.isEmpty()) {
+			if(dialog.open() == Window.OK) {
 				String path = dialogSave.open();
 				PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(path));
 				writer.setPageEvent(new PageStamper());
+				writer.setPageEmpty(false);
 
 				_document.open();
 				addMetaData();
@@ -227,16 +222,21 @@ public class GeneratePDFHandler extends AbstractHandler {
 	}
 
 	private static void addContent() throws DocumentException {
-		Anchor anchor = new Anchor("Data campaigns", catFont);
-		anchor.setName("Data campaigns");
-
+		Anchor anchor = new Anchor("Campaigns Analysis", catFont);
+		Paragraph empty = new Paragraph();
+		addEmptyLine(empty, 1);
+		anchor.add(empty);
+		anchor.setName("Campaigns Analysis");
+		
 		Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-
+		
 		for (MEC mec : _mecsSelected) {
+			Paragraph prevPara = new Paragraph();
+			addEmptyLine(prevPara, 2);
+			catPart.add(prevPara);
 			Paragraph subPara = new Paragraph(mec.getId(), subFont);
 			addEmptyLine(subPara, 1);
 			Section subCatPart = catPart.addSection(subPara);
-			addEmptyLine(subPara, 1);
 			if (_tableSelected == 1) {
 				createTableMEC(subCatPart, mec);
 				if (!_chartsSelected.isEmpty()) {
@@ -265,38 +265,33 @@ public class GeneratePDFHandler extends AbstractHandler {
 					}
 				}
 			}
-			addEmptyLine(subPara, 1);
 		}
 
 		_document.add(catPart);
-
-		anchor = new Anchor("Second Chapter", catFont);
-		anchor.setName("Second Chapter");
-
-		catPart = new Chapter(new Paragraph(anchor), 1);
-
-		_document.add(catPart);
-
 	}
 
-	private static void createTableMEC(Section subCatPart, MEC mec)
-			throws BadElementException {
+	private static void createTableMEC(Section subCatPart, MEC mec) throws DocumentException {
 		if (_aggregationSelected == 0) {
 			PdfPTable table = new PdfPTable(3);
+			table.setHeaderRows(20);
+			table.setWidths(new int[]{12, 12, 12});
+			table.setTotalWidth(510);
+			table.setLockedWidth(true);
+			table.getDefaultCell().setFixedHeight(12);
 
-			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", boldFont));
+			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", whiteFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-			c1.setBackgroundColor(new BaseColor(197, 214, 255));
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
+			table.addCell(c1);
+			
+			c1 = new PdfPCell(new Phrase("Alternative", whiteFont));
+			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Alternative", boldFont));
+			c1 = new PdfPCell(new Phrase("Value", whiteFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-			c1.setBackgroundColor(new BaseColor(197, 214, 255));
-			table.addCell(c1);
-
-			c1 = new PdfPCell(new Phrase("Value", boldFont));
-			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-			c1.setBackgroundColor(new BaseColor(197, 214, 255));
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
 			table.addCell(c1);
 			table.setHeaderRows(1);
 
@@ -308,102 +303,109 @@ public class GeneratePDFHandler extends AbstractHandler {
 	}
 
 	private static void aggregateCampaings(PdfPTable table, MEC mec) {
-		Map<Criterion, Map<Alternative, Double>> criteriaWithValueAcumAlternatives = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
-		for (Campaign campaign : _campaignsSelected) {
-			java.util.List<Criterion> criteriaMEC = mec.getAvailableCriteria();
-			for (Criterion criterion : criteriaMEC) {
-				for (Alternative alternative : _alternativesSelected) {
-					if (campaign.getValue(criterion, alternative) != 0) {
-						if (criteriaWithValueAcumAlternatives.get(criterion) != null) {
-							Map<Alternative, Double> alternativesValuesAcum = criteriaWithValueAcumAlternatives
-									.get(criterion);
-							if (alternativesValuesAcum.get(alternative) != null) {
-								double valueAcum = alternativesValuesAcum
-										.get(alternative)
-										+ campaign.getValue(criterion,
-												alternative);
-								alternativesValuesAcum.put(alternative,
-										valueAcum);
-								criteriaWithValueAcumAlternatives.put(
-										criterion, alternativesValuesAcum);
-							} else {
-								alternativesValuesAcum.put(alternative,
-										campaign.getValue(criterion,
-												alternative));
-								criteriaWithValueAcumAlternatives.put(
-										criterion, alternativesValuesAcum);
-							}
-						} else {
-							Map<Alternative, Double> alternativesValuesAcum = new LinkedHashMap<Alternative, Double>();
-							alternativesValuesAcum.put(alternative,
-									campaign.getValue(criterion, alternative));
-							criteriaWithValueAcumAlternatives.put(criterion,
-									alternativesValuesAcum);
-						}
+		PdfPCell cell;
+		for(Campaign campaign: _campaignsSelected) {
+			for (Criterion c : mec.getCriteria().keySet()) {
+				cell = new PdfPCell(new Phrase(c.getId(), normalFont));
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				cell.setRowspan(_alternativesSelected.size());
+				table.addCell(cell);
+				for (Alternative a : _alternativesSelected) {
+					if(a.hasChildrens()) {
+						cell = new PdfPCell(new Phrase(a.getId(), normalFont));
+						cell.setBackgroundColor(COLOR_PARENT_TABLE);
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+						cell = new PdfPCell(new Phrase(Double.toString(getTotalValueMEC(mec, campaign, a))));
+						cell.setBackgroundColor(COLOR_PARENT_TABLE);
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+					} else { 
+						cell = new PdfPCell(new Phrase(a.getId(), normalFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+						cell = new PdfPCell(new Phrase(Double.toString(getValueMEC(mec, campaign, a)), normalFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
 					}
 				}
 			}
 		}
-
-		PdfPCell cell;
-		for (Criterion c : criteriaWithValueAcumAlternatives.keySet()) {
-			Map<Alternative, Double> aValues = criteriaWithValueAcumAlternatives
-					.get(c);
-			cell = new PdfPCell(new Phrase(c.getId(), normalFont));
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setRowspan(aValues.size());
-			table.addCell(cell);
-			for (Alternative a : aValues.keySet()) {
-				cell = new PdfPCell(new Phrase(a.getId(), normalFont));
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-				cell = new PdfPCell(new Phrase(Double.toString(aValues.get(a)),
-						normalFont));
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-			}
+	}
+	
+	private static double getTotalValueMEC(MEC mec, Campaign campaign, Alternative parent) {
+		double result = 0;
+		for(Alternative children: parent.getChildrens()) {
+			result += getValueMEC(mec, campaign, children);
 		}
+		
+		return result;
 	}
 
-	private static void desaggregateCampaigns(Section subCatPart, MEC mec) {
+	private static double getValueMEC(MEC mec, Campaign campaign, Alternative alternative) {
+		double numerator = 1, denominator = 1;
+		
+		List<Object> positionAndWeigth;
+		for(Criterion criterion: mec.getCriteria().keySet()) {
+			positionAndWeigth = mec.getCriteria().get(criterion);
+			if((Integer) positionAndWeigth.get(0) == 0) {
+				numerator *= campaign.getValue(criterion, alternative) * (Double) positionAndWeigth.get(1);
+			} else {
+				denominator *= campaign.getValue(criterion, alternative) * (Double) positionAndWeigth.get(1);
+			}
+		}
+		
+		return numerator / denominator;
+	}
+
+	private static void desaggregateCampaigns(Section subCatPart, MEC mec) throws DocumentException {
 		for (Campaign campaign : _campaignsSelected) {
 			PdfPTable table = new PdfPTable(3);
+			table.setHeaderRows(20);
+			table.setWidths(new int[]{12, 12, 12});
+			table.setTotalWidth(510);
+			table.setLockedWidth(true);
+			table.getDefaultCell().setFixedHeight(12);
 
-			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", normalFont));
+			PdfPCell c1 = new PdfPCell(new Phrase("Criterion", whiteFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
+			table.addCell(c1);
+			
+			c1 = new PdfPCell(new Phrase("Alternative", whiteFont));
+			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
 			table.addCell(c1);
 
-			c1 = new PdfPCell(new Phrase("Alternative", normalFont));
+			c1 = new PdfPCell(new Phrase("Value", whiteFont));
 			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-			table.addCell(c1);
-
-			c1 = new PdfPCell(new Phrase("Value", normalFont));
-			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			c1.setBackgroundColor(COLOR_HEADER_TABLE);
 			table.addCell(c1);
 			table.setHeaderRows(1);
 
 			PdfPCell cell;
 			java.util.List<Criterion> criteriaMEC = mec.getAvailableCriteria();
 			for (Criterion criterion : criteriaMEC) {
+				cell = new PdfPCell(new Phrase(criterion.getId(), normalFont));
+				cell.setRowspan(_alternativesSelected.size());
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
 				for (Alternative alternative : _alternativesSelected) {
-					cell = new PdfPCell(new Phrase(criterion.getId(),
-							normalFont));
-					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-					table.addCell(cell);
-					cell = new PdfPCell(new Phrase(alternative.getId(),
-							normalFont));
-					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-					table.addCell(cell);
 					if (campaign.getValue(criterion, alternative) != 0) {
-						cell = new PdfPCell(new Phrase(Double.toString(campaign
-								.getValue(criterion, alternative)), normalFont));
+						cell = new PdfPCell(new Phrase(alternative.getId(), normalFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+						cell = new PdfPCell(new Phrase(Double.toString(getValueMEC(mec, campaign, alternative)), normalFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 						table.addCell(cell);
 					} else {
-						cell = new PdfPCell(new Phrase(Double.toString(campaign
-								.getAcumValue(criterion, alternative,
-										_alternativesSelected)), normalFont));
+						cell = new PdfPCell(new Phrase(alternative.getId(), normalFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						cell.setBackgroundColor(COLOR_PARENT_TABLE);
+						table.addCell(cell);
+						cell = new PdfPCell(new Phrase(Double.toString(getTotalValueMEC(mec, campaign, alternative)), normalFont));		
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						cell.setBackgroundColor(COLOR_PARENT_TABLE);
 						table.addCell(cell);
 					}
 				}
@@ -424,28 +426,23 @@ public class GeneratePDFHandler extends AbstractHandler {
 			for (Campaign campaign : _campaignsSelected) {
 				campaigns.add(campaign);
 			}
-			chart.createChartByPDF(campaigns, mec, 0, "combine",
-					_alternativesSelected);
+			chart.createChartByPDF(campaigns, mec, 0, "combine", _alternativesSelected);
 			JFreeChart barChart = chart.getBarChart();
 			generatePNGChart(barChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for (Campaign campaign : _campaignsSelected) {
 				Campaign clone = (Campaign) campaign.clone();
-				clone.setName(campaign.getId() + "_" + campaign.getName() + "("
-						+ campaign.getInitialDate() + "-"
-						+ campaign.getFinalDate() + ")");
+				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")");
 				campaigns.add(clone);
 			}
 			JFreeChart barChart = null;
 			for (String action : _desaggregationOption) {
 				if (!action.equals("contexts")) {
-					chart.createChartByPDF(campaigns, mec, 0, action,
-							_alternativesSelected);
+					chart.createChartByPDF(campaigns, mec, 0, action, _alternativesSelected);
 					barChart = chart.getBarChart();
 				} else {
-					chart.createChartByPDF(campaigns, mec, 2, action,
-							_alternativesSelected);
+					chart.createChartByPDF(campaigns, mec, 2, action, _alternativesSelected);
 					barChart = chart.getStackedChart();
 				}
 				generatePNGChart(barChart, subCatPart);
@@ -463,18 +460,20 @@ public class GeneratePDFHandler extends AbstractHandler {
 
 		Image pdfImage;
 		try {
-			pdfImage = com.itextpdf.text.Image.getInstance(System
-					.getProperty("user.home") + NAME_FILE);
+			pdfImage = com.itextpdf.text.Image.getInstance(System.getProperty("user.home") + NAME_FILE);
 			subCatPart.add(pdfImage);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (BadElementException e) {
 			e.printStackTrace();
 		}
+		
+		Paragraph sectionPara = new Paragraph();
+		subCatPart.add(sectionPara);
+		addEmptyLine(sectionPara, 2);
 	}
 
-	private static void createLineCharts(Section subCatPart, MEC mec)
-			throws BadElementException {
+	private static void createLineCharts(Section subCatPart, MEC mec) throws BadElementException {
 		MECChart chart = new MECChart();
 
 		if (_aggregationSelected == 0) {
@@ -482,17 +481,14 @@ public class GeneratePDFHandler extends AbstractHandler {
 			for (Campaign campaign : _campaignsSelected) {
 				campaigns.add(campaign);
 			}
-			chart.createChartByPDF(campaigns, mec, 1, "combine",
-					_alternativesSelected);
+			chart.createChartByPDF(campaigns, mec, 1, "combine", _alternativesSelected);
 			JFreeChart lineChart = chart.getLineChart();
 			generatePNGChart(lineChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for (Campaign campaign : _campaignsSelected) {
 				Campaign clone = (Campaign) campaign.clone();
-				clone.setName(campaign.getId() + "_" + campaign.getName() + "("
-						+ campaign.getInitialDate() + "-"
-						+ campaign.getFinalDate() + ")");
+				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")");
 				campaigns.add(clone);
 			}
 
@@ -501,8 +497,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 				if (action.equals("separate")) {
 					action = "combine";
 				}
-				chart.createChartByPDF(campaigns, mec, 1, action,
-						_alternativesSelected);
+				chart.createChartByPDF(campaigns, mec, 1, action, _alternativesSelected);
 				lineChart = chart.getLineChart();
 				generatePNGChart(lineChart, subCatPart);
 			}

@@ -109,6 +109,21 @@ public class MECChart {
 						createBarChartDatasetSeparateProvinces());
 			}
 		}
+		activateLegend(_barChart);
+	}
+
+	private void activateLegend(JFreeChart chart) {
+		if (chart != null) {
+			if (chart.getLegend() == null) {
+				LegendTitle legend = new LegendTitle(chart.getPlot());
+				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
+				legend.setFrame(new LineBorder());
+				legend.setBackgroundPaint(Color.white);
+				legend.setPosition(RectangleEdge.BOTTOM);
+				chart.addLegend(legend);
+			}
+		}
+		
 	}
 
 	public void refreshStackedChart() {
@@ -117,6 +132,8 @@ public class MECChart {
 		} else {
 			_stackedChart.getCategoryPlot().setDataset(createBarChartDatasetSeparateContexts());
 		}
+		
+		activateLegend(_stackedChart);
 	}
 
 	public void refreshLineChart() {
@@ -129,17 +146,16 @@ public class MECChart {
 				_lineChart = createLineChart(createLineChartDatasetSeparateContexts());
 			}
 		} else {
-			if (_action.equals("contexts")) {
-				_lineChart.getXYPlot().setDataset(
-						createLineChartDatasetSeparateContexts());
-			} else if (_action.equals("combine")) {
-				_lineChart.getXYPlot().setDataset(
-						createLineChartDatasetCombineCampaigns());
+			if (_action.equals("combine")) {
+					_lineChart.getXYPlot().setDataset(createLineChartDatasetCombineCampaigns());
 			} else if (_action.equals("separate_provinces")) {
-				_lineChart.getXYPlot().setDataset(
-						createLineChartDatasetSeparateProvinces());
+				_lineChart.getXYPlot().setDataset(createLineChartDatasetSeparateProvinces());
+			} else if (_action.equals("contexts")) {
+				_lineChart.getXYPlot().setDataset(createLineChartDatasetSeparateContexts());
 			}
 		}
+		
+		activateLegend(_lineChart);
 	}
 
 	public void setMEC(List<Campaign> campaignsSeries, MEC mec,
@@ -373,22 +389,20 @@ public class MECChart {
 			Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
 			List<Double> numeratorAndDenominator;
 			for (Campaign campaign : noDataCampaigns) {
-				Map<Criterion, List<Object>> criteriaData = _mecSelected
-						.getCriteria();
+				Map<Criterion, List<Object>> mecCriteria = _mecSelected.getCriteria();
 				numerator = 1;
 				denominator = 1;
-				for (Criterion c : criteriaData.keySet()) {
+				for (Criterion c : mecCriteria.keySet()) {
 					if (campaign.getCriteria().contains(c)) {
 						value = 0;
 						acumValue = 0;
-						data = criteriaData.get(c);
+						data = mecCriteria.get(c);
 						for (Alternative a : alternativesSelected) {
 							if (a.hasChildrens()) {
 								List<Alternative> childrens = a.getChildrens();
 								for (Alternative children : childrens) {
 									if (alternativesSelected.contains(children)) {
-										acumValue += campaign.getValue(c,
-												children);
+										acumValue += campaign.getValue(c, children);
 									}
 								}
 								if (value == 0) {
@@ -427,8 +441,7 @@ public class MECChart {
 					if (dataValues.isEmpty()) {
 						valueAcum += nAd.get(0) / nAd.get(1);
 					} else {
-						valueAcum += (nAd.get(0) * dataValues.get(0))
-								/ (nAd.get(1) * dataValues.get(1));
+						valueAcum += (nAd.get(0) * dataValues.get(0)) / (nAd.get(1) * dataValues.get(1));
 					}
 				}
 			} else {
@@ -452,24 +465,12 @@ public class MECChart {
 			}
 
 			dataset.addValue(valueAcum, _mecSelected.getId(), category);
-
-			if (_barChart != null) {
-				if (_barChart.getLegend() == null) {
-					LegendTitle legend = new LegendTitle(_barChart.getPlot());
-					legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-					legend.setFrame(new LineBorder());
-					legend.setBackgroundPaint(Color.white);
-					legend.setPosition(RectangleEdge.BOTTOM);
-					_barChart.addLegend(legend);
-				}
-			}
 		}
 		return dataset;
 	}
 
 	private List<Double> loadCampaignsDataDirectAggregation() {
-		List<Alternative> alternativesSelected = AlternativesView
-				.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		List<Double> numeratorAndDenominator;
 		double numerator = 1, denominator = 1;
 
@@ -612,17 +613,6 @@ public class MECChart {
 			Map<Campaign, Double> mecCampaignsDataValue = loadCampaignsDataDirectNoAggregation();
 			for (Campaign c : mecCampaignsDataValue.keySet()) {
 				dataset.addValue(mecCampaignsDataValue.get(c), _mecSelected, c.getName());
-			}
-		}
-
-		if (_barChart != null) {
-			if (_barChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_barChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_barChart.addLegend(legend);
 			}
 		}
 
@@ -782,18 +772,7 @@ public class MECChart {
 
 			dataset.addValue(valueAcum, _mecSelected.getId(), province);
 		}
-
-		if (_barChart != null) {
-			if (_barChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_barChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_barChart.addLegend(legend);
-			}
-		}
-
+		
 		return dataset;
 	}
 
@@ -930,31 +909,11 @@ public class MECChart {
 			}
 		}
 
-		if (_barChart != null) {
-			if (_barChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_barChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_barChart.addLegend(legend);
-			}
-		}
-
 		return dataset;
 	}
 	private XYDataset createLineChartDatasetCombineCampaigns() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
-
-		/*String serieNameNoData = "", serieNameData = "";
-		for (Campaign campaign : _campaignsSeries) {
-			if (!campaign.isACampaignData()) {
-				serieNameNoData += campaign.getName() + "-";
-			} else {
-				serieNameData += campaign.getName() + "-";
-			}
-		}*/
-
+		
 		Map<Integer, List<Double>> monthValues = new LinkedHashMap<Integer, List<Double>>();
 		List<Double> dataValues = loadCampaignsDataDirectAggregation();
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
@@ -1080,18 +1039,7 @@ public class MECChart {
 			}
 		}
 		dataset.addSeries(campaignSerie);
-
-		if (_lineChart != null) {
-			if (_lineChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_lineChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_lineChart.addLegend(legend);
-			}
-		}
-
+		
 		return dataset;
 	}
 
@@ -1215,17 +1163,6 @@ public class MECChart {
 			dataset.addSeries(campaignSerie);
 		}
 
-		if (_lineChart != null) {
-			if (_lineChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_lineChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_lineChart.addLegend(legend);
-			}
-		}
-
 		return dataset;
 	}
 
@@ -1233,15 +1170,13 @@ public class MECChart {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
 		double acumValue = 0, weight;
-		List<Alternative> alternativesSelected = AlternativesView
-				.getAlternativesSelected();
+		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 		Map<Alternative, Double> childrenValue;
 		Map<Criterion, Integer> criteriaPos = new LinkedHashMap<Criterion, Integer>();
 		Map<Criterion, Map<Alternative, Double>> alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
 		Map<Campaign, Map<Criterion, Map<Alternative, Double>>> campaignsAlternativesWithValues = new LinkedHashMap<Campaign, Map<Criterion, Map<Alternative, Double>>>();
 		for (Campaign campaign : _campaignsSeries) {
-			Map<Criterion, List<Object>> criteriaData = _mecSelected
-					.getCriteria();
+			Map<Criterion, List<Object>> criteriaData = _mecSelected.getCriteria();
 			alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
 			for (Criterion c : criteriaData.keySet()) {
 				childrenValue = new LinkedHashMap<Alternative, Double>();
@@ -1271,36 +1206,29 @@ public class MECChart {
 		Map<String, List<Campaign>> campaignsForProvinces = campaignsSameProvince(true);
 		List<String> provinces = getProvincesCampaigns();
 		for (String province : provinces) {
-			List<Campaign> campaignsProvinces = campaignsForProvinces
-					.get(province);
+			List<Campaign> campaignsProvinces = campaignsForProvinces.get(province);
 			for (Campaign campaign : campaignsProvinces) {
-				Map<Criterion, Map<Alternative, Double>> criteriaWithAlternativesAndValues = campaignsAlternativesWithValues
-						.get(campaign);
+				Map<Criterion, Map<Alternative, Double>> criteriaWithAlternativesAndValues = campaignsAlternativesWithValues.get(campaign);
 				for (Alternative a : alternativesSelected) {
 					if (!a.hasChildrens()) {
 						if (!seriesAlreadyAdded.contains(a)) {
-							serie = new XYSeries(a.getId() + "_"
-									+ campaign.getProvince());
+							serie = new XYSeries(a.getId() + "_" + campaign.getProvince());
 							dataset.addSeries(serie);
 							seriesAlreadyAdded.add(a);
 						} else {
 							try {
-								serie = dataset.getSeries(a.getId() + "_"
-										+ campaign.getProvince());
+								serie = dataset.getSeries(a.getId() + "_" + campaign.getProvince());
 							} catch (UnknownKeyException e) {
-								serie = new XYSeries(a.getId() + "_"
-										+ campaign.getProvince());
+								serie = new XYSeries(a.getId() + "_" + campaign.getProvince());
 								dataset.addSeries(serie);
 								seriesAlreadyAdded.add(a);
 							}
 						}
 						numerator = 1;
 						denominator = 1;
-						for (Criterion c : criteriaWithAlternativesAndValues
-								.keySet()) {
+						for (Criterion c : criteriaWithAlternativesAndValues.keySet()) {
 							int pos = criteriaPos.get(c);
-							Map<Alternative, Double> alternativesValues = criteriaWithAlternativesAndValues
-									.get(c);
+							Map<Alternative, Double> alternativesValues = criteriaWithAlternativesAndValues.get(c);
 							if (alternativesValues.get(a) != null) {
 								if (pos == 0) {
 									numerator *= alternativesValues.get(a);
@@ -1330,18 +1258,6 @@ public class MECChart {
 				}
 			}
 		}
-
-		if (_lineChart != null) {
-			if (_lineChart.getLegend() == null) {
-				LegendTitle legend = new LegendTitle(_lineChart.getPlot());
-				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
-				legend.setBackgroundPaint(Color.white);
-				legend.setPosition(RectangleEdge.BOTTOM);
-				_lineChart.addLegend(legend);
-			}
-		}
 		return dataset;
 	}
-
 }
