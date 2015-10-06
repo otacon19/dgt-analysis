@@ -58,6 +58,7 @@ import com.itextpdf.text.PageSize;
 public class GeneratePDFHandler extends AbstractHandler {
 
 	private static Document _document;
+	private static PdfWriter _writer; 
 
 	private static int _tableSelected;
 	private static java.util.List<String> _chartsSelected;
@@ -152,14 +153,6 @@ public class GeneratePDFHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), new GeneratePDFWizard());
 
-		_tableSelected = SelectChartWizardPage.getInformationTable();
-		_chartsSelected = SelectChartWizardPage.getInformationCharts();
-		_campaignsSelected = SelectCampaignsWizardPage.getInformationCampaigns();
-		_aggregationSelected = SelectCampaignsWizardPage.getInformationAggregation();
-		_desaggregationOption = SelectCampaignsWizardPage.getInformationDesaggregationOption();
-		_alternativesSelected = SelectAlternativesWizardPage.getInformationAlternatives();
-		_mecsSelected = SelectMEsWizardPage.getInformationMECs();
-
 		try {
 			_document = new Document(PageSize.A4, 36, 36, 54, 70);
 			
@@ -168,11 +161,21 @@ public class GeneratePDFHandler extends AbstractHandler {
 			dialogSave.setFilterExtensions(new String[] { "*.pdf", "*.*" });
 			dialogSave.setFilterPath(System.getProperty("user.name"));
 			dialogSave.setFileName("Analysis.pdf");
+			
 			if(dialog.open() == Window.OK) {
+				
+				_tableSelected = SelectChartWizardPage.getInformationTable();
+				_chartsSelected = SelectChartWizardPage.getInformationCharts();
+				_campaignsSelected = SelectCampaignsWizardPage.getInformationCampaigns();
+				_aggregationSelected = SelectCampaignsWizardPage.getInformationAggregation();
+				_desaggregationOption = SelectCampaignsWizardPage.getInformationDesaggregationOption();
+				_alternativesSelected = SelectAlternativesWizardPage.getInformationAlternatives();
+				_mecsSelected = SelectMEsWizardPage.getInformationMECs();
+				
 				String path = dialogSave.open();
-				PdfWriter writer = PdfWriter.getInstance(_document, new FileOutputStream(path));
-				writer.setPageEvent(new PageStamper());
-				writer.setPageEmpty(false);
+				_writer = PdfWriter.getInstance(_document, new FileOutputStream(path));
+				_writer.setPageEvent(new PageStamper());
+				_writer.setPageEmpty(false);
 
 				_document.open();
 				addMetaData();
@@ -231,25 +234,22 @@ public class GeneratePDFHandler extends AbstractHandler {
 		Chapter catPart = new Chapter(new Paragraph(anchor), 1);
 		
 		for (MEC mec : _mecsSelected) {
-			Paragraph prevPara = new Paragraph();
-			addEmptyLine(prevPara, 2);
-			catPart.add(prevPara);
+			
 			Paragraph subPara = new Paragraph(mec.getId(), subFont);
 			addEmptyLine(subPara, 1);
 			Section subCatPart = catPart.addSection(subPara);
+			
 			if (_tableSelected == 1) {
 				createTableMEC(subCatPart, mec);
-				if (!_chartsSelected.isEmpty()) {
-					if (_chartsSelected.size() == 1) {
-						if (_chartsSelected.get(0).equals("0")) {
-							createBarCharts(subCatPart, mec);
-						} else {
-							createLineCharts(subCatPart, mec);
-						}
-					} else {
+				if (_chartsSelected.size() == 1) {
+					if (_chartsSelected.get(0).equals("0")) {
 						createBarCharts(subCatPart, mec);
+					} else {
 						createLineCharts(subCatPart, mec);
 					}
+				} else {
+					createBarCharts(subCatPart, mec);
+					createLineCharts(subCatPart, mec);
 				}
 			} else {
 				if (!_chartsSelected.isEmpty()) {
@@ -266,8 +266,9 @@ public class GeneratePDFHandler extends AbstractHandler {
 				}
 			}
 		}
-
 		_document.add(catPart);
+		//_document.newPage();
+	    //_writer.setPageEmpty(false);
 	}
 
 	private static void createTableMEC(Section subCatPart, MEC mec) throws DocumentException {
@@ -300,6 +301,10 @@ public class GeneratePDFHandler extends AbstractHandler {
 		} else {
 			desaggregateCampaigns(subCatPart, mec);
 		}
+		
+		Paragraph empty = new Paragraph();
+		addEmptyLine(empty, 1);
+		subCatPart.add(empty);
 	}
 
 	private static void aggregateCampaings(PdfPTable table, MEC mec) {
@@ -453,7 +458,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static void generatePNGChart(JFreeChart chart, Section subCatPart) {
 		File file = new File(System.getProperty("user.home") + NAME_FILE);
 		try {
-			ChartUtilities.saveChartAsPNG(file, chart, 530, 200);
+			ChartUtilities.saveChartAsPNG(file, chart, 530, 230);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -470,7 +475,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 		
 		Paragraph sectionPara = new Paragraph();
 		subCatPart.add(sectionPara);
-		addEmptyLine(sectionPara, 2);
+		addEmptyLine(sectionPara, 1);
 	}
 
 	private static void createLineCharts(Section subCatPart, MEC mec) throws BadElementException {

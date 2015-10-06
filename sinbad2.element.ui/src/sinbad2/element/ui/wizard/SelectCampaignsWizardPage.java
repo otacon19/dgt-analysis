@@ -5,18 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -27,9 +22,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 
 import sinbad2.element.campaigns.Campaign;
+import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignIdLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignInitialDateLabelProvider;
@@ -55,7 +50,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		super("Select campaigns");
 		setDescription("Select the campaigns you want");
 		
-		_campaignsSelected = new LinkedList<Campaign>();
+		_campaignsSelected = CampaignsView.getCampaignsSelected();
 		_desaggregationOption = new LinkedList<String>();
 	}
 	
@@ -274,7 +269,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setResizable(false);
 		tc.pack();
 		
-		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.LEFT);
 		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -302,50 +297,6 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		tc.setText("Final date");
 		tc.setResizable(false);
 		tc.pack();
-		
-		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
-		tc = tvc.getColumn();
-		tc.setText("Selection");
-		tc.pack();
-		tvc.setLabelProvider(new ColumnLabelProvider() {
-			Map<Object, Button> buttons = new HashMap<Object, Button>();
-
-			@Override
-			public void update(ViewerCell cell) {
-				TableItem item = (TableItem) cell.getItem();
-
-				final Button button;
-				if (buttons.containsKey(cell.getElement())) {
-					button = buttons.get(cell.getElement());
-				} else {
-					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
-					button.setData("campaign", (Campaign) item.getData()); 
-					buttons.put(cell.getElement(), button);
-					
-					button.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							if(((Button) e.widget).getSelection()) {
-								_campaignsSelected.add((Campaign) button.getData("campaign"));
-							} else {
-								if(!_campaignsSelected.isEmpty()) {
-									_campaignsSelected.remove((Campaign) button.getData("campaign"));
-								}
-							}
-							validate();
-						}
-					});
-				}
-
-				TableEditor editor = new TableEditor(item.getParent());
-				button.pack();
-				editor.minimumWidth = button.getSize().x;
-				editor.horizontalAlignment = SWT.CENTER;
-				editor.setEditor(button, item, cell.getColumnIndex());
-				editor.layout();
-				button.setData("editor", editor);
-			}
-		});
 	}
 	
 	private void validate() {

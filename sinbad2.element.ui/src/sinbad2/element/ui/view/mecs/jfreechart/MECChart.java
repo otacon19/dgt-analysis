@@ -16,7 +16,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
-import org.jfree.chart.block.LineBorder;
+import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
@@ -116,14 +116,13 @@ public class MECChart {
 		if (chart != null) {
 			if (chart.getLegend() == null) {
 				LegendTitle legend = new LegendTitle(chart.getPlot());
+				legend.setFrame(BlockBorder.NONE);
 				legend.setMargin(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-				legend.setFrame(new LineBorder());
 				legend.setBackgroundPaint(Color.white);
 				legend.setPosition(RectangleEdge.BOTTOM);
 				chart.addLegend(legend);
 			}
 		}
-		
 	}
 
 	public void refreshStackedChart() {
@@ -302,7 +301,7 @@ public class MECChart {
 		plot.setRangeCrosshairVisible(true);
 		
 		BarRenderer br = (BarRenderer) plot.getRenderer();
-		br.setMaximumBarWidth(.1);
+		br.setMaximumBarWidth(.2);
 		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance()));
 		br.setBaseItemLabelsVisible(true);
 		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
@@ -311,7 +310,7 @@ public class MECChart {
 		br.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 12));
 		
 		CategoryAxis domainAxis = plot.getDomainAxis();
-		domainAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 5));
+		domainAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 4));
 
 		return chart;
 
