@@ -256,6 +256,13 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 							if(a.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
 								buttonsAlternatives.get(item.getData()).setEnabled(false);
+								buttonsAlternatives.get(item.getData()).setSelection(false);
+								_alternativesSelected.remove(a);
+								if(a.hasChildrens()) {
+									for(Alternative children: a.getChildrens()) {
+										_alternativesSelected.remove(children);
+									}
+								}
 							}
 						} else if(a.equals(item.getData())) {
 							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
@@ -293,6 +300,13 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 							if(alt.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
 								buttonsAlternatives.get(item.getData()).setEnabled(false);
+								buttonsAlternatives.get(item.getData()).setSelection(false);
+								_alternativesSelected.remove(alt);
+								if(alt.hasChildrens()) {
+									for(Alternative children: alt.getChildrens()) {
+										_alternativesSelected.remove(children);
+									}
+								}
 							}
 						} else if(alt.equals(item.getData())) {
 							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
