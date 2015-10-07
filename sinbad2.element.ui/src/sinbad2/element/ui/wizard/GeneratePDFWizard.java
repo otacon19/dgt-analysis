@@ -2,6 +2,8 @@ package sinbad2.element.ui.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
 
+import sinbad2.element.ui.nls.Messages;
+
 public class GeneratePDFWizard extends Wizard {
 	private SelectChartWizardPage _page1;
 	private SelectCampaignsWizardPage _page2;
@@ -15,7 +17,7 @@ public class GeneratePDFWizard extends Wizard {
 
 	@Override
 	public String getWindowTitle() {
-		return "Generate PDF";
+		return Messages.GeneratePDFWizard_Generate_PDF;
 	}
 
 	@Override

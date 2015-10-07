@@ -44,6 +44,7 @@ import sinbad2.element.criterion.Criterion;
 import sinbad2.element.criterion.listener.CriteriaChangeEvent;
 import sinbad2.element.criterion.listener.ECriteriaChange;
 import sinbad2.element.ui.Images;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.criteria.provider.CriteriaSelectedContentProvider;
 import sinbad2.element.ui.view.criteria.provider.CriterionOperationLabelProvider;
@@ -128,150 +129,8 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 		TableViewerColumn tvc = new TableViewerColumn(_tableViewer, SWT.NONE);
 		tvc.setLabelProvider(new CriterionSelectedIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("Index");
+		tc.setText(Messages.CriteriaView_Index_column);
 		tc.setResizable(false);
-		tc.pack();
-		
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
-		tc = tvc.getColumn();
-		tc.setText("Selection");
-		tc.pack();
-		tvc.setLabelProvider(new ColumnLabelProvider() {
-			Map<Object, Button> buttons = new HashMap<Object, Button>();
-
-			@Override
-			public void update(ViewerCell cell) {
-				TableItem item = (TableItem) cell.getItem();
-
-				final Button button;
-				if (buttons.containsKey(cell.getElement()) && !((Button) buttons.get(cell.getElement())).isDisposed()) {
-					button = buttons.get(cell.getElement());
-				} else {
-					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
-					button.setData("criterion", (Criterion) item.getData()); 
-					buttons.put(cell.getElement(), button);
-					if(_criteriaBeforeSelected.contains(item.getData())) {
-						button.setSelection(true);
-					} else {
-						button.setSelection(false);
-					}
-					_buttons.add(button);
-					
-					button.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							if(((Button) e.widget).getSelection()) {
-								_criteriaSelected.add((Criterion) button.getData("criterion"));
-							} else {
-								if(!_criteriaSelected.isEmpty()) {
-									_criteriaSelected.remove((Criterion) button.getData("criterion"));
-								}
-							}
-							Collections.sort(_criteriaSelected);
-							
-							_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_SELECTED_CHANGES, null, _criteriaSelected, false));
-						}
-					});
-				}
-
-				TableEditor editor = new TableEditor(item.getParent());
-				button.pack();
-				editor.minimumWidth = button.getSize().x;
-				editor.horizontalAlignment = SWT.CENTER;
-				editor.setEditor(button, item, cell.getColumnIndex());
-				editor.layout();
-				button.setData("editor", editor);
-				
-				checkMatchingCriteria(item);
-			}
-
-			private void checkMatchingCriteria(TableItem item) {
-				List<Criterion> allCriteria = _elementsSet.getCriteria();
-				
-				Map<Criterion, Button> criteriaButtons = new HashMap<Criterion, Button>();
-				for(Button b: _buttons) {
-					criteriaButtons.put((Criterion) b.getData("criterion"), b);
-				}
-				
-				List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
-				if(campaignsSelected.size() == 1) {
-					Campaign campaignSelected = CampaignsView.getCampaignsSelected().get(0);
-					for(Criterion c: allCriteria) {
-						if(!campaignSelected.getCriteria().contains(c)) {
-							if(c.equals(item.getData())) {
-								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								criteriaButtons.get(c).setEnabled(false);
-							}
-						} else if(c.equals(item.getData())) {
-							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-							criteriaButtons.get(c).setEnabled(true);
-						}
-					}
-				} else if(campaignsSelected.size() > 1) {
-					List<Criterion> allCriteriaCampaigns = new LinkedList<Criterion>();
-					List<Criterion> dataCriteria = new LinkedList<Criterion>();
-					int numCampaignsData = 0;
-					for(Campaign c: campaignsSelected) {
-						if(!c.isACampaignData()) {
-							List<Criterion> criteria = c.getCriteria();
-							for(Criterion cri: criteria) {
-								allCriteriaCampaigns.add(cri);
-							}
-						} else {
-							numCampaignsData++;
-							List<Criterion> criteria = c.getCriteria();
-							for(Criterion cri: criteria) {
-								if(!dataCriteria.contains(cri)) {
-									dataCriteria.add(cri);
-								}
-							}
-						}
-					}
-					Map<Criterion, Integer> criteriaRepeat;
-					criteriaRepeat = checkMatchingData(allCriteriaCampaigns, campaignsSelected.size() - numCampaignsData);
-					for(Criterion dc: dataCriteria) {
-						criteriaRepeat.put(dc, campaignsSelected.size() - numCampaignsData);
-					}
-
-					for(Criterion cri: _elementsSet.getCriteria()) {
-						if(!criteriaRepeat.containsKey(cri)) {
-							if(cri.equals(item.getData())) {
-								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-								criteriaButtons.get(cri).setEnabled(false);
-							}
-						} else {
-							int rep = criteriaRepeat.get(cri);
-							if((rep != campaignsSelected.size() - numCampaignsData)) {
-								if(cri.equals(item.getData())) {
-									item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-									criteriaButtons.get(cri).setEnabled(false);
-								}
-							} else if(cri.equals(item.getData())) {
-								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
-								criteriaButtons.get(cri).setEnabled(true);
-							}
-						}
-					}
-				}
-			}
-			
-			private Map<Criterion, Integer> checkMatchingData(List<Criterion> allCriteriaCampaigns, int numCampaigns) {		
-				Map<Criterion, Integer> criteriaRepeat = new LinkedHashMap<Criterion, Integer>();
-				int numRep;
-				for(int i = 0; i < allCriteriaCampaigns.size(); i++){
-				    Criterion c1 = allCriteriaCampaigns.get(i);
-				    numRep = 0;
-				    for(int j = 0; j < allCriteriaCampaigns.size(); j++){
-				    	Criterion c2 = allCriteriaCampaigns.get(j);
-				        if(c1.equals(c2)) {
-				            numRep++;
-				            criteriaRepeat.put(c1, numRep);
-				        }
-				    }
-				}
-				return criteriaRepeat;
-			}
-		});
 		
 		class TypeLabelProvider extends OwnerDrawLabelProvider {
 
@@ -309,16 +168,161 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
 		tvc.setLabelProvider(new TypeLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Type");
+		tc.setText(Messages.CriteriaView_Type_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
 		tvc.setLabelProvider(new CriterionOperationLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Operation");
+		tc.setText(Messages.CriteriaView_Operation_column);
 		tc.setResizable(false);
-		tc.pack();
+		
+		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tc = tvc.getColumn();
+		tc.setText(Messages.CriteriaView_Selection_column);
+		tvc.setLabelProvider(new ColumnLabelProvider() {
+			Map<Object, Button> buttons = new HashMap<Object, Button>();
+
+			@Override
+			public void update(ViewerCell cell) {
+				TableItem item = (TableItem) cell.getItem();
+
+				final Button button;
+				if (buttons.containsKey(cell.getElement()) && !((Button) buttons.get(cell.getElement())).isDisposed()) {
+					button = buttons.get(cell.getElement());
+				} else {
+					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
+					button.setData("criterion", (Criterion) item.getData());  //$NON-NLS-1$
+					buttons.put(cell.getElement(), button);
+					if(_criteriaBeforeSelected.contains(item.getData())) {
+						button.setSelection(true);
+					} else {
+						button.setSelection(false);
+					}
+					_buttons.add(button);
+					
+					button.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							if(((Button) e.widget).getSelection()) {
+								_criteriaSelected.add((Criterion) button.getData("criterion")); //$NON-NLS-1$
+							} else {
+								if(!_criteriaSelected.isEmpty()) {
+									_criteriaSelected.remove((Criterion) button.getData("criterion")); //$NON-NLS-1$
+								}
+							}
+							Collections.sort(_criteriaSelected);
+							
+							_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_SELECTED_CHANGES, null, _criteriaSelected, false));
+						}
+					});
+				}
+
+				TableEditor editor = new TableEditor(item.getParent());
+				button.pack();
+				editor.minimumWidth = button.getSize().x;
+				editor.horizontalAlignment = SWT.CENTER;
+				editor.setEditor(button, item, cell.getColumnIndex());
+				editor.layout();
+				button.setData("editor", editor); //$NON-NLS-1$
+				
+				checkMatchingCriteria(item);
+			}
+
+			private void checkMatchingCriteria(TableItem item) {
+				List<Criterion> allCriteria = _elementsSet.getCriteria();
+				
+				Map<Criterion, Button> criteriaButtons = new HashMap<Criterion, Button>();
+				for(Button b: _buttons) {
+					criteriaButtons.put((Criterion) b.getData("criterion"), b); //$NON-NLS-1$
+				}
+				
+				List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
+				if(campaignsSelected.size() == 1) {
+					Campaign campaignSelected = CampaignsView.getCampaignsSelected().get(0);
+					for(Criterion c: allCriteria) {
+						if(!campaignSelected.getCriteria().contains(c)) {
+							if(c.equals(item.getData())) {
+								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
+								criteriaButtons.get(c).setEnabled(false);
+								criteriaButtons.get(c).setSelection(false);
+								_criteriaSelected.remove(c);
+							}
+						} else if(c.equals(item.getData())) {
+							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+							criteriaButtons.get(c).setEnabled(true);
+						}
+					}
+				} else if(campaignsSelected.size() > 1) {
+					List<Criterion> allCriteriaCampaigns = new LinkedList<Criterion>();
+					List<Criterion> dataCriteria = new LinkedList<Criterion>();
+					int numCampaignsData = 0;
+					for(Campaign c: campaignsSelected) {
+						if(!c.isACampaignData()) {
+							List<Criterion> criteria = c.getCriteria();
+							for(Criterion cri: criteria) {
+								allCriteriaCampaigns.add(cri);
+							}
+						} else {
+							numCampaignsData++;
+							List<Criterion> criteria = c.getCriteria();
+							for(Criterion cri: criteria) {
+								if(!dataCriteria.contains(cri)) {
+									dataCriteria.add(cri);
+								}
+							}
+						}
+					}
+					Map<Criterion, Integer> criteriaRepeat;
+					criteriaRepeat = checkMatchingData(allCriteriaCampaigns, campaignsSelected.size() - numCampaignsData);
+					for(Criterion dc: dataCriteria) {
+						criteriaRepeat.put(dc, campaignsSelected.size() - numCampaignsData);
+					}
+
+					for(Criterion cri: _elementsSet.getCriteria()) {
+						if(!criteriaRepeat.containsKey(cri)) {
+							if(cri.equals(item.getData())) {
+								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
+								criteriaButtons.get(cri).setEnabled(false);
+								criteriaButtons.get(cri).setSelection(false);
+								_criteriaSelected.remove(cri);
+							}
+						} else {
+							int rep = criteriaRepeat.get(cri);
+							if((rep != campaignsSelected.size() - numCampaignsData)) {
+								if(cri.equals(item.getData())) {
+									item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
+									criteriaButtons.get(cri).setEnabled(false);
+									criteriaButtons.get(cri).setSelection(false);
+									_criteriaSelected.remove(cri);
+								}
+							} else if(cri.equals(item.getData())) {
+								item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+								criteriaButtons.get(cri).setEnabled(true);
+							}
+						}
+					}
+				}
+			}
+			
+			private Map<Criterion, Integer> checkMatchingData(List<Criterion> allCriteriaCampaigns, int numCampaigns) {		
+				Map<Criterion, Integer> criteriaRepeat = new LinkedHashMap<Criterion, Integer>();
+				int numRep;
+				for(int i = 0; i < allCriteriaCampaigns.size(); i++){
+				    Criterion c1 = allCriteriaCampaigns.get(i);
+				    numRep = 0;
+				    for(int j = 0; j < allCriteriaCampaigns.size(); j++){
+				    	Criterion c2 = allCriteriaCampaigns.get(j);
+				        if(c1.equals(c2)) {
+				            numRep++;
+				            criteriaRepeat.put(c1, numRep);
+				        }
+				    }
+				}
+				return criteriaRepeat;
+			}
+		});
+		
 
 	}
 	
@@ -373,9 +377,9 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 		for(Button b: _buttons) {
 			if(!b.isDisposed()) {
 				if(b.getSelection() && !campaignsSelected.isEmpty()) {
-					_criteriaBeforeSelected.add((Criterion) b.getData("criterion"));
+					_criteriaBeforeSelected.add((Criterion) b.getData("criterion")); //$NON-NLS-1$
 				}
-				TableEditor editor = (TableEditor) b.getData("editor");
+				TableEditor editor = (TableEditor) b.getData("editor"); //$NON-NLS-1$
 				editor.getEditor().dispose();
 			}
 		}

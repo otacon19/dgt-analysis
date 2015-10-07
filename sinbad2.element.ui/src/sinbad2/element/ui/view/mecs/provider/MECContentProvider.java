@@ -76,11 +76,11 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 				//FIXME cargamos las imágenes de las fórmulas
 				for(MEC m: _elementsSet.getMECs()) {
 					if(m.getFormula() == null) {
-						if(m.getId().equals("Distancia")) {
+						if(m.getId().equals("Distancia")) { //$NON-NLS-1$
 							m.setFormula(ImagesFormulas.Distancia);
-						} else if(m.getId().equals("Tiempo")) {
+						} else if(m.getId().equals("Tiempo")) { //$NON-NLS-1$
 							m.setFormula(ImagesFormulas.Tiempo);
-						} else if(m.getId().equals("Desplazamientos")) {
+						} else if(m.getId().equals("Desplazamientos")) { //$NON-NLS-1$
 							m.setFormula(ImagesFormulas.Desplazamiento);
 						}
 					}

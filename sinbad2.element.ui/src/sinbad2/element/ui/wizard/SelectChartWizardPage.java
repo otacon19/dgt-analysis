@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import sinbad2.element.ui.Images;
+import sinbad2.element.ui.nls.Messages;
 
 public class SelectChartWizardPage extends WizardPage {
 
@@ -24,8 +25,8 @@ public class SelectChartWizardPage extends WizardPage {
 	private static int _tableSelected;
 	
 	protected SelectChartWizardPage() {
-		super("Select chart");
-		setDescription("Select the chart you want");
+		super(Messages.SelectChartWizardPage_Select_chart);
+		setDescription(Messages.SelectChartWizardPage_Select_the_chart_you_want);
 		
 		_chartsSelected = new LinkedList<String>();
 	}
@@ -49,7 +50,7 @@ public class SelectChartWizardPage extends WizardPage {
 		layout.marginLeft = 60;
 		containerTable.setLayout(layout);
 		Label tableLabel = new Label(containerTable, SWT.RIGHT);
-		tableLabel.setText("Table");
+		tableLabel.setText(Messages.SelectChartWizardPage_Table);
 		_tableSelectedButton = new Button(containerTable, SWT.CHECK);
 		_tableSelectedButton.setSelection(false);
 		_tableSelectedButton.addSelectionListener(new SelectionAdapter() {
@@ -64,7 +65,7 @@ public class SelectChartWizardPage extends WizardPage {
 		layout.marginLeft = 45;
 		containerBarChart.setLayout(layout);
 		Label barChartLabel = new Label(containerBarChart, SWT.CENTER);
-		barChartLabel.setText("Bar chart");
+		barChartLabel.setText(Messages.SelectChartWizardPage_Bar_chart);
 		_barChartSelectedButton = new Button(containerBarChart, SWT.CHECK);
 		_barChartSelectedButton.setSelection(false);
 		_barChartSelectedButton.addSelectionListener(new SelectionAdapter() {
@@ -79,7 +80,7 @@ public class SelectChartWizardPage extends WizardPage {
 		layout.marginLeft = 45;
 		containerLineChart.setLayout(layout);
 		Label lineChartLabel = new Label(containerLineChart, SWT.CENTER);
-		lineChartLabel.setText("Line chart");
+		lineChartLabel.setText(Messages.SelectChartWizardPage_Line_chart);
 		_lineChartSelectedButton = new Button(containerLineChart, SWT.CHECK);
 		_lineChartSelectedButton.setSelection(false);
 		_lineChartSelectedButton.addSelectionListener(new SelectionAdapter() {
@@ -121,16 +122,16 @@ public class SelectChartWizardPage extends WizardPage {
 			_tableSelected = 0;
 		}
 		
-		if(_barChartSelectedButton.getSelection() && !_chartsSelected.contains("0")) {
-			_chartsSelected.add("0");
-		} else if(!_barChartSelectedButton.getSelection() && _chartsSelected.contains("0")) {
-			_chartsSelected.remove("0");
+		if(_barChartSelectedButton.getSelection() && !_chartsSelected.contains("0")) { //$NON-NLS-1$
+			_chartsSelected.add("0"); //$NON-NLS-1$
+		} else if(!_barChartSelectedButton.getSelection() && _chartsSelected.contains("0")) { //$NON-NLS-1$
+			_chartsSelected.remove("0"); //$NON-NLS-1$
 		}
 		
-		if(_lineChartSelectedButton.getSelection() && !_chartsSelected.contains("1")) {
-			_chartsSelected.add("1");
-		} else if(!_lineChartSelectedButton.getSelection() && _chartsSelected.contains("1")) {
-			_chartsSelected.remove("1");
+		if(_lineChartSelectedButton.getSelection() && !_chartsSelected.contains("1")) { //$NON-NLS-1$
+			_chartsSelected.add("1"); //$NON-NLS-1$
+		} else if(!_lineChartSelectedButton.getSelection() && _chartsSelected.contains("1")) { //$NON-NLS-1$
+			_chartsSelected.remove("1"); //$NON-NLS-1$
 		}
 		
 		setPageComplete(_barChartSelectedButton.getSelection() || _lineChartSelectedButton.getSelection() || _tableSelected == 1);	

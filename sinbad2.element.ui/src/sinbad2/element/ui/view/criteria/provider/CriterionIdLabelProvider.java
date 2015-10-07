@@ -19,19 +19,19 @@ public class CriterionIdLabelProvider extends ColumnLabelProvider {
 	
 	@Override
 	public Image getImage(Object element) {
-		if(((Criterion) element).getId().equals("Desplazamientos")) {
+		if(((Criterion) element).getId().equals("Desplazamientos")) { //$NON-NLS-1$
 			return Images.Journey;
 		} else {
-			if(((Criterion) element).getId().equals("Distancia")) {
+			if(((Criterion) element).getId().equals("Distancia")) { //$NON-NLS-1$
 				return Images.Distance;
 			} else {
-				if(((Criterion) element).getId().equals("Tiempo")) {
+				if(((Criterion) element).getId().equals("Tiempo")) { //$NON-NLS-1$
 					return Images.Time;
 				} else {
-					if(((Criterion) element).getId().equals("Habitantes")) {
+					if(((Criterion) element).getId().equals("Habitantes")) { //$NON-NLS-1$
 						return Images.People;
 					} else {
-						if(((Criterion) element).getId().equals("Censo")) {
+						if(((Criterion) element).getId().equals("Censo")) { //$NON-NLS-1$
 							return Images.Park;	
 						} else {
 							return Images.Licences;

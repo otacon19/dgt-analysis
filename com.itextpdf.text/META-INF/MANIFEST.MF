@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Text
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.itextpdf.text
 Bundle-Version: 1.0.0
-Bundle-Vendor: ITextPdf
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: com.itextpdf.awt,
  com.itextpdf.awt.geom,

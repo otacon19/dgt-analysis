@@ -10,55 +10,6 @@
                id="flintstones.menu.file"
                label="%file.menu.name"
                mnemonic="%file.menu.mnemonic">
-            <command
-                  commandId="flintstones.core.io.new"
-                  style="push">
-            </command>
-            <command
-                  commandId="flintstones.core.ui.io.read"
-                  style="push">
-            </command>
-            <command
-                  commandId="flintstones.core.ui.io.save"
-                  style="push">
-            </command>
-            <command
-                  commandId="flintstones.core.ui.io.save.as"
-                  style="push">
-            </command>
-            <command
-                  commandId="flintstones.core.ui.io.save.and.close"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.file.exit"
-                  id="exit"
-                  label="%file.command.exit.name"
-                  style="push">
-            </command>
-            <separator
-                  name="sinbad2.core.ui.separator"
-                  visible="true">
-            </separator>
-         </menu>
-         <menu
-               id="flintstones.menu.edit"
-               label="%edit.menu.name"
-               mnemonic="%edit.menu.mnemonic">
-            <command
-                  commandId="flintstones.core.undo"
-                  style="push">
-            </command>
-            <command
-                  commandId="flintstones.core.redo"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.preferences"
-                  id="preferences"
-                  label="%preferences.command.name"
-                  style="push">
-            </command>
          </menu>
       </menuContribution>
       <menuContribution

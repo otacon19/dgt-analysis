@@ -1,10 +1,5 @@
 package sinbad2.element.ui.view.campaigns;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +38,8 @@ import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.campaigns.Campaign;
 import sinbad2.element.campaigns.listener.CampaignsChangeEvent;
 import sinbad2.element.campaigns.listener.ECampaignsChange;
+import sinbad2.element.ui.ComparatorCampaigns;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.alternatives.AlternativesView;
 import sinbad2.element.ui.view.campaigns.dialog.AddCampaignsDialog;
 import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider;
@@ -61,6 +58,7 @@ public class CampaignsView extends ViewPart {
 
 	private TableViewer _tableViewer;
 	private CampaignsSelectedContentProvider _provider;
+	private ComparatorCampaigns _comparatorCampaigns;
 	
 	private static List<Campaign> _campaignsSelected;
 	private static List<Campaign> _campaignsPreviouslyAdded;
@@ -75,6 +73,8 @@ public class CampaignsView extends ViewPart {
 		_campaignsSelected = new LinkedList<Campaign>();
 		_campaignsPreviouslyAdded = new LinkedList<Campaign>();
 		_buttons = new LinkedList<Button>();
+		
+		_comparatorCampaigns = new ComparatorCampaigns();
 		
 		ProblemElementsManager elementsManager = ProblemElementsManager.getInstance();
 		_elementsSet = elementsManager.getActiveElementSet();
@@ -112,6 +112,7 @@ public class CampaignsView extends ViewPart {
 		campaigns.setBackground(new Color(Display.getCurrent(),255, 255, 255));	
 		
 		_tableViewer = new TableViewer(campaigns, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
+		_tableViewer.setComparator(_comparatorCampaigns);
 		_tableViewer.getTable().addListener(SWT.Selection, new Listener() {
 	        @Override
 	        public void handleEvent(Event event) {
@@ -147,6 +148,7 @@ public class CampaignsView extends ViewPart {
 		
 		_tableViewer.setInput(_provider.getInput());
 		getSite().setSelectionProvider(_tableViewer);
+		_provider.pack();
 		
 		Composite buttonsContainer = new Composite(campaigns, SWT.NONE);
 		GridLayout g_layout = new GridLayout(2, true);
@@ -160,7 +162,7 @@ public class CampaignsView extends ViewPart {
 		_addCampaigns = new Button(buttonsContainer, SWT.PUSH);
 		gridData = new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1);
 		_addCampaigns.setLayoutData(gridData);
-		_addCampaigns.setText("Add");
+		_addCampaigns.setText(Messages.CampaignsView_Add);
 		_addCampaigns.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 		_addCampaigns.setImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD).createImage());
 		_addCampaigns.setEnabled(true);
@@ -181,7 +183,7 @@ public class CampaignsView extends ViewPart {
 		_removeCampaigns = new Button(buttonsContainer, SWT.PUSH);
 		gridData = new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1);
 		_removeCampaigns.setLayoutData(gridData);
-		_removeCampaigns.setText("Remove");
+		_removeCampaigns.setText(Messages.CampaignsView_Remove);
 		_removeCampaigns.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 		_removeCampaigns.setImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE).createImage());
 		_removeCampaigns.setEnabled(false);
@@ -217,110 +219,37 @@ public class CampaignsView extends ViewPart {
 
 	private void addColumns() {
 		TableViewerColumn tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
-		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Comparator<Campaign> comparatorByName = new Comparator<Campaign>() {
-					@Override
-					public int compare(Campaign c1, Campaign c2) {
-				        return c1.getName().compareTo(c2.getName());
-				    }
-				};
-				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByName);
-				_tableViewer.refresh();
-			}
-		});
 		tvc.setLabelProvider(new CampaignIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("Campaign");
+		tc.addSelectionListener(getSelectionAdapter(tvc.getColumn(), 0));
+		tc.setText(Messages.CampaignsView_Campaign_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
-		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Comparator<Campaign> comparatorByProvinces = new Comparator<Campaign>() {
-					@Override
-					public int compare(Campaign c1, Campaign c2) {
-				        return c1.getProvince().compareTo(c2.getProvince());
-				    }
-				};
-				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByProvinces);
-				_tableViewer.refresh();
-			}
-		});
 		tvc.setLabelProvider(new CampaignProvinceLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Region");
+		tc.addSelectionListener(getSelectionAdapter(tvc.getColumn(), 1));
+		tc.setText(Messages.CampaignsView_Region_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
-		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
-					@Override
-					public int compare(Campaign c1, Campaign c2) {
-						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
-				    	Date date1 = null, date2 = null;
-				    	try {
-				    		date1 = formatter.parse(c1.getInitialDate());
-				    		date2 = formatter.parse(c2.getInitialDate());
-				    	} catch (ParseException e) {
-				    		e.printStackTrace();
-				    	}
-				        return date1.compareTo(date2);
-					}
-				};
-				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByDate);
-				_tableViewer.refresh();
-			}
-		});
 		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Initial date");
+		tc.addSelectionListener(getSelectionAdapter(tvc.getColumn(), 2));
+		tc.setText(Messages.CampaignsView_Initial_date_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
-		tvc.getColumn().addSelectionListener(new SelectionAdapter() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
-					@Override
-					public int compare(Campaign c1, Campaign c2) {
-						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
-				    	Date date1 = null, date2 = null;
-				    	try {
-				    		date1 = formatter.parse(c1.getFinalDate());
-				    		date2 = formatter.parse(c2.getFinalDate());
-				    	} catch (ParseException e) {
-				    		e.printStackTrace();
-				    	}
-				        return date1.compareTo(date2);
-					}
-				};
-				Collections.sort((List<Campaign>) _provider.getInput(), comparatorByDate);
-				_tableViewer.refresh();
-			}
-		});
 		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Final date");
+		tc.addSelectionListener(getSelectionAdapter(tvc.getColumn(), 3));
+		tc.setText(Messages.CampaignsView_Final_date_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Selection");
+		tc.setText(Messages.CampaignsView_Selection_column);
 		tc.setResizable(false);
-		tc.pack();
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			Map<Object, Button> buttons = new HashMap<Object, Button>();
 
@@ -333,23 +262,23 @@ public class CampaignsView extends ViewPart {
 					button = buttons.get(cell.getElement());
 				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
-					button.setData("campaign", (Campaign) item.getData()); 
+					button.setData("campaign", (Campaign) item.getData());  //$NON-NLS-1$
 					button.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
 							setEnabledButtonsCampaings(true);
-							if(((Campaign) button.getData("campaign")).isACampaignData()) {
-								checkCompatibleCampaigns((Campaign) button.getData("campaign"), button.getSelection());
+							if(((Campaign) button.getData("campaign")).isACampaignData()) { //$NON-NLS-1$
+								checkCompatibleCampaigns((Campaign) button.getData("campaign"), button.getSelection()); //$NON-NLS-1$
 							} else {
-								checkCompatibleDataCampaigns((Campaign) button.getData("campaign"), button.getSelection());
+								checkCompatibleDataCampaigns((Campaign) button.getData("campaign"), button.getSelection()); //$NON-NLS-1$
 							}
 							
 							if(((Button) e.widget).getSelection()) {
-								if(!_campaignsSelected.contains((Campaign) button.getData("campaign"))) {
-									_campaignsSelected.add((Campaign) button.getData("campaign"));
+								if(!_campaignsSelected.contains((Campaign) button.getData("campaign"))) { //$NON-NLS-1$
+									_campaignsSelected.add((Campaign) button.getData("campaign")); //$NON-NLS-1$
 								}
 							} else {
-								_campaignsSelected.remove((Campaign) button.getData("campaign"));
+								_campaignsSelected.remove((Campaign) button.getData("campaign")); //$NON-NLS-1$
 							}
 							
 							if(_campaignsSelected.isEmpty()) {
@@ -366,7 +295,7 @@ public class CampaignsView extends ViewPart {
 						private void checkCompatibleCampaigns(Campaign dataCampaign, boolean selection) {
 							if(selection) {
 								for(Button b: _buttons) {
-									Campaign c = (Campaign) b.getData("campaign");
+									Campaign c = (Campaign) b.getData("campaign"); //$NON-NLS-1$
 									if(!c.getProvince().equals(dataCampaign.getProvince())) {
 										b.setEnabled(false);
 									}
@@ -379,7 +308,7 @@ public class CampaignsView extends ViewPart {
 						private void checkCompatibleDataCampaigns(Campaign campaign, boolean selection) {
 							if(selection) {
 								for(Button b: _buttons) {
-									Campaign c = (Campaign) b.getData("campaign");
+									Campaign c = (Campaign) b.getData("campaign"); //$NON-NLS-1$
 									if(!c.getProvince().equals(campaign.getProvince()) && c.isACampaignData()) {
 										b.setEnabled(false);
 									}
@@ -399,10 +328,24 @@ public class CampaignsView extends ViewPart {
 				editor.horizontalAlignment = SWT.CENTER;
 				editor.setEditor(button, item, cell.getColumnIndex());
 				editor.layout();
-				button.setData("editor", editor);
+				button.setData("editor", editor); //$NON-NLS-1$
 			}
 
 		});
+	}
+	
+	private SelectionAdapter getSelectionAdapter(final TableColumn column, final int index) {
+		SelectionAdapter selectionAdapter = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				_comparatorCampaigns.setColumn(index);
+				int dir = _comparatorCampaigns.getDirection();
+				_tableViewer.getTable().setSortDirection(dir);
+				_tableViewer.getTable().setSortColumn(column);
+				_tableViewer.refresh();
+			}
+		};
+		return selectionAdapter;
 	}
 	
 	private void hookContextMenu() {
@@ -434,10 +377,10 @@ public class CampaignsView extends ViewPart {
 		for(Campaign c: _campaignsSelected) {
 			for(Button b: _buttons) {
 				if(!b.isDisposed()) {
-					Campaign campaign = (Campaign) b.getData("campaign");
+					Campaign campaign = (Campaign) b.getData("campaign"); //$NON-NLS-1$
 					String id = campaign.getId();
 					if(id.equals(c.getId())) {
-						TableEditor editor = (TableEditor) b.getData("editor");
+						TableEditor editor = (TableEditor) b.getData("editor"); //$NON-NLS-1$
 						editor.getEditor().dispose();
 						buttonsToRemove.add(b);
 					}

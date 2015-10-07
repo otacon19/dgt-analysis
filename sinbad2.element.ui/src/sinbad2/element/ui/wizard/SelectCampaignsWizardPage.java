@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
 
 import sinbad2.element.campaigns.Campaign;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.campaigns.provider.CampaignFinalDateLabelProvider;
 import sinbad2.element.ui.view.campaigns.provider.CampaignIdLabelProvider;
@@ -47,8 +48,8 @@ public class SelectCampaignsWizardPage extends WizardPage {
 	private static List<String> _desaggregationOption;
 
 	protected SelectCampaignsWizardPage() {
-		super("Select campaigns");
-		setDescription("Select the campaigns you want");
+		super(Messages.SelectCampaignsWizardPage_Select_campaigns);
+		setDescription(Messages.SelectCampaignsWizardPage_Select_the_campaigns_you_want);
 		
 		_campaignsSelected = CampaignsView.getCampaignsSelected();
 		_desaggregationOption = new LinkedList<String>();
@@ -110,12 +111,12 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		layout = new GridLayout(4, false);
 		containerAggregation.setLayout(layout);
 		Label aggregationLabel = new Label(containerAggregation, SWT.LEFT);
-		aggregationLabel.setText("Aggregate");
+		aggregationLabel.setText(Messages.SelectCampaignsWizardPage_Aggregate);
 		_aggregateButton = new Button(containerAggregation, SWT.RADIO);
 		_aggregateButton.setSelection(false);
 		
 		Label desaggregationLabel = new Label(containerAggregation, SWT.LEFT);
-		desaggregationLabel.setText("Desaggregate");
+		desaggregationLabel.setText(Messages.SelectCampaignsWizardPage_Desaggregate);
 		_desaggregateButton = new Button(containerAggregation, SWT.RADIO);
 		_desaggregateButton.setSelection(false);
 		
@@ -125,7 +126,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		containerDesaggregationOptions.setLayout(layout);
 		
 		final Label labelCampaigns = new Label(containerDesaggregationOptions, SWT.LEFT);
-		labelCampaigns.setText("- By Campaigns");
+		labelCampaigns.setText(Messages.SelectCampaignsWizardPage_By_campaigns);
 		labelCampaigns.setVisible(false);
 		_campaignsButton = new Button(containerDesaggregationOptions, SWT.CHECK);
 		_campaignsButton.setVisible(false);
@@ -138,7 +139,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		final Label labelProvinces = new Label(containerDesaggregationOptions, SWT.LEFT);
 		labelProvinces.setVisible(false);
-		labelProvinces.setText("- By Provinces");
+		labelProvinces.setText(Messages.SelectCampaignsWizardPage_By_provinces);
 		_provincesButton = new Button(containerDesaggregationOptions, SWT.CHECK);
 		_provincesButton.setVisible(false);
 		_provincesButton.setSelection(false);
@@ -150,7 +151,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		final Label labelContexts = new Label(containerDesaggregationOptions, SWT.LEFT);
 		labelContexts.setVisible(false);
-		labelContexts.setText("- By Contexts");
+		labelContexts.setText(Messages.SelectCampaignsWizardPage_By_contexts);
 		_contextsButton = new Button(containerDesaggregationOptions, SWT.CHECK);
 		_contextsButton.setSelection(false);
 		_contextsButton.setVisible(false);
@@ -215,7 +216,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		tvc.setLabelProvider(new CampaignIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("Campaign");
+		tc.setText(Messages.SelectCampaignsWizardPage_Campaign_column);
 		tc.setResizable(false);
 		tc.pack();
 		
@@ -236,7 +237,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		tvc.setLabelProvider(new CampaignProvinceLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Province");
+		tc.setText(Messages.SelectCampaignsWizardPage_Province_column);
 		tc.setResizable(false);
 		tc.pack();
 		
@@ -248,7 +249,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
 					@Override
 					public int compare(Campaign c1, Campaign c2) {
-						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
+						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy"); //$NON-NLS-1$
 				    	Date date1 = null, date2 = null;
 				    	try {
 				    		date1 = formatter.parse(c1.getInitialDate());
@@ -265,7 +266,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		tvc.setLabelProvider(new CampaignInitialDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Initial date");
+		tc.setText(Messages.SelectCampaignsWizardPage_Initial_date_column);
 		tc.setResizable(false);
 		tc.pack();
 		
@@ -277,7 +278,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 				Comparator<Campaign> comparatorByDate = new Comparator<Campaign>() {	
 					@Override
 					public int compare(Campaign c1, Campaign c2) {
-						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy");
+						SimpleDateFormat formatter = new SimpleDateFormat("MM/yy"); //$NON-NLS-1$
 				    	Date date1 = null, date2 = null;
 				    	try {
 				    		date1 = formatter.parse(c1.getFinalDate());
@@ -294,7 +295,7 @@ public class SelectCampaignsWizardPage extends WizardPage {
 		});
 		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Final date");
+		tc.setText(Messages.SelectCampaignsWizardPage_Final_date_column);
 		tc.setResizable(false);
 		tc.pack();
 	}
@@ -304,27 +305,27 @@ public class SelectCampaignsWizardPage extends WizardPage {
 			setPageComplete(!_campaignsSelected.isEmpty());
 		} else {
 			if(_campaignsButton.getSelection()) {
-				if(!_desaggregationOption.contains("separate")) {
-					_desaggregationOption.add("separate");
+				if(!_desaggregationOption.contains("separate")) { //$NON-NLS-1$
+					_desaggregationOption.add("separate"); //$NON-NLS-1$
 				}
 			} else {
-				_desaggregationOption.remove("separate");
+				_desaggregationOption.remove("separate"); //$NON-NLS-1$
 			}
 			
 			if(_provincesButton.getSelection()) {
-				if(!_desaggregationOption.contains("separate_provinces")) {
-					_desaggregationOption.add("separate_provinces");
+				if(!_desaggregationOption.contains("separate_provinces")) { //$NON-NLS-1$
+					_desaggregationOption.add("separate_provinces"); //$NON-NLS-1$
 				}
 			} else {
-				_desaggregationOption.remove("separate_provinces");
+				_desaggregationOption.remove("separate_provinces"); //$NON-NLS-1$
 			}
 			
 			if(_contextsButton.getSelection()) {
-				if(!_desaggregationOption.contains("contexts")) {
-					_desaggregationOption.add("contexts");
+				if(!_desaggregationOption.contains("contexts")) { //$NON-NLS-1$
+					_desaggregationOption.add("contexts"); //$NON-NLS-1$
 				}
 			} else {
-				_desaggregationOption.remove("contexts");
+				_desaggregationOption.remove("contexts"); //$NON-NLS-1$
 			}
 			setPageComplete((_campaignsButton.getSelection() || _provincesButton.getSelection() || _contextsButton.getSelection()) && !_campaignsSelected.isEmpty());
 		}

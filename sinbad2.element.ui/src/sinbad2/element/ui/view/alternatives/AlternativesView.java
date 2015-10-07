@@ -39,6 +39,7 @@ import sinbad2.element.alternative.listener.EAlternativesChange;
 import sinbad2.element.campaigns.Campaign;
 import sinbad2.element.campaigns.listener.CampaignsChangeEvent;
 import sinbad2.element.campaigns.listener.ICampaignsChangeListener;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.alternatives.provider.AlternativeSelectedIdLabelProvider;
 import sinbad2.element.ui.view.alternatives.provider.AlternativesSelectedContentProvider;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
@@ -140,15 +141,13 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 		TreeViewerColumn tvc = new TreeViewerColumn(_treeViewer, SWT.CENTER);
 		tvc.setLabelProvider(new AlternativeSelectedIdLabelProvider());
 		TreeColumn tc = tvc.getColumn();
-		tc.setText("Context");
+		tc.setText(Messages.AlternativesView_Context_column);
 		tc.setResizable(false);
-		tc.pack();
 		
 		tvc = new TreeViewerColumn(_treeViewer, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Selection");
+		tc.setText(Messages.AlternativesView_Selection_column);
 		tc.setResizable(false);
-		tc.pack();
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			Map<Object, Button> buttons = new HashMap<Object, Button>();
 
@@ -161,7 +160,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
 					button.setSelection(false);
-					button.setData("alternative", (Alternative) item.getData());
+					button.setData("alternative", (Alternative) item.getData()); //$NON-NLS-1$
 					buttons.put(cell.getElement(), button);
 					if(_alternativesBeforeSelected.contains(item.getData())) {
 						button.setSelection(true);
@@ -183,11 +182,11 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 						@Override
 						public void widgetSelected(SelectionEvent e) {
 							if(((Button) e.widget).getSelection()) {
-								_alternativesSelected.add((Alternative) button.getData("alternative"));
+								_alternativesSelected.add((Alternative) button.getData("alternative")); //$NON-NLS-1$
 								button.setSelection(true);
 								
-								if(((Alternative) button.getData("alternative")).hasChildrens()) {
-									List<Alternative> childrens = ((Alternative) button.getData("alternative")).getChildrens();
+								if(((Alternative) button.getData("alternative")).hasChildrens()) { //$NON-NLS-1$
+									List<Alternative> childrens = ((Alternative) button.getData("alternative")).getChildrens(); //$NON-NLS-1$
 									for(Alternative children: childrens) {
 										if(!_alternativesSelected.contains(children)) {
 											_alternativesSelected.add(children);
@@ -195,18 +194,18 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 									}
 									
 									for(Button b: _buttons) {
-										if(childrens.contains(b.getData("alternative"))) {
+										if(childrens.contains(b.getData("alternative"))) { //$NON-NLS-1$
 											b.setSelection(true);
 										}
 									}
 								}
 							} else {
 								if(!_alternativesSelected.isEmpty()) {
-									_alternativesSelected.remove((Alternative) button.getData("alternative"));
+									_alternativesSelected.remove((Alternative) button.getData("alternative")); //$NON-NLS-1$
 									button.setSelection(false);
 									
-									if(((Alternative) button.getData("alternative")).hasChildrens()) {
-										List<Alternative> childrens = ((Alternative) button.getData("alternative")).getChildrens();
+									if(((Alternative) button.getData("alternative")).hasChildrens()) { //$NON-NLS-1$
+										List<Alternative> childrens = ((Alternative) button.getData("alternative")).getChildrens(); //$NON-NLS-1$
 										for(Alternative children: childrens) {
 											if(_alternativesSelected.contains(children)) {
 												_alternativesSelected.remove(children);
@@ -214,7 +213,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 										}
 										
 										for(Button b: _buttons) {
-											if(childrens.contains(b.getData("alternative"))) {
+											if(childrens.contains(b.getData("alternative"))) { //$NON-NLS-1$
 												b.setSelection(false);
 											}
 										}
@@ -235,7 +234,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 				editor.horizontalAlignment = SWT.CENTER;
 				editor.setEditor(button, item, cell.getColumnIndex());
 				editor.layout();
-				button.setData("editor", editor);
+				button.setData("editor", editor); //$NON-NLS-1$
 				
 				checkMatchingAlternatives(item);
 			}
@@ -245,7 +244,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 				
 				Map<Alternative, Button> buttonsAlternatives = new HashMap<Alternative, Button>();
 				for(Button b: _buttons) {
-					buttonsAlternatives.put((Alternative) b.getData("alternative"), b);
+					buttonsAlternatives.put((Alternative) b.getData("alternative"), b); //$NON-NLS-1$
 				}
 				
 				List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
@@ -370,9 +369,9 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 		for(Button b: _buttons) {
 			if(!b.isDisposed()) {
 				if(b.getSelection() && !campaignsSelected.isEmpty()) {
-					_alternativesBeforeSelected.add((Alternative) b.getData("alternative"));
+					_alternativesBeforeSelected.add((Alternative) b.getData("alternative")); //$NON-NLS-1$
 				}
-				TreeEditor editor = (TreeEditor) b.getData("editor");
+				TreeEditor editor = (TreeEditor) b.getData("editor"); //$NON-NLS-1$
 				editor.getEditor().dispose();
 			}
 		}

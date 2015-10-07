@@ -43,6 +43,7 @@ import sinbad2.element.campaigns.listener.CampaignsChangeEvent;
 import sinbad2.element.campaigns.listener.ICampaignsChangeListener;
 import sinbad2.element.mec.MEC;
 import sinbad2.element.ui.Images;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.mecs.dialog.NewMeDialog;
 import sinbad2.element.ui.view.mecs.jfreechart.MECChart;
@@ -117,7 +118,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 
 		Label tableLabel = new Label(container, SWT.NULL);
 		tableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		tableLabel.setText("Exposure measurements");
+		tableLabel.setText(Messages.MECView_Exposure_measurements);
 		tableLabel.setFont(SWTResourceManager.getFont("Cantarell", 10, SWT.BOLD)); //$NON-NLS-1$
 		tableLabel.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 
@@ -163,28 +164,28 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				
 				_tableItems.add(item);
 				
-				List<Integer> coordinates = (List<Integer>) item.getData("coordinates");
+				List<Integer> coordinates = (List<Integer>) item.getData("coordinates"); //$NON-NLS-1$
 				Point pCoordinates = new Point(coordinates.get(0), coordinates.get(1));
 				Rectangle boundsImage = new Rectangle(pCoordinates.x, pCoordinates.y, 12, 12);
 				
 				if(!item.getForeground().equals(new Color(Display.getCurrent(), 211, 211, 211))) {
 					if(boundsImage.contains(pt)) {
-						if(item.getData("check") == null || !(boolean) item.getData("check")) {
-							item.setData("check", true);
+						if(item.getData("check") == null || !(boolean) item.getData("check")) { //$NON-NLS-1$ //$NON-NLS-2$
+							item.setData("check", true); //$NON-NLS-1$
 							_addFormulaButton.setEnabled(true);
 							List<TableItem> tableItemsToRemove = new LinkedList<TableItem>();
 							for(TableItem ti: _tableItems) {
 								if(!ti.equals(item)) {
 									if(!ti.isDisposed()) {
-										ti.setData("check", false);
+										ti.setData("check", false); //$NON-NLS-1$
 									} else {
 										tableItemsToRemove.add(ti);
 									}
 								}
 							}
 							_tableItems.removeAll(tableItemsToRemove);
-						} else if((boolean) item.getData("check")) {
-							item.setData("check", false);
+						} else if((boolean) item.getData("check")) { //$NON-NLS-1$
+							item.setData("check", false); //$NON-NLS-1$
 						}
 					}
 					
@@ -193,7 +194,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 						if (rect.contains(pt)) {
 							if (i == 2) {
 								if(boundsImage.contains(pt)) {
-									if ((boolean) item.getData("check")) {
+									if ((boolean) item.getData("check")) { //$NON-NLS-1$
 										_mecSelected = (MEC) item.getData();
 										List<Campaign> campaignsSelected = CampaignsView.getCampaignsSelected();
 										if(!campaignsSelected.isEmpty()) {
@@ -213,7 +214,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 
 		_addFormulaButton = new Button(container, SWT.NULL);
 		_addFormulaButton.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
-		_addFormulaButton.setText("Add");
+		_addFormulaButton.setText(Messages.MECView_Add);
 		_addFormulaButton.setEnabled(false);
 		_addFormulaButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD).createImage());
 		_addFormulaButton.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
@@ -261,7 +262,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		buttonsChartComposite.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 
 		_changeChartButton = new Button(buttonsChartComposite, SWT.NULL);
-		_changeChartButton.setToolTipText("Change chart");
+		_changeChartButton.setToolTipText(Messages.MECView_Change_chart);
 		_changeChartButton.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
 		_changeChartButton.setEnabled(false);
 		_changeChartButton.setImage(Images.LineChart);
@@ -287,7 +288,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		});
 
 		_changeAggregationButton = new Button(buttonsChartComposite, SWT.NULL);
-		_changeAggregationButton.setToolTipText("Disaggregate");
+		_changeAggregationButton.setToolTipText(Messages.MECView_Disaggregate);
 		_changeAggregationButton.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
 		_changeAggregationButton.setEnabled(false);
 		_changeAggregationButton.setImage(Images.No_aggregation);
@@ -300,13 +301,13 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 				if (_aggregationOption == 0) {
 					_changeAggregationButton.setImage(Images.Aggregation);
 					_aggregationOption = 1;
-					_changeAggregationButton.setToolTipText("Aggregate");
+					_changeAggregationButton.setToolTipText(Messages.MECView_Aggregate);
 				} else {
 					_changeAggregationButton.setImage(Images.No_aggregation);
 					_aggregationOption = 0;	
 					_changeAxisCombo.select(0);
 					_changeAxisCombo.setEnabled(false);
-					_changeAggregationButton.setToolTipText("Disaggregate");
+					_changeAggregationButton.setToolTipText(Messages.MECView_Disaggregate);
 				}
 				checkOptions(campaigns);
 			}
@@ -314,13 +315,13 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		});
 
 		_changeAxisCombo = new Combo(buttonsChartComposite, SWT.NULL);
-		_changeAxisCombo.setToolTipText("Change axis value");
+		_changeAxisCombo.setToolTipText(Messages.MECView_Change_axis_value);
 		_changeAxisCombo.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
 		_changeAxisCombo.setEnabled(false);
 		_changeAxisCombo.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
-		_changeAxisCombo.add("Campaigns");
-		_changeAxisCombo.add("Provinces");
-		_changeAxisCombo.add("Contexts");
+		_changeAxisCombo.add(Messages.MECView_Campaigns);
+		_changeAxisCombo.add(Messages.MECView_Provinces);
+		_changeAxisCombo.add(Messages.MECView_Contexts);
 		_changeAxisCombo.select(0);
 
 		_changeAxisCombo.addSelectionListener(new SelectionAdapter() {
@@ -342,7 +343,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		TableViewerColumn tvc = new TableViewerColumn(_tableViewer, SWT.NONE);
 		tvc.setLabelProvider(new MECIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("EM");
+		tc.setText(Messages.MECView_EM);
 		tc.setResizable(true);
 		tc.pack();
 
@@ -386,7 +387,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		tvc = new TableViewerColumn(_tableViewer, SWT.NONE);
 		tvc.setLabelProvider(new FormulaLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Formula");
+		tc.setText(Messages.MECView_Formula);
 		tc.setResizable(false);
 		tc.pack();
 		
@@ -413,7 +414,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					
 					coordinates.add(x);
 			 		coordinates.add(y);
-			 		event.item.setData("coordinates", coordinates);
+			 		event.item.setData("coordinates", coordinates); //$NON-NLS-1$
 					
 					event.gc.drawImage(radioButton, x, y);
 				}
@@ -424,7 +425,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 
 		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Selection");
+		tc.setText(Messages.MECView_Selection_column);
 		tc.setResizable(false);
 		tc.pack();
 		tvc.setLabelProvider(new SelectionLabelProvider() {
@@ -599,10 +600,10 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for(Campaign c: campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")");
+			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			campaignsWithName.add(clone);
 		}
-		_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "combine");
+		_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "combine"); //$NON-NLS-1$
 	}
 	
 	private void combineCampaignsProvinces(List<Campaign> campaigns) {
@@ -612,28 +613,28 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			clone.setName(clone.getProvince());
 			campaignsWithProvinceName.add(clone);
 		}
-		_chart.setMEC(campaignsWithProvinceName, _mecSelected, _chartType, "combine");
+		_chart.setMEC(campaignsWithProvinceName, _mecSelected, _chartType, "combine"); //$NON-NLS-1$
 	}
 
 	private void separateCampaigns(List<Campaign> campaigns) {
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for (Campaign c : campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")");
+			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			campaignsWithName.add(clone);
 		}
 		
 		if(_changeAxisCombo.getSelectionIndex() != 2) {
 			if(_changeAxisCombo.getSelectionIndex() == 1) {
-				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate_provinces");
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate_provinces"); //$NON-NLS-1$
 			} else {
-				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate");
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "separate"); //$NON-NLS-1$
 			}
 		} else {
 			if(_chartType == 0) {
-				_chart.setMEC(campaignsWithName, _mecSelected, 2, "contexts");
+				_chart.setMEC(campaignsWithName, _mecSelected, 2, "contexts"); //$NON-NLS-1$
 			} else {
-				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "contexts");
+				_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "contexts"); //$NON-NLS-1$
 			}
 		}
 	}

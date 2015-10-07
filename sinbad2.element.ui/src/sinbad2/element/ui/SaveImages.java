@@ -43,7 +43,7 @@ public class SaveImages {
 		for (Set<Object> s : powerSet(allElementsSet)) {
 			combinations = new ArrayList<Object>(s);
 			formulaCriteria = new LinkedList<String>();
-			equationCriteria = "";
+			equationCriteria = ""; //$NON-NLS-1$
 			if(!combinations.isEmpty()) {
 				for(int i = 0; i < combinations.size(); ++i) {
 					formulaCriteria.add(combinations.get(i).toString());
@@ -52,14 +52,14 @@ public class SaveImages {
 				
 				for(int c = 0; c < formulaCriteria.size(); ++c) {
 					if(c < formulaCriteria.size() - 1) {
-						equationCriteria += formulaCriteria.get(c) + "$\\times$";
+						equationCriteria += formulaCriteria.get(c) + "$\\times$"; //$NON-NLS-1$
 					} else {
 						equationCriteria += formulaCriteria.get(c);
 					}
 				}
 
 				if(!equationCriteria.isEmpty()) {
-						formula = new TeXFormula("\\mbox{ME=" + equationCriteria + "}"); //$NON-NLS-1$
+						formula = new TeXFormula("\\mbox{ME=" + equationCriteria + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 						nameFile = formulaCriteria.toString();
 				}
 				
@@ -77,7 +77,7 @@ public class SaveImages {
 	
 				ImageLoader loader = new ImageLoader();
 				loader.data = new ImageData[] { formulaImage.getImageData() };
-				loader.save("D:\\Álvaro\\Escritorio\\Flintstones-DGT\\formulas" + "/" + nameFile + ".png", SWT.IMAGE_PNG);
+				loader.save("D:\\Álvaro\\Escritorio\\Flintstones-DGT\\formulas" + "/" + nameFile + ".png", SWT.IMAGE_PNG); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}

@@ -65,6 +65,7 @@ import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.criterion.Criterion;
 import sinbad2.element.mec.MEC;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.criteria.CriteriaView;
 import sinbad2.element.ui.view.criteria.provider.CriteriaMEsContentProvider;
 import sinbad2.element.ui.view.criteria.provider.CriterionSelectedIdLabelProvider;
@@ -120,7 +121,7 @@ public class NewMeDialog extends Dialog {
 		Label idLabel = new Label(container, SWT.NULL);
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, false, 4, 1);
 		idLabel.setLayoutData(gridData);
-		idLabel.setText("Name of Exposure measurement (EM)");
+		idLabel.setText(Messages.NewMeDialog_Name_of_exposure_measurement_EM);
 		idLabel.setFont(SWTResourceManager.getFont("Cantarell", 10, SWT.BOLD)); //$NON-NLS-1$
 
 		Text text = new Text(container, SWT.BORDER);
@@ -160,7 +161,7 @@ public class NewMeDialog extends Dialog {
 		
 		_addCriteria = new Button(container, SWT.NULL);
 		_addCriteria.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
-		_addCriteria.setText("Add");
+		_addCriteria.setText(Messages.NewMeDialog_Add);
 		_addCriteria.setImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD).createImage());
 		_addCriteria.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 		
@@ -169,8 +170,8 @@ public class NewMeDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				_criteriaNumerator.clear();
 				_criteriaDenominator.clear();
-				_numerator = "";
-				_denominator = "";
+				_numerator = ""; //$NON-NLS-1$
+				_denominator = ""; //$NON-NLS-1$
 				_formulaImage = null;
 				_frame.repaint();
 				
@@ -186,7 +187,7 @@ public class NewMeDialog extends Dialog {
 				for (int i = 0; i < _criteriaSelected.size(); ++i) {
 					Criterion c = _criteriaSelected.get(i);
 					for(Combo comb: _combos) {
-						if(comb.getData("criterion").equals(c)) {
+						if(comb.getData("criterion").equals(c)) { //$NON-NLS-1$
 							position = comb.getSelectionIndex();
 							if(position == 0) {
 								if(!_numerator.contains(c.getId())){
@@ -226,7 +227,7 @@ public class NewMeDialog extends Dialog {
 
 		Button clearFormula = new Button(container, SWT.NULL);
 		clearFormula.setLayoutData(new GridData(SWT.RIGHT, SWT.RIGHT, false, false, 1, 1));
-		clearFormula.setText("Clear");
+		clearFormula.setText(Messages.NewMeDialog_Clear);
 		clearFormula.setImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR).createImage());
 		clearFormula.setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 		
@@ -252,13 +253,13 @@ public class NewMeDialog extends Dialog {
 		TableViewerColumn tvc = new TableViewerColumn(tableViewer, SWT.CENTER);
 		tvc.setLabelProvider(new CriterionSelectedIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("Index");
+		tc.setText(Messages.NewMeDialog_Index_column);
 		tc.setResizable(false);
 		tc.pack();
 		
 		tvc = new TableViewerColumn(tableViewer, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Position");
+		tc.setText(Messages.NewMeDialog_Position_column);
 		tc.setResizable(false);
 		tc.setWidth(100);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
@@ -273,11 +274,11 @@ public class NewMeDialog extends Dialog {
 				} else {
 					combo = new Combo((Composite) cell.getViewerRow().getControl(), SWT.CENTER);
 					_combos.add(combo);
-					combo.add("Numerator");
-					combo.add("Denominator");
-					combo.add("Not selected");
+					combo.add(Messages.NewMeDialog_Numerator);
+					combo.add(Messages.NewMeDialog_Denominator);
+					combo.add(Messages.NewMeDialog_Not_selected);
 					combo.select(2);
-					combo.setData("criterion", item.getData());
+					combo.setData("criterion", item.getData()); //$NON-NLS-1$
 					combos.put(cell.getElement(), combo);		
 					
 					combo.addSelectionListener(new SelectionAdapter() {
@@ -308,7 +309,7 @@ public class NewMeDialog extends Dialog {
 		
 		tvc = new TableViewerColumn(tableViewer, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Weighing");
+		tc.setText(Messages.NewMeDialog_Weighing);
 		tc.setResizable(false);
 		tc.pack();
 		tvc.setLabelProvider(new ColumnLabelProvider() {
@@ -322,7 +323,7 @@ public class NewMeDialog extends Dialog {
 					text = texts.get(cell.getElement());
 				} else {
 					text = new Text((Composite) cell.getViewerRow().getControl(), SWT.CENTER);
-					text.setData("criterion", item.getData());
+					text.setData("criterion", item.getData()); //$NON-NLS-1$
 					_texts.add(text);
 					texts.put(cell.getElement(), text);		
 				}
@@ -337,14 +338,14 @@ public class NewMeDialog extends Dialog {
 			            String newS = oldS.substring(0, e.start) + e.text + oldS.substring(e.end);
 
 			            if(!newS.isEmpty()) {
-			            	if(newS.equals("00") || newS.equals("01")) {
+			            	if(newS.equals("00") || newS.equals("01")) { //$NON-NLS-1$ //$NON-NLS-2$
 			            		e.doit = false;
 			            	} else {
 					            boolean isFloat = true;
 					            float num = 0;
 					            try {
 					                num = Float.parseFloat(newS);
-					                text.setData("value", newS);
+					                text.setData("value", newS); //$NON-NLS-1$
 					            } catch(NumberFormatException ex) {
 					                isFloat = false;
 					            }
@@ -400,30 +401,30 @@ public class NewMeDialog extends Dialog {
 			List<MEC> allMECs = elementsSet.getMECs();
 			for(MEC m : allMECs) {
 				if(m.getId().equals(_mecName)) {
-					message = "Duplicated id";
+					message = Messages.NewMeDialog_Duplicated_id;
 				}
 			}
 		} else {
-			message = "Empty name";
+			message = Messages.NewMeDialog_Empty_name;
 		}
 		
 		validId = validate(_nameControlDecoration, message);
 		
 		float acum = 0;
 		for(Text t: _texts) {
-			String value = (String) t.getData("value");
+			String value = (String) t.getData("value"); //$NON-NLS-1$
 			try {
-				if(t.getData("value") == null || ((String) t.getData("value")).isEmpty()) {
-					value = "0";
+				if(t.getData("value") == null || ((String) t.getData("value")).isEmpty()) { //$NON-NLS-1$ //$NON-NLS-2$
+					value = "0"; //$NON-NLS-1$
 				}
-				_criteriaWeight.put((Criterion) t.getData("criterion"), Double.parseDouble(value));
+				_criteriaWeight.put((Criterion) t.getData("criterion"), Double.parseDouble(value)); //$NON-NLS-1$
 				acum += Double.parseDouble(value);
 			} catch(NumberFormatException ex) {
 	        	acum = -1;
 	        }
 		}
 		if(!(acum == 1.0)) {
-			message = "Values must add 1";
+			message = Messages.NewMeDialog_Values_must_add_1;
 			weightsNoCorrect();
 		} else {
 			weightsCorrect();
@@ -432,7 +433,7 @@ public class NewMeDialog extends Dialog {
 		validValue = validate(_nameControlDecoration, message);
 		
 		if(_formulaImage == null) {
-			message = "Empty ME";
+			message = Messages.NewMeDialog_Empty_ME;
 		} else {
 			validImage = true;
 		}
@@ -446,12 +447,12 @@ public class NewMeDialog extends Dialog {
 	private void weightsCorrect() {
 		Map<Criterion, Combo> combos = new HashMap<Criterion, Combo>();
 		for(Combo c: _combos) {
-			combos.put((Criterion) c.getData("criterion"), c);
+			combos.put((Criterion) c.getData("criterion"), c); //$NON-NLS-1$
 		}
 		
 		Map<Criterion, Text> texts = new HashMap<Criterion, Text>();
 		for(Text t: _texts) {
-			texts.put((Criterion) t.getData("criterion"), t);
+			texts.put((Criterion) t.getData("criterion"), t); //$NON-NLS-1$
 		}
 		
 		for(Criterion c: (List<Criterion>) _providerCriteria.getInput()) {
@@ -467,12 +468,12 @@ public class NewMeDialog extends Dialog {
 	private void weightsNoCorrect() {
 		Map<Criterion, Combo> combos = new HashMap<Criterion, Combo>();
 		for(Combo c: _combos) {
-			combos.put((Criterion) c.getData("criterion"), c);
+			combos.put((Criterion) c.getData("criterion"), c); //$NON-NLS-1$
 		}
 		
 		Map<Criterion, Text> texts = new HashMap<Criterion, Text>();
 		for(Text t: _texts) {
-			texts.put((Criterion) t.getData("criterion"), t);
+			texts.put((Criterion) t.getData("criterion"), t); //$NON-NLS-1$
 		}
 		
 		for(Criterion c: (List<Criterion>) _providerCriteria.getInput()) {
@@ -537,7 +538,7 @@ public class NewMeDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("New EM");
+		newShell.setText(Messages.NewMeDialog_New_EM);
 	}
 
 	public void createFormula() {
@@ -547,7 +548,7 @@ public class NewMeDialog extends Dialog {
 			String formulaText = "\\mbox{MEC=\\dfrac{1}{" + _denominator + "}}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
 		} else if(!_numerator.isEmpty() && _denominator.isEmpty()) {
-			formula = new TeXFormula("\\mbox{MEC=" + _numerator + "}"); //$NON-NLS-1$
+			formula = new TeXFormula("\\mbox{MEC=" + _numerator + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			String formulaText = "\\mbox{MEC=\\dfrac{" + _numerator + "}{" + _denominator + "}}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
@@ -602,21 +603,21 @@ public class NewMeDialog extends Dialog {
 		}
 		Map<Criterion, Combo> combos = new HashMap<Criterion, Combo>();
 		for(Combo c: _combos) {
-			combos.put((Criterion) c.getData("criterion"), c);
+			combos.put((Criterion) c.getData("criterion"), c); //$NON-NLS-1$
 		}
 		
 		Map<Criterion, Text> texts = new HashMap<Criterion, Text>();
 		for(Text t: _texts) {
-			texts.put((Criterion) t.getData("criterion"), t);
+			texts.put((Criterion) t.getData("criterion"), t); //$NON-NLS-1$
 		}
 		
 		for(Button b: buttonsCriteria) {
 			if(!b.isEnabled()) {
-				TableItem ti = tableItemsCriteria.get(b.getData("criterion"));
+				TableItem ti = tableItemsCriteria.get(b.getData("criterion")); //$NON-NLS-1$
 				ti.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
-				Combo c = combos.get(b.getData("criterion"));
+				Combo c = combos.get(b.getData("criterion")); //$NON-NLS-1$
 				c.setEnabled(false);
-				Text t = texts.get(b.getData("criterion"));
+				Text t = texts.get(b.getData("criterion")); //$NON-NLS-1$
 				t.setEnabled(false);
 			}
 		}

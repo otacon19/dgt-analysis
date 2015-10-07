@@ -42,6 +42,7 @@ import sinbad2.element.alternative.Alternative;
 import sinbad2.element.campaigns.Campaign;
 import sinbad2.element.criterion.Criterion;
 import sinbad2.element.mec.MEC;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.alternatives.AlternativesView;
 
 public class MECChart {
@@ -66,7 +67,7 @@ public class MECChart {
 		_chartComposite = null;
 		_campaignsSeries = new LinkedList<Campaign>();
 		_alternativesSelectedPDF = new LinkedList<Alternative>();
-		_action = "";
+		_action = ""; //$NON-NLS-1$
 		_fontPDF = false;
 	}
 	
@@ -90,21 +91,21 @@ public class MECChart {
 		if (_barChart == null) {
 			if(_action.isEmpty()) {
 				_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
-			} else if(_action.equals("combine")) {
+			} else if(_action.equals("combine")) { //$NON-NLS-1$
 				_barChart = createBarChart(createBarChartDatasetCombineCampaigns());
-			} else if(_action.equals("separate")) {
+			} else if(_action.equals("separate")) { //$NON-NLS-1$
 				_barChart = createBarChart(createBarChartDatasetSeparateCampaigns());
-			} else if(_action.equals("separate_provinces")) {
+			} else if(_action.equals("separate_provinces")) { //$NON-NLS-1$
 				_barChart = createBarChart(createBarChartDatasetSeparateProvinces());
 			}
 		} else {
-			if (_action.equals("separate")) {
+			if (_action.equals("separate")) { //$NON-NLS-1$
 				_barChart.getCategoryPlot().setDataset(
 						createBarChartDatasetSeparateCampaigns());
-			} else if (_action.equals("combine")) {
+			} else if (_action.equals("combine")) { //$NON-NLS-1$
 				_barChart.getCategoryPlot().setDataset(
 						createBarChartDatasetCombineCampaigns());
-			} else if (_action.equals("separate_provinces")) {
+			} else if (_action.equals("separate_provinces")) { //$NON-NLS-1$
 				_barChart.getCategoryPlot().setDataset(
 						createBarChartDatasetSeparateProvinces());
 			}
@@ -137,19 +138,19 @@ public class MECChart {
 
 	public void refreshLineChart() {
 		if (_lineChart == null) {
-			if(_action.equals("combine")) {
+			if(_action.equals("combine")) { //$NON-NLS-1$
 				_lineChart = createLineChart(createLineChartDatasetCombineCampaigns());
-			} else if(_action.equals("separate_provinces")) {
+			} else if(_action.equals("separate_provinces")) { //$NON-NLS-1$
 				_lineChart = createLineChart(createLineChartDatasetSeparateProvinces());
-			} else if(_action.equals("contexts")) {
+			} else if(_action.equals("contexts")) { //$NON-NLS-1$
 				_lineChart = createLineChart(createLineChartDatasetSeparateContexts());
 			}
 		} else {
-			if (_action.equals("combine")) {
+			if (_action.equals("combine")) { //$NON-NLS-1$
 					_lineChart.getXYPlot().setDataset(createLineChartDatasetCombineCampaigns());
-			} else if (_action.equals("separate_provinces")) {
+			} else if (_action.equals("separate_provinces")) { //$NON-NLS-1$
 				_lineChart.getXYPlot().setDataset(createLineChartDatasetSeparateProvinces());
-			} else if (_action.equals("contexts")) {
+			} else if (_action.equals("contexts")) { //$NON-NLS-1$
 				_lineChart.getXYPlot().setDataset(createLineChartDatasetSeparateContexts());
 			}
 		}
@@ -277,9 +278,9 @@ public class MECChart {
 		rangeAxis.setAutoRange(true);
 
 		br.setDrawBarOutline(false);
-		br.setSeriesItemLabelGenerator(0, new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance())); 
+		br.setSeriesItemLabelGenerator(0, new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));  //$NON-NLS-1$
 		br.setSeriesItemLabelsVisible(0, true);
-		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance())); //$NON-NLS-1$
 		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.TOP_CENTER));
 		plot.setRenderer(br);
 		
@@ -288,8 +289,8 @@ public class MECChart {
 
 	private JFreeChart createStacketChart(CategoryDataset dataset) {
 
-		final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "",
-				"", dataset, PlotOrientation.HORIZONTAL, false, true, false);
+		final JFreeChart chart = ChartFactory.createStackedBarChart3D("", "", //$NON-NLS-1$ //$NON-NLS-2$
+				"", dataset, PlotOrientation.HORIZONTAL, false, true, false); //$NON-NLS-1$
 
 		chart.setBackgroundPaint(Color.white);
 
@@ -302,15 +303,15 @@ public class MECChart {
 		
 		BarRenderer br = (BarRenderer) plot.getRenderer();
 		br.setMaximumBarWidth(.2);
-		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance()));
+		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance())); //$NON-NLS-1$
 		br.setBaseItemLabelsVisible(true);
 		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
 		br.setSeriesPositiveItemLabelPosition(1, new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
-		br.setBaseItemLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 12), false);
-		br.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 12));
+		br.setBaseItemLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 12), false); //$NON-NLS-1$
+		br.setSeriesItemLabelFont(0, new java.awt.Font("Cantarell", Font.PLAIN, 12)); //$NON-NLS-1$
 		
 		CategoryAxis domainAxis = plot.getDomainAxis();
-		domainAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 4));
+		domainAxis.setLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 4)); //$NON-NLS-1$
 
 		return chart;
 
@@ -329,30 +330,30 @@ public class MECChart {
 		plot.setRangeGridlinePaint(Color.white);
 
 		String[] months = new String[12];
-		months[0] = "January";
-		months[1] = "February";
-		months[2] = "March";
-		months[3] = "April";
-		months[4] = "May";
-		months[5] = "June";
-		months[6] = "July";
-		months[7] = "August";
-		months[8] = "September";
-		months[9] = "October";
-		months[10] = "November";
-		months[11] = "December";
+		months[0] = Messages.MECChart_January;
+		months[1] = Messages.MECChart_February;
+		months[2] = Messages.MECChart_March;
+		months[3] = Messages.MECChart_April;
+		months[4] = Messages.MECChart_May;
+		months[5] = Messages.MECChart_June;
+		months[6] = Messages.MECChart_July;
+		months[7] = Messages.MECChart_August;
+		months[8] = Messages.MECChart_September;
+		months[9] = Messages.MECChart_October;
+		months[10] = Messages.MECChart_November;
+		months[11] = Messages.MECChart_December;
 	
-		SymbolAxis rangeAxis = new SymbolAxis("", months) {
+		SymbolAxis rangeAxis = new SymbolAxis("", months) { //$NON-NLS-1$
 			@Override
 			public Font getTickLabelFont() {
 				if(!_fontPDF) {
-					return new java.awt.Font("Cantarell", Font.PLAIN, 10);
+					return new java.awt.Font("Cantarell", Font.PLAIN, 10); //$NON-NLS-1$
 				} else {
-					return new java.awt.Font("Cantarell", Font.PLAIN, 6);
+					return new java.awt.Font("Cantarell", Font.PLAIN, 6); //$NON-NLS-1$
 				}
 			}
 		};
-		rangeAxis.setTickLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 10));
+		rangeAxis.setTickLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 10)); //$NON-NLS-1$
 		plot.setDomainAxis(rangeAxis);
 
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer() {
@@ -382,7 +383,7 @@ public class MECChart {
 
 			double acumValue, value, numerator, denominator, weight;
 			int pos = -1;
-			String category = "";
+			String category = ""; //$NON-NLS-1$
 			
 			List<Object> data;
 			Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
@@ -429,7 +430,7 @@ public class MECChart {
 				campaignsTotalValue.put(campaign, numeratorAndDenominator);
 
 				if (!category.contains(campaign.getName())) {
-					category += campaign.getName() + "-";
+					category += campaign.getName() + "-"; //$NON-NLS-1$
 				}
 			}
 
@@ -457,7 +458,7 @@ public class MECChart {
 				List<Campaign> dataCampaigns = getDataCampaigns();
 				for (Campaign c : dataCampaigns) {
 					if (!category.contains(c.getName())) {
-						category += c.getName() + "-";
+						category += c.getName() + "-"; //$NON-NLS-1$
 					}
 				}
 				category = category.substring(0, category.length() - 1);
@@ -902,7 +903,7 @@ public class MECChart {
 									a.getId() + campaign.getProvince(), total);
 						}
 
-						dataset.addValue(total, a.getId(), a.getParent() + "(" + campaign.getProvince() + ")");
+						dataset.addValue(total, a.getId(), a.getParent() + "(" + campaign.getProvince() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
@@ -1056,7 +1057,7 @@ public class MECChart {
 
 		XYSeries campaignSerie = null;
 		for (String province : provinces) {
-			campaignSerie = new XYSeries(_mecSelected.getId() + "(" + province + ")");
+			campaignSerie = new XYSeries(_mecSelected.getId() + "(" + province + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			List<Campaign> campaignsProvinces = campaignsForProvinces
 					.get(province);
 			campaignsTotalValue.clear();
@@ -1211,14 +1212,14 @@ public class MECChart {
 				for (Alternative a : alternativesSelected) {
 					if (!a.hasChildrens()) {
 						if (!seriesAlreadyAdded.contains(a)) {
-							serie = new XYSeries(a.getId() + "_" + campaign.getProvince());
+							serie = new XYSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
 							dataset.addSeries(serie);
 							seriesAlreadyAdded.add(a);
 						} else {
 							try {
-								serie = dataset.getSeries(a.getId() + "_" + campaign.getProvince());
+								serie = dataset.getSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
 							} catch (UnknownKeyException e) {
-								serie = new XYSeries(a.getId() + "_" + campaign.getProvince());
+								serie = new XYSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
 								dataset.addSeries(serie);
 								seriesAlreadyAdded.add(a);
 							}

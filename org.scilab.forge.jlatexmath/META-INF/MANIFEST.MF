@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jlatexmath
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.scilab.forge.jlatexmath
 Bundle-Version: 1.0.0
-Bundle-Vendor: Scilab
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.scilab.forge.jlatexmath,
  org.scilab.forge.jlatexmath.cache,

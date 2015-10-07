@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Button;
 import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.campaigns.operation.DeselectAllCampaignOperation;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 
 public class DeselectAllCampaignHandler extends AbstractHandler {
@@ -29,7 +30,7 @@ public class DeselectAllCampaignHandler extends AbstractHandler {
 		ProblemElementsManager elementsManager = ProblemElementsManager.getInstance();
 		ProblemElementsSet elementsSet = elementsManager.getActiveElementSet();
 		
-		IUndoableOperation operation = new DeselectAllCampaignOperation("Deselect all", buttons, elementsSet);
+		IUndoableOperation operation = new DeselectAllCampaignOperation(Messages.DeselectAllCampaignHandler_Deselect_all, buttons, elementsSet);
 		IOperationHistory operationHistory = OperationHistoryFactory.getOperationHistory();
 			
 		operation.addContext(IOperationHistory.GLOBAL_UNDO_CONTEXT);

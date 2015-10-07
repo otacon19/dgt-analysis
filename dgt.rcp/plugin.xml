@@ -16,7 +16,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="dgt.rcp.application"
-            name="dgt">
+            name="%product.name">
          <property
                name="appName"
                value="dgt">

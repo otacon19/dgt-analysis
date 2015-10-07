@@ -8,8 +8,8 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="flintstones.menu.file"
-               label="File"
-               mnemonic="A">
+               label="%menu.label"
+               mnemonic="%menu.file.mnemonic">
             <command
                   commandId="sinbad2.element.pdf"
                   style="push">
@@ -116,7 +116,7 @@
       </command>
       <command
             id="sinbad2.element.pdf"
-            name="Generate PDF">
+            name="%command.pdf.name">
       </command>
    </extension>
    <extension

@@ -1,0 +1,120 @@
+package sinbad2.element.ui.nls;
+
+import org.eclipse.osgi.util.NLS;
+
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "sinbad2.element.ui.nls.messages"; //$NON-NLS-1$
+	public static String AddCampaignsDialog_Add;
+	public static String AddCampaignsDialog_Add_campaigns;
+	public static String AddCampaignsDialog_Campaign_column;
+	public static String AddCampaignsDialog_Choose_date;
+	public static String AddCampaignsDialog_Context_column;
+	public static String AddCampaignsDialog_Date;
+	public static String AddCampaignsDialog_Final_date_column;
+	public static String AddCampaignsDialog_Index_column;
+	public static String AddCampaignsDialog_Initial_date_column;
+	public static String AddCampaignsDialog_Region_column;
+	public static String AddCampaignsDialog_Remove;
+	public static String AddCampaignsDialog_Type_column;
+	public static String AlternativesView_Context_column;
+	public static String AlternativesView_Selection_column;
+	public static String CampaignsView_Add;
+	public static String CampaignsView_Campaign_column;
+	public static String CampaignsView_Final_date_column;
+	public static String CampaignsView_Initial_date_column;
+	public static String CampaignsView_Region_column;
+	public static String CampaignsView_Remove;
+	public static String CampaignsView_Selection_column;
+	public static String CriteriaView_Index_column;
+	public static String CriteriaView_Operation_column;
+	public static String CriteriaView_Selection_column;
+	public static String CriteriaView_Type_column;
+	public static String CriterionOperationLabelProvider_Accumulate;
+	public static String CriterionOperationLabelProvider_Media;
+	public static String DeselectAllAlternativeHandler_Deselect_all;
+	public static String DeselectAllCampaignHandler_Deselect_all;
+	public static String DeselectAllCriterionHandler_Deselect_all;
+	public static String GeneratePDFHandler_Campaign_column;
+	public static String GeneratePDFHandler_Campaigns_analysis_anchor;
+	public static String GeneratePDFHandler_Campaigns_analysis_name_section;
+	public static String GeneratePDFHandler_Context_column;
+	public static String GeneratePDFHandler_Decision_mec_analysis_pdf_title;
+	public static String GeneratePDFHandler_DGT_analysis_campaigns_subject;
+	public static String GeneratePDFHandler_Index_column;
+	public static String GeneratePDFHandler_Keywords_pdf;
+	public static String GeneratePDFHandler_Measure_hours;
+	public static String GeneratePDFHandler_Report_generated_by;
+	public static String GeneratePDFWizard_Generate_PDF;
+	public static String MECChart_April;
+	public static String MECChart_August;
+	public static String MECChart_December;
+	public static String MECChart_February;
+	public static String MECChart_January;
+	public static String MECChart_July;
+	public static String MECChart_June;
+	public static String MECChart_March;
+	public static String MECChart_May;
+	public static String MECChart_November;
+	public static String MECChart_October;
+	public static String MECChart_September;
+	public static String MECView_Add;
+	public static String MECView_Aggregate;
+	public static String MECView_Campaigns;
+	public static String MECView_Change_axis_value;
+	public static String MECView_Change_chart;
+	public static String MECView_Contexts;
+	public static String MECView_Disaggregate;
+	public static String MECView_EM;
+	public static String MECView_Exposure_measurements;
+	public static String MECView_Formula;
+	public static String MECView_Provinces;
+	public static String MECView_Selection_column;
+	public static String NewMeDialog_Add;
+	public static String NewMeDialog_Clear;
+	public static String NewMeDialog_Denominator;
+	public static String NewMeDialog_Duplicated_id;
+	public static String NewMeDialog_Empty_ME;
+	public static String NewMeDialog_Empty_name;
+	public static String NewMeDialog_Index_column;
+	public static String NewMeDialog_Name_of_exposure_measurement_EM;
+	public static String NewMeDialog_New_EM;
+	public static String NewMeDialog_Not_selected;
+	public static String NewMeDialog_Numerator;
+	public static String NewMeDialog_Position_column;
+	public static String NewMeDialog_Values_must_add_1;
+	public static String NewMeDialog_Weighing;
+	public static String SelectAllAlternativeHandler_Select_all;
+	public static String SelectAllCampaignHandler_Select_all;
+	public static String SelectAllCriterionHandler_Select_all;
+	public static String SelectAlternativesWizardPage_Context_column;
+	public static String SelectAlternativesWizardPage_Select_contexts;
+	public static String SelectAlternativesWizardPage_Select_the_contexts_you_want;
+	public static String SelectCampaignsWizardPage_Aggregate;
+	public static String SelectCampaignsWizardPage_By_campaigns;
+	public static String SelectCampaignsWizardPage_By_contexts;
+	public static String SelectCampaignsWizardPage_By_provinces;
+	public static String SelectCampaignsWizardPage_Campaign_column;
+	public static String SelectCampaignsWizardPage_Desaggregate;
+	public static String SelectCampaignsWizardPage_Final_date_column;
+	public static String SelectCampaignsWizardPage_Initial_date_column;
+	public static String SelectCampaignsWizardPage_Province_column;
+	public static String SelectCampaignsWizardPage_Select_campaigns;
+	public static String SelectCampaignsWizardPage_Select_the_campaigns_you_want;
+	public static String SelectChartWizardPage_Bar_chart;
+	public static String SelectChartWizardPage_Line_chart;
+	public static String SelectChartWizardPage_Select_chart;
+	public static String SelectChartWizardPage_Select_the_chart_you_want;
+	public static String SelectChartWizardPage_Table;
+	public static String SelectMEsWizardPage_EM_column;
+	public static String SelectMEsWizardPage_Formula_column;
+	public static String SelectMEsWizardPage_Select_MEs;
+	public static String SelectMEsWizardPage_Select_the_MEs_you_want;
+	public static String SelectMEsWizardPage_Selection_column;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages() {
+	}
+}

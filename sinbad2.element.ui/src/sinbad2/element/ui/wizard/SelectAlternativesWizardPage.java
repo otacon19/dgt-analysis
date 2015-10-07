@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import sinbad2.element.alternative.Alternative;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.alternatives.AlternativesView;
 import sinbad2.element.ui.view.alternatives.provider.AlternativeSelectedIdLabelProvider;
 import sinbad2.element.ui.view.alternatives.provider.AlternativesWizardContentProvider;
@@ -26,8 +27,8 @@ public class SelectAlternativesWizardPage extends WizardPage {
 	private static List<Alternative> _alternativesSelected;
 	
 	protected SelectAlternativesWizardPage() {
-		super("Select contexts");
-		setDescription("Select the contexts you want");
+		super(Messages.SelectAlternativesWizardPage_Select_contexts);
+		setDescription(Messages.SelectAlternativesWizardPage_Select_the_contexts_you_want);
 		
 		_alternativesSelected = AlternativesView.getAlternativesSelected();		
 	}
@@ -79,7 +80,7 @@ public class SelectAlternativesWizardPage extends WizardPage {
 		TreeViewerColumn tvc = new TreeViewerColumn(_treeViewerAlternatives, SWT.CENTER);
 		tvc.setLabelProvider(new AlternativeSelectedIdLabelProvider());
 		TreeColumn tc = tvc.getColumn();
-		tc.setText("Context");
+		tc.setText(Messages.SelectAlternativesWizardPage_Context_column);
 		tc.setResizable(false);
 		tc.pack();
 	}

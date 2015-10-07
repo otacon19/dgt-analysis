@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Rcp
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: dgt.rcp;singleton:=true
 Bundle-Version: 1
 Bundle-Activator: dgt.rcp.Activator
-Bundle-Vendor: Sinbad2
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui;bundle-version="3.8.2",
  org.eclipse.core.runtime;bundle-version="3.8.0",
  sinbad2.resolutionphase.analysis;bundle-version="1.0.0"

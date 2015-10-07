@@ -15,17 +15,17 @@ public class AlternativeSelectedIdLabelProvider extends ColumnLabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		if(((Alternative) element).getId().equals("Motivo")) {
+		if(((Alternative) element).getId().equals("Motivo")) { //$NON-NLS-1$
 			return Images.Reason;
 		} else {
-			if(((Alternative) element).getId().equals("Tipo vehículo")) {
+			if(((Alternative) element).getId().equals("Tipo vehículo")) { //$NON-NLS-1$
 				return Images.Kind_of_cars;
 			} else {
-				if(((Alternative) element).getId().equals("Franja horaria")) {
+				if(((Alternative) element).getId().equals("Franja horaria")) { //$NON-NLS-1$
 					return Images.Time_zone;
-				} else if(((Alternative) element).getId().equals("Periodo semanal")) {
+				} else if(((Alternative) element).getId().equals("Periodo semanal")) { //$NON-NLS-1$
 					return Images.Week;
-				} else if(((Alternative) element).getId().equals("Permisos")){
+				} else if(((Alternative) element).getId().equals("Permisos")){ //$NON-NLS-1$
 					return Images.Permission;
 				} else {
 					return null;

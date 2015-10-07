@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import sinbad2.element.mec.MEC;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.mecs.provider.MECIdLabelProvider;
 import sinbad2.element.ui.view.mecs.provider.MECsWizardContentProvider;
 
@@ -37,8 +38,8 @@ public class SelectMEsWizardPage extends WizardPage {
 	private static List<MEC> _mecsSelected;
 	
 	protected SelectMEsWizardPage() {
-		super("Select MEs");
-		setDescription("Select the MEs you want");
+		super(Messages.SelectMEsWizardPage_Select_MEs);
+		setDescription(Messages.SelectMEsWizardPage_Select_the_MEs_you_want);
 		
 		_mecsSelected = new LinkedList<MEC>();
 	}
@@ -98,7 +99,7 @@ public class SelectMEsWizardPage extends WizardPage {
 		TableViewerColumn tvc = new TableViewerColumn(_tableViewerMEs, SWT.NONE);
 		tvc.setLabelProvider(new MECIdLabelProvider());
 		TableColumn tc = tvc.getColumn();
-		tc.setText("ME");
+		tc.setText(Messages.SelectMEsWizardPage_EM_column);
 		tc.setResizable(true);
 		tc.pack();
 
@@ -142,13 +143,13 @@ public class SelectMEsWizardPage extends WizardPage {
 		tvc = new TableViewerColumn(_tableViewerMEs, SWT.NONE);
 		tvc.setLabelProvider(new FormulaLabelProvider());
 		tc = tvc.getColumn();
-		tc.setText("Formula");
+		tc.setText(Messages.SelectMEsWizardPage_Formula_column);
 		tc.setResizable(false);
 		tc.pack();
 
 		tvc = new TableViewerColumn(_tableViewerMEs, SWT.CENTER);
 		tc = tvc.getColumn();
-		tc.setText("Selection");
+		tc.setText(Messages.SelectMEsWizardPage_Selection_column);
 		tc.setResizable(false);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			Map<Object, Button> buttons = new HashMap<Object, Button>();
@@ -162,16 +163,16 @@ public class SelectMEsWizardPage extends WizardPage {
 					button = buttons.get(cell.getElement());
 				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
-					button.setData("mec", (MEC) item.getData()); 
+					button.setData("mec", (MEC) item.getData());  //$NON-NLS-1$
 					button.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
 							if(((Button) e.widget).getSelection()) {
-								if(!_mecsSelected.contains((MEC) button.getData("mec"))) {
-									_mecsSelected.add((MEC) button.getData("mec"));
+								if(!_mecsSelected.contains((MEC) button.getData("mec"))) { //$NON-NLS-1$
+									_mecsSelected.add((MEC) button.getData("mec")); //$NON-NLS-1$
 								}
 							} else {
-								_mecsSelected.remove((MEC) button.getData("mec"));
+								_mecsSelected.remove((MEC) button.getData("mec")); //$NON-NLS-1$
 							}
 							
 							if(!_mecsSelected.isEmpty()) {
@@ -189,7 +190,7 @@ public class SelectMEsWizardPage extends WizardPage {
 				editor.horizontalAlignment = SWT.CENTER;
 				editor.setEditor(button, item, cell.getColumnIndex());
 				editor.layout();
-				button.setData("editor", editor);
+				button.setData("editor", editor); //$NON-NLS-1$
 			}
 		});
 	}

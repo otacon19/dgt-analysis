@@ -23,7 +23,7 @@ public class CriteriaMEsContentProvider implements IStructuredContentProvider {
 		_criteria = new LinkedList<Criterion>();
 		
 		for(Button b: CriteriaView.getButtons()) {
-			_criteria.add((Criterion) b.getData("criterion"));
+			_criteria.add((Criterion) b.getData("criterion")); //$NON-NLS-1$
 		}
 	}
 

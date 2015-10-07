@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Button;
 import sinbad2.element.ProblemElementsManager;
 import sinbad2.element.ProblemElementsSet;
 import sinbad2.element.alternative.operation.SelectAllAlternativeOperation;
+import sinbad2.element.ui.nls.Messages;
 import sinbad2.element.ui.view.alternatives.AlternativesView;
 
 public class SelectAllAlternativeHandler extends AbstractHandler {
@@ -29,7 +30,7 @@ public class SelectAllAlternativeHandler extends AbstractHandler {
 		ProblemElementsManager elementsManager = ProblemElementsManager.getInstance();
 		ProblemElementsSet elementsSet = elementsManager.getActiveElementSet();
 		
-		IUndoableOperation operation = new SelectAllAlternativeOperation("Select all", buttons, elementsSet);
+		IUndoableOperation operation = new SelectAllAlternativeOperation(Messages.SelectAllAlternativeHandler_Select_all, buttons, elementsSet);
 		IOperationHistory operationHistory = OperationHistoryFactory.getOperationHistory();
 			
 		operation.addContext(IOperationHistory.GLOBAL_UNDO_CONTEXT);
