@@ -629,7 +629,7 @@ public class AddCampaignsDialog extends Dialog {
 		tc.setResizable(false);
 		tc.pack();
 
-		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewerCampaigns, SWT.LEFT);
 		tvc.setLabelProvider(new CampaignFinalDateLabelProvider());
 		tc = tvc.getColumn();
 		tc.addSelectionListener(getSelectionAdapter(_tableViewerCampaigns, tvc.getColumn(), 3));

@@ -139,7 +139,7 @@ public class NewMeDialog extends Dialog {
 		_nameControlDecoration = createNotificationDecorator(text);
 		
 		_tableViewerCriteria = new TableViewer(container, SWT.CENTER | SWT.BORDER | SWT.FULL_SELECTION);
-		_tableViewerCriteria.getTable().setLinesVisible(true);
+		_tableViewerCriteria.getTable().setLinesVisible(false);
 		_providerCriteria = new CriteriaMEsContentProvider(_tableViewerCriteria);
 		_tableViewerCriteria.setContentProvider(_providerCriteria);
 		_tableViewerCriteria.getTable().setHeaderVisible(true);
@@ -194,7 +194,7 @@ public class NewMeDialog extends Dialog {
 									_numerator += c.getId() + "$\\times$"; //$NON-NLS-1$
 									_criteriaNumerator.add(c);
 								}
-							} else {
+							} else if(position == 1) {
 								if(!_denominator.contains(c.getId())){
 									_denominator += c.getId() + "$\\times$"; //$NON-NLS-1$
 									_criteriaDenominator.add(c);
@@ -261,7 +261,7 @@ public class NewMeDialog extends Dialog {
 		tc = tvc.getColumn();
 		tc.setText(Messages.NewMeDialog_Position_column);
 		tc.setResizable(false);
-		tc.setWidth(100);
+		tc.setWidth(120);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			Map<Object, Combo> combos = new HashMap<Object, Combo>();
 
@@ -272,7 +272,7 @@ public class NewMeDialog extends Dialog {
 				if (combos.containsKey(cell.getElement())) {
 					combo = combos.get(cell.getElement());
 				} else {
-					combo = new Combo((Composite) cell.getViewerRow().getControl(), SWT.CENTER);
+					combo = new Combo((Composite) cell.getViewerRow().getControl(), SWT.CENTER | SWT.READ_ONLY);
 					_combos.add(combo);
 					combo.add(Messages.NewMeDialog_Numerator);
 					combo.add(Messages.NewMeDialog_Denominator);
@@ -297,6 +297,8 @@ public class NewMeDialog extends Dialog {
 							} else {
 								_addCriteria.setEnabled(true);
 							}
+							
+							validate();
 						};
 					});
 				}
@@ -417,13 +419,19 @@ public class NewMeDialog extends Dialog {
 				if(t.getData("value") == null || ((String) t.getData("value")).isEmpty()) { //$NON-NLS-1$ //$NON-NLS-2$
 					value = "0"; //$NON-NLS-1$
 				}
-				_criteriaWeight.put((Criterion) t.getData("criterion"), Double.parseDouble(value)); //$NON-NLS-1$
-				acum += Double.parseDouble(value);
+				for(Combo c: _combos) {
+					if(c.getData("criterion").equals(t.getData("criterion"))) {
+						if(c.getSelectionIndex() != 2) {
+							_criteriaWeight.put((Criterion) t.getData("criterion"), Double.parseDouble(value)); //$NON-NLS-1$
+							acum += Double.parseDouble(value);
+						}
+					}
+				}
 			} catch(NumberFormatException ex) {
 	        	acum = -1;
 	        }
 		}
-		if(!(acum == 1.0)) {
+		if((acum <= 0.99 || acum >= 1.01 )) {
 			message = Messages.NewMeDialog_Values_must_add_1;
 			weightsNoCorrect();
 		} else {
@@ -459,6 +467,8 @@ public class NewMeDialog extends Dialog {
 			Combo combo = combos.get(c);
 			if(combo.getSelectionIndex() != 2) {
 				texts.get(c).setBackground(new Color(Display.getCurrent(), 203, 255, 203));
+			} else {
+				texts.get(c).setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 			}
 		}
 		
@@ -480,6 +490,8 @@ public class NewMeDialog extends Dialog {
 			Combo combo = combos.get(c);
 			if(combo.getSelectionIndex() != 2) {
 				texts.get(c).setBackground(new Color(Display.getCurrent(), 255, 203, 203));
+			} else {
+				texts.get(c).setBackground(new Color(Display.getCurrent(), 255, 255, 255));
 			}
 		}
 	}
@@ -549,9 +561,11 @@ public class NewMeDialog extends Dialog {
 			formula = new TeXFormula(formulaText);
 		} else if(!_numerator.isEmpty() && _denominator.isEmpty()) {
 			formula = new TeXFormula("\\mbox{MEC=" + _numerator + "}"); //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
+		} else if(!_numerator.isEmpty() && !_denominator.isEmpty()){
 			String formulaText = "\\mbox{MEC=\\dfrac{" + _numerator + "}{" + _denominator + "}}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			formula = new TeXFormula(formulaText);
+		} else {
+			formula = new TeXFormula();
 		}
 
 		TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 12);

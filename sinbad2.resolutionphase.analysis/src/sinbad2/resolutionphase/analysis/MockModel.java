@@ -69,7 +69,7 @@ public class MockModel {
 		//Campañas
 		//Campañas Jaén 2015
 		//Random random = new Random();
-		Campaign campaign = new Campaign("0", "Campaña Navidad");
+		Campaign campaign = new Campaign("0", "Navidad");
 		for(Criterion cri: elementSet.getCriteria()) {
 			if(!cri.isDirect()) {
 				campaign.addCriterion(cri);
@@ -100,7 +100,7 @@ public class MockModel {
 		campaign.setDates("11/15", "12/15");
 		elementSet.addCampaign(campaign);
 		
-		Campaign campaignWithoutAllData = new Campaign("1", "Campaña_Diciembre");
+		Campaign campaignWithoutAllData = new Campaign("1", "Diciembre");
 		campaignWithoutAllData.addAlternative(a1);
 		campaignWithoutAllData.addAlternative(a3);
 		campaignWithoutAllData.addCriterion(c1);
@@ -127,7 +127,7 @@ public class MockModel {
 		campaignWithoutAllData.setDates("12/15", "12/15");
 		elementSet.addCampaign(campaignWithoutAllData);
 		
-		Campaign campaignSummer = new Campaign("2", "Campaña_Verano");
+		Campaign campaignSummer = new Campaign("2", "Verano");
 		campaignSummer.addAlternative(a1);
 		campaignSummer.addCriterion(c1);
 		campaignSummer.addCriterion(c2);
@@ -153,7 +153,7 @@ public class MockModel {
 		campaignSummer.setDates("06/15", "09/15");
 		elementSet.addCampaign(campaignSummer);
 		
-		Campaign campaign_data = new Campaign("3", "Campaña_Datos_1");
+		Campaign campaign_data = new Campaign("3", "Datos_Enero");
 		campaign_data.addAlternative(a5);
 		campaign_data.addCriterion(c4);
 		campaign_data.addCriterion(c5);
@@ -180,7 +180,7 @@ public class MockModel {
 		campaign_data.setDates("01/15", "01/15");
 		elementSet.addCampaign(campaign_data);
 		
-		campaign_data = new Campaign("4", "Campaña_Datos_2");
+		campaign_data = new Campaign("4", "Datos_Febrero");
 		campaign_data.addAlternative(a5);
 		campaign_data.addCriterion(c4);
 		campaign_data.addCriterion(c5);

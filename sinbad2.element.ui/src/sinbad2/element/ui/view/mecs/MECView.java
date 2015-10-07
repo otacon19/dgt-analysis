@@ -364,7 +364,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			 		int imageHeight = formula.getBounds().height;
 			 		int y = event.y + (itemHeight - imageHeight) / 2;
 			 		
-					event.gc.drawImage(formula, x, y);
+					event.gc.drawImage(formula, x, y + 1);
 				}
 			}
 
@@ -412,18 +412,18 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 					int x = bounds.width > 0 ? bounds.x + bounds.width: bounds.x;
 					int y = bounds.height > 0 ? bounds.y + bounds.height: bounds.y;
 					
-					coordinates.add(x);
+					coordinates.add(x / 2);
 			 		coordinates.add(y);
 			 		event.item.setData("coordinates", coordinates); //$NON-NLS-1$
 					
-					event.gc.drawImage(radioButton, x, y);
+					event.gc.drawImage(radioButton, x / 2, y);
 				}
 			}
 			
 			protected abstract Image getImage(Object element);
 		}
 
-		tvc = new TableViewerColumn(_tableViewer, SWT.CENTER);
+		tvc = new TableViewerColumn(_tableViewer, SWT.LEFT);
 		tc = tvc.getColumn();
 		tc.setText(Messages.MECView_Selection_column);
 		tc.setResizable(false);

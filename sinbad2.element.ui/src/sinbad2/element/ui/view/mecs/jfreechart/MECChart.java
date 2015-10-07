@@ -300,7 +300,7 @@ public class MECChart {
 		plot.setRangeCrosshairVisible(true);
 		
 		BarRenderer br = (BarRenderer) plot.getRenderer();
-		br.setMaximumBarWidth(.2);
+		br.setMaximumBarWidth(.1);
 		br.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator("{0} {2}", NumberFormat.getInstance(), NumberFormat.getNumberInstance())); //$NON-NLS-1$
 		br.setBaseItemLabelsVisible(true);
 		br.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER, TextAnchor.CENTER, 0));
