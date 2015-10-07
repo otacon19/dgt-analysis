@@ -8,6 +8,6 @@ Require-Bundle: sinbad2.core;visibility:=reexport,
  org.eclipse.ui;bundle-version="3.8.2";visibility:=reexport,
  org.eclipse.core.expressions;visibility:=reexport,
  org.scilab.forge.jlatexmath;bundle-version="1.0.0";visibility:=reexport,
- org.jfree.chart.JFreeChart;bundle-version="1.0.0";visibility:=reexport,
+ org.jfree.chart.jfreechart;bundle-version="1.0.0";visibility:=reexport,
  com.itextpdf.text;bundle-version="1.0.0";visibility:=reexport
 Export-Package: org.eclipse.wb.swt

@@ -6,7 +6,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-	private static final String PERSPECTIVE_ID = "flintstones.resolutionphase.analysis.perspective";
+	private static final String PERSPECTIVE_ID = "flintstones.resolutionphase.analysis.perspective"; //$NON-NLS-1$
 
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
 			IWorkbenchWindowConfigurer configurer) {

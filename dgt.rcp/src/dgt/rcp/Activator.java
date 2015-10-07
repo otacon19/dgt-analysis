@@ -67,7 +67,7 @@ public class Activator extends AbstractUIPlugin implements IStartup {
 	@Override
 	public void earlyStartup() {
 		try {
-            Platform.getBundle("org.scilab.forge.jlatexmath");
+            Platform.getBundle("org.scilab.forge.jlatexmath"); //$NON-NLS-1$
         } catch (MissingResourceException x) {
             x.printStackTrace();
         }

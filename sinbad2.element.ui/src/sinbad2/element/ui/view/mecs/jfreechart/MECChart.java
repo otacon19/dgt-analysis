@@ -222,13 +222,11 @@ public class MECChart {
 		_chartComposite.setSize(width, height);
 	}
 
-	public void initializeLineChart(Composite container, int width, int height,
-			int style) {
+	public void initializeLineChart(Composite container, int width, int height, int style) {
 		refreshLineChart();
 
 		if (_chartComposite == null) {
-			_chartComposite = new ChartComposite(container, style, _lineChart,
-					true);
+			_chartComposite = new ChartComposite(container, style, _lineChart, true);
 		}
 
 		_chartComposite.setChart(_lineChart);
