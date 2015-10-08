@@ -461,23 +461,23 @@ public class GeneratePDFHandler extends AbstractHandler {
 			for (Campaign campaign : _campaignsSelected) {
 				campaigns.add(campaign);
 			}
-			chart.createChartByPDF(campaigns, mec, 0, "combine", _alternativesSelected); //$NON-NLS-1$
+			chart.createChartByPDF(campaigns, mec, 0, "combine"); //$NON-NLS-1$
 			JFreeChart barChart = chart.getBarChart();
 			generatePNGChart(barChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for (Campaign campaign : _campaignsSelected) {
 				Campaign clone = (Campaign) campaign.clone();
-				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				clone.setName(campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				campaigns.add(clone);
 			}
 			JFreeChart barChart = null;
 			for (String action : _desaggregationOption) {
 				if (!action.equals("contexts")) { //$NON-NLS-1$
-					chart.createChartByPDF(campaigns, mec, 0, action, _alternativesSelected);
+					chart.createChartByPDF(campaigns, mec, 0, action);
 					barChart = chart.getBarChart();
 				} else {
-					chart.createChartByPDF(campaigns, mec, 2, action, _alternativesSelected);
+					chart.createChartByPDF(campaigns, mec, 2, action);
 					barChart = chart.getStackedChart();
 				}
 				generatePNGChart(barChart, subCatPart);
@@ -518,14 +518,14 @@ public class GeneratePDFHandler extends AbstractHandler {
 			for (Campaign campaign : _campaignsSelected) {
 				campaigns.add(campaign);
 			}
-			chart.createChartByPDF(campaigns, mec, 1, "combine", _alternativesSelected); //$NON-NLS-1$
+			chart.createChartByPDF(campaigns, mec, 1, "combine"); //$NON-NLS-1$
 			JFreeChart lineChart = chart.getLineChart();
 			generatePNGChart(lineChart, subCatPart);
 		} else {
 			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
 			for (Campaign campaign : _campaignsSelected) {
 				Campaign clone = (Campaign) campaign.clone();
-				clone.setName(campaign.getId() + "_" + campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				clone.setName(campaign.getName() + "(" + campaign.getInitialDate() + "-" + campaign.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				campaigns.add(clone);
 			}
 
@@ -534,7 +534,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 				if (action.equals("separate")) { //$NON-NLS-1$
 					action = "combine"; //$NON-NLS-1$
 				}
-				chart.createChartByPDF(campaigns, mec, 1, action, _alternativesSelected);
+				chart.createChartByPDF(campaigns, mec, 1, action);
 				lineChart = chart.getLineChart();
 				generatePNGChart(lineChart, subCatPart);
 			}

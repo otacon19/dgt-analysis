@@ -600,7 +600,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for(Campaign c: campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			clone.setName(c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			campaignsWithName.add(clone);
 		}
 		_chart.setMEC(campaignsWithName, _mecSelected, _chartType, "combine"); //$NON-NLS-1$
@@ -620,7 +620,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		List<Campaign> campaignsWithName = new LinkedList<Campaign>();
 		for (Campaign c : campaigns) {
 			Campaign clone = (Campaign) c.clone();
-			clone.setName(c.getId() + "_" + c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			clone.setName(c.getName() + "(" + c.getInitialDate() + "-" + c.getFinalDate() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			campaignsWithName.add(clone);
 		}
 		

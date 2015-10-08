@@ -57,8 +57,6 @@ public class MECChart {
 	private String _action;
 	
 	private static boolean _fontPDF;
-	
-	private List<Alternative> _alternativesSelectedPDF;
 
 	public MECChart() {
 		_barChart = null;
@@ -66,7 +64,6 @@ public class MECChart {
 		_stackedChart = null;
 		_chartComposite = null;
 		_campaignsSeries = new LinkedList<Campaign>();
-		_alternativesSelectedPDF = new LinkedList<Alternative>();
 		_action = ""; //$NON-NLS-1$
 		_fontPDF = false;
 	}
@@ -158,8 +155,7 @@ public class MECChart {
 		activateLegend(_lineChart);
 	}
 
-	public void setMEC(List<Campaign> campaignsSeries, MEC mec,
-			int typeChart, String action) {
+	public void setMEC(List<Campaign> campaignsSeries, MEC mec, int typeChart, String action) {
 		_campaignsSeries = campaignsSeries;
 		_mecSelected = mec;
 		_action = action;
@@ -177,11 +173,10 @@ public class MECChart {
 		}
 	}
 	
-	public void createChartByPDF(List<Campaign> campaignsSeries, MEC mec, int typeChart, String action, List<Alternative> alternativesSelectedPDF) {
+	public void createChartByPDF(List<Campaign> campaignsSeries, MEC mec, int typeChart, String action) {
 		_campaignsSeries = campaignsSeries;
 		_mecSelected = mec;
 		_action = action;
-		_alternativesSelectedPDF = alternativesSelectedPDF;
 		_fontPDF = true;
 
 		if (typeChart == 0) {
@@ -208,8 +203,7 @@ public class MECChart {
 		_chartComposite.setSize(width, height);
 	}
 
-	public void initializeStackedChart(Composite container, int width,
-			int height, int style) {
+	public void initializeStackedChart(Composite container, int width, int height, int style) {
 		refreshStackedChart();
 
 		if (_chartComposite == null) {
@@ -236,8 +230,7 @@ public class MECChart {
 
 	public void clear() {
 		if (_barChart != null) {
-			_barChart.getCategoryPlot()
-					.setDataset(new DefaultCategoryDataset());
+			_barChart.getCategoryPlot().setDataset(new DefaultCategoryDataset());
 		}
 
 		if (_lineChart != null) {
@@ -245,8 +238,7 @@ public class MECChart {
 		}
 
 		if (_stackedChart != null) {
-			_stackedChart.getCategoryPlot().setDataset(
-					new DefaultCategoryDataset());
+			_stackedChart.getCategoryPlot().setDataset(new DefaultCategoryDataset());
 		}
 	}
 
@@ -256,8 +248,7 @@ public class MECChart {
 	}
 
 	private JFreeChart createBarChart(CategoryDataset dataset) {
-		JFreeChart chart = ChartFactory.createBarChart3D(null, null, null,
-				dataset, PlotOrientation.VERTICAL, false, true, false);
+		JFreeChart chart = ChartFactory.createBarChart3D(null, null, null, dataset, PlotOrientation.VERTICAL, false, true, false);
 
 		chart.setBackgroundPaint(Color.white);
 
@@ -318,8 +309,7 @@ public class MECChart {
 	@SuppressWarnings("serial")
 	private static JFreeChart createLineChart(XYDataset dataset) {
 
-		JFreeChart chart = ChartFactory.createXYLineChart(null, null, null,
-				dataset, PlotOrientation.VERTICAL, false, true, false);
+		JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, false, true, false);
 
 		chart.setBackgroundPaint(Color.white);
 
@@ -372,99 +362,73 @@ public class MECChart {
 		if (!_campaignsSeries.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
 			List<Campaign> noDataCampaigns = getNoDataCampaigns();
-			List<Alternative> alternativesSelected;
-			if(_alternativesSelectedPDF.isEmpty()) {
-				alternativesSelected = AlternativesView.getAlternativesSelected();
-			} else {
-				alternativesSelected = _alternativesSelectedPDF;
-			}
-
-			double acumValue, value, numerator, denominator, weight;
-			int pos = -1;
-			String category = ""; //$NON-NLS-1$
 			
-			List<Object> data;
-			Map<Campaign, List<Double>> campaignsTotalValue = new LinkedHashMap<Campaign, List<Double>>();
-			List<Double> numeratorAndDenominator;
+			List<Alternative >alternativesSelected = AlternativesView.getAlternativesSelected();
+
+			double campaignValueMEC = 0;
+			String categoryName = ""; //$NON-NLS-1$
 			for (Campaign campaign : noDataCampaigns) {
-				Map<Criterion, List<Object>> mecCriteria = _mecSelected.getCriteria();
-				numerator = 1;
-				denominator = 1;
-				for (Criterion c : mecCriteria.keySet()) {
-					if (campaign.getCriteria().contains(c)) {
-						value = 0;
-						acumValue = 0;
-						data = mecCriteria.get(c);
-						for (Alternative a : alternativesSelected) {
-							if (a.hasChildrens()) {
-								List<Alternative> childrens = a.getChildrens();
-								for (Alternative children : childrens) {
-									if (alternativesSelected.contains(children)) {
-										acumValue += campaign.getValue(c, children);
-									}
-								}
-								if (value == 0) {
-									value = acumValue;
-								} else if (acumValue < value) {
-									value = acumValue;
-								}
-							}
-						}
-						weight = (double) data.get(1);
-						value *= weight;
-						if (!c.isDirect()) {
-							pos = (int) data.get(0);
-							if (pos == 0) {
-								numerator *= value;
-							} else {
-								denominator *= value;
-							}
-						}
+				for(Alternative parent: alternativesSelected) {
+					if(parent.hasChildrens()) {
+						campaignValueMEC += getTotalValueMEC(_mecSelected, campaign, parent);
 					}
 				}
-				numeratorAndDenominator = new LinkedList<Double>();
-				numeratorAndDenominator.add(numerator);
-				numeratorAndDenominator.add(denominator);
-				campaignsTotalValue.put(campaign, numeratorAndDenominator);
-
-				if (!category.contains(campaign.getName())) {
-					category += campaign.getName() + "-"; //$NON-NLS-1$
-				}
+				if (!categoryName.contains(campaign.getName())) {
+					categoryName += campaign.getName() + "-"; //$NON-NLS-1$
+				}	
 			}
-
-			double valueAcum = 0;
-			if (!campaignsTotalValue.isEmpty()) {
-				for (Campaign c : campaignsTotalValue.keySet()) {
-					List<Double> nAd = campaignsTotalValue.get(c);
-					if (dataValues.isEmpty()) {
-						valueAcum += nAd.get(0) / nAd.get(1);
-					} else {
-						valueAcum += (nAd.get(0) * dataValues.get(0)) / (nAd.get(1) * dataValues.get(1));
-					}
+				
+			if(campaignValueMEC > 0) {
+				if(!dataValues.isEmpty()) {
+					campaignValueMEC *= (dataValues.get(0) / dataValues.get(1));
 				}
 			} else {
-				valueAcum = dataValues.get(0) / dataValues.get(1);
+				campaignValueMEC = dataValues.get(0) / dataValues.get(1);
 			}
 
-			if (valueAcum == 1 || Double.isInfinite(valueAcum)) {
-				valueAcum = 0;
+			if (Double.isInfinite(campaignValueMEC)) {
+				campaignValueMEC = 0;
 			}
-
-			if (!category.isEmpty()) {
-				category = category.substring(0, category.length() - 1);
-			} else {
+	
+			if (categoryName.isEmpty()) {
 				List<Campaign> dataCampaigns = getDataCampaigns();
 				for (Campaign c : dataCampaigns) {
-					if (!category.contains(c.getName())) {
-						category += c.getName() + "-"; //$NON-NLS-1$
+					if (!categoryName.contains(c.getName())) {
+						categoryName += c.getName() + "-"; //$NON-NLS-1$
 					}
 				}
-				category = category.substring(0, category.length() - 1);
 			}
-
-			dataset.addValue(valueAcum, _mecSelected.getId(), category);
+			categoryName = categoryName.substring(0, categoryName.length() - 1);
+			dataset.addValue(campaignValueMEC, _mecSelected.getId(), categoryName);
 		}
+		
 		return dataset;
+	}
+	
+	private double getTotalValueMEC(MEC mec, Campaign campaign, Alternative parent) {
+		double result = 0;
+		for(Alternative children: parent.getChildrens()) {
+			result += getValueMEC(mec, campaign, children);
+		}
+		
+		return result;
+	}
+	
+	private double getValueMEC(MEC mec, Campaign campaign, Alternative alternative) {
+		double numerator = 1, denominator = 1;
+		
+		List<Object> positionAndWeigth;
+		for(Criterion criterion: mec.getCriteria().keySet()) {
+			positionAndWeigth = mec.getCriteria().get(criterion);
+			if(!criterion.isDirect()) {
+				if((Integer) positionAndWeigth.get(0) == 0) {
+					numerator *= campaign.getValue(criterion, alternative) * (Double) positionAndWeigth.get(1);
+				} else {
+					denominator *= campaign.getValue(criterion, alternative) * (Double) positionAndWeigth.get(1);
+				}
+			}
+		}
+		return numerator / denominator;
 	}
 
 	private List<Double> loadCampaignsDataDirectAggregation() {
@@ -480,8 +444,7 @@ public class MECChart {
 		}
 
 		if (!dataCampaigns.isEmpty()) {
-			Map<Criterion, List<Object>> mecCriteria = _mecSelected
-					.getCriteria();
+			Map<Criterion, List<Object>> mecCriteria = _mecSelected.getCriteria();
 			Map<Criterion, Double> dataValues = new LinkedHashMap<Criterion, Double>();
 			Map<Criterion, Integer> dataValuesRepeat = new LinkedHashMap<Criterion, Integer>();
 			List<Object> dataOfCriterion;
@@ -495,8 +458,7 @@ public class MECChart {
 					if (mecCriteria.containsKey(c)) {
 						for (Alternative alternativeSelected : alternativesSelected) {
 							if (!alternativeSelected.hasChildrens()) {
-								acumValue += dataCampaign.getValue(c,
-										alternativeSelected);
+								acumValue += dataCampaign.getValue(c, alternativeSelected);
 							}
 						}
 						weight = (double) dataOfCriterion.get(1);
@@ -540,79 +502,33 @@ public class MECChart {
 
 	private CategoryDataset createBarChartDatasetSeparateCampaigns() {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		double acumValue, value, numerator, denominator, weight, total;
-		int pos = -1;
+		double campaignValueMEC = 0;
 
 		List<Campaign> noDataCampaigns = getNoDataCampaigns();
-		if (!noDataCampaigns.isEmpty()) {
 			List<Double> dataValues = loadCampaignsDataDirectAggregation();
-			List<Alternative> alternativesSelected = AlternativesView
-					.getAlternativesSelected();
+			List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 			for (Campaign campaign : noDataCampaigns) {
-				Map<Criterion, List<Object>> criteriaData = _mecSelected
-						.getCriteria();
-				numerator = 1;
-				denominator = 1;
-				for (Criterion c : criteriaData.keySet()) {
-					if (campaign.getCriteria().contains(c)) {
-						acumValue = 0;
-						value = 0;
-						List<Object> data = criteriaData.get(c);
-						for (Alternative a : alternativesSelected) {
-							if (a.hasChildrens()) {
-								List<Alternative> childrens = a.getChildrens();
-								for (Alternative children : childrens) {
-									if (alternativesSelected.contains(children)) {
-										acumValue += campaign.getValue(c,
-												children);
-									}
-								}
-								if (value == 0) {
-									value = acumValue;
-								} else if (acumValue < value) {
-									value = acumValue;
-								}
-							}
-						}
-						weight = (double) data.get(1);
-						value *= weight;
-						if (!c.isDirect()) {
-							pos = (int) data.get(0);
-							if (pos == 0) {
-								numerator *= value;
-								if (numerator == 0) {
-									numerator = 1;
-								}
-							} else {
-								denominator *= value;
-								if (denominator == 0) {
-									denominator = 1;
-								}
-							}
-						}
+				campaignValueMEC = 0;
+				for(Alternative parent: alternativesSelected) {
+					if(parent.hasChildrens()) {
+						campaignValueMEC += getTotalValueMEC(_mecSelected, campaign, parent);
 					}
-
-					if (!dataValues.isEmpty()) {
-						total = (numerator * dataValues.get(0))
-								/ (denominator * dataValues.get(1));
-					} else {
-						total = numerator / denominator;
-					}
-
-					if (Double.isInfinite(total) || total == 1) {
-						total = 0;
-					}
-
-					String category = campaign.getName();
-					dataset.addValue(total, _mecSelected.getId(), category);
 				}
+				
+				if(campaignValueMEC > 0) {
+					if(!dataValues.isEmpty()) {
+						campaignValueMEC *= (dataValues.get(0) / dataValues.get(1));
+					}
+				} else {
+					campaignValueMEC = dataValues.get(0) / dataValues.get(1);
+				}
+
+				if (Double.isInfinite(campaignValueMEC)) {
+					campaignValueMEC = 0;
+				}
+
+				dataset.addValue(campaignValueMEC, _mecSelected.getId(), campaign.getName());
 			}
-		} else {
-			Map<Campaign, Double> mecCampaignsDataValue = loadCampaignsDataDirectNoAggregation();
-			for (Campaign c : mecCampaignsDataValue.keySet()) {
-				dataset.addValue(mecCampaignsDataValue.get(c), _mecSelected, c.getName());
-			}
-		}
 
 		return dataset;
 	}
@@ -652,13 +568,11 @@ public class MECChart {
 
 		Map<Campaign, Double> mecCampaignsValue = new LinkedHashMap<Campaign, Double>();
 		if (!dataCampaigns.isEmpty()) {
-			Map<Criterion, List<Object>> mecCriteria = _mecSelected
-					.getCriteria();
+			Map<Criterion, List<Object>> mecCriteria = _mecSelected.getCriteria();
 			List<Object> dataOfCriterion;
 			double acumValue = 0, weight;
 			for (Campaign dataCampaign : dataCampaigns) {
-				List<Criterion> dataCampaignCriteria = dataCampaign
-						.getCriteria();
+				List<Criterion> dataCampaignCriteria = dataCampaign.getCriteria();
 				numerator = 1;
 				denominator = 1;
 				for (Criterion c : dataCampaignCriteria) {
@@ -667,8 +581,7 @@ public class MECChart {
 					if (mecCriteria.containsKey(c)) {
 						for (Alternative alternativeSelected : alternativesSelected) {
 							if (!alternativeSelected.hasChildrens()) {
-								acumValue += dataCampaign.getValue(c,
-										alternativeSelected);
+								acumValue += dataCampaign.getValue(c, alternativeSelected);
 							}
 						}
 						weight = (double) dataOfCriterion.get(1);

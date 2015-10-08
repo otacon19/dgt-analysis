@@ -269,33 +269,20 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 						}
 					}
 				} else if(campaignsSelected.size() > 1) {
+					
 					List<Alternative> allAlternativesCampaigns = new LinkedList<Alternative>();
-					List<Alternative> dataAlternatives = new LinkedList<Alternative>();
-					int numCampaignsData = 0;
-					for(Campaign c: campaignsSelected) {
-						if(!c.isACampaignData()) { 
-							List<Alternative> alternatives = c.getAlternatives();
-							for(Alternative alt: alternatives) {
-								allAlternativesCampaigns.add(alt);
-							}
-						} else {
-							numCampaignsData++;
-							List<Alternative> alternatives = c.getAlternatives();
-							for(Alternative a: alternatives) {
-								if(!dataAlternatives.contains(a)) {
-									dataAlternatives.add(a);
-								}
-							}
+					for(Campaign campaign: campaignsSelected) {
+						List<Alternative> alternativesCampaign = campaign.getAlternatives();
+						for(Alternative alternative: alternativesCampaign) {
+							allAlternativesCampaigns.add(alternative);
 						}
 					}
+					
 					Map<Alternative, Integer> alternativesRepeat;
-					alternativesRepeat = checkMatchingData(allAlternativesCampaigns, campaignsSelected.size() - numCampaignsData);
-					for(Alternative a: dataAlternatives) {
-						alternativesRepeat.put(a, campaignsSelected.size() - numCampaignsData);
-					}
+					alternativesRepeat = checkMatchingData(allAlternativesCampaigns, campaignsSelected.size());
 					for(Alternative alt: alternativesRepeat.keySet()) {
 						int rep = alternativesRepeat.get(alt);
-						if(rep != campaignsSelected.size() - numCampaignsData) {
+						if(rep != campaignsSelected.size()) {
 							if(alt.equals(item.getData())) {
 								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
 								buttonsAlternatives.get(item.getData()).setEnabled(false);
@@ -310,6 +297,17 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 						} else if(alt.equals(item.getData())) {
 							item.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 							buttonsAlternatives.get(item.getData()).setEnabled(true);
+						}
+					}
+					
+					for(Alternative a: _elementsSet.getAlternatives()) {
+						if(!allAlternativesCampaigns.contains(a)) {
+							if(a.equals(item.getData())) {
+								item.setForeground(new Color(Display.getCurrent(), 211, 211, 211));
+								buttonsAlternatives.get(item.getData()).setEnabled(false);
+								buttonsAlternatives.get(item.getData()).setSelection(false);
+								_alternativesSelected.remove(a);
+							}
 						}
 					}
 				}
@@ -333,8 +331,8 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 			}
 
 		});
-
-	}
+		
+ 	}	
 	
 	private void hookContextMenu() {
 		MenuManager menuManager = new MenuManager();
