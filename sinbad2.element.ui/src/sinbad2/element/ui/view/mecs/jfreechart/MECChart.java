@@ -30,7 +30,6 @@ import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.UnknownKeyException;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -186,7 +185,6 @@ public class MECChart {
 		}
 	}
 
-
 	public void initializeBarChart(Composite container, int width, int height,
 			int style) {
 		refreshBarChart();
@@ -205,8 +203,7 @@ public class MECChart {
 		refreshStackedChart();
 
 		if (_chartComposite == null) {
-			_chartComposite = new ChartComposite(container, style,
-					_stackedChart, true);
+			_chartComposite = new ChartComposite(container, style, _stackedChart, true);
 		}
 
 		_chartComposite.setChart(_stackedChart);
@@ -714,89 +711,60 @@ public class MECChart {
 	private XYDataset createLineChartDatasetSeparateContexts() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
-		double acumValue = 0, weight;
 		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
-		Map<Alternative, Double> childrenValue;
-		Map<Criterion, Integer> criteriaPos = new LinkedHashMap<Criterion, Integer>();
-		Map<Criterion, Map<Alternative, Double>> alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
-		Map<Campaign, Map<Criterion, Map<Alternative, Double>>> campaignsAlternativesWithValues = new LinkedHashMap<Campaign, Map<Criterion, Map<Alternative, Double>>>();
-		for (Campaign campaign : _campaignsSeries) {
-			Map<Criterion, List<Object>> criteriaData = _mecSelected.getCriteria();
-			alternativesWithValues = new LinkedHashMap<Criterion, Map<Alternative, Double>>();
-			for (Criterion c : criteriaData.keySet()) {
-				childrenValue = new LinkedHashMap<Alternative, Double>();
-				List<Object> data = criteriaData.get(c);
-				criteriaPos.put(c, (Integer) data.get(0));
-				for (Alternative a : alternativesSelected) {
-					if (a.hasChildrens()) {
-						List<Alternative> childrens = a.getChildrens();
-						for (Alternative children : childrens) {
-							if (alternativesSelected.contains(children)) {
-								acumValue = campaign.getValue(c, children);
-								weight = (double) data.get(1);
-								acumValue *= weight;
-								childrenValue.put(children, acumValue);
-							}
-						}
-					}
-				}
-				alternativesWithValues.put(c, childrenValue);
-			}
-			campaignsAlternativesWithValues.put(campaign, alternativesWithValues);
-		}
-
-		double numerator, denominator;
-		XYSeries serie = null;
+		
 		List<Alternative> seriesAlreadyAdded = new LinkedList<Alternative>();
 		Map<String, List<Campaign>> campaignsForProvinces = campaignsSameProvince();
 		List<String> provinces = getProvincesCampaigns();
+		double campaignValueMEC = 0, campaignValueMECDirect = 0;
+		XYSeries campaignSerie = null;
 		for (String province : provinces) {
 			List<Campaign> campaignsProvinces = campaignsForProvinces.get(province);
+			campaignValueMEC = 0;
+			campaignValueMECDirect = 0;
 			for (Campaign campaign : campaignsProvinces) {
-				Map<Criterion, Map<Alternative, Double>> criteriaWithAlternativesAndValues = campaignsAlternativesWithValues.get(campaign);
-				for (Alternative a : alternativesSelected) {
-					if (!a.hasChildrens()) {
-						if (!seriesAlreadyAdded.contains(a)) {
-							serie = new XYSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
-							dataset.addSeries(serie);
-							seriesAlreadyAdded.add(a);
-						} else {
-							try {
-								serie = dataset.getSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
-							} catch (UnknownKeyException e) {
-								serie = new XYSeries(a.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
-								dataset.addSeries(serie);
-								seriesAlreadyAdded.add(a);
-							}
-						}
-						numerator = 1;
-						denominator = 1;
-						for (Criterion c : criteriaWithAlternativesAndValues.keySet()) {
-							int pos = criteriaPos.get(c);
-							Map<Alternative, Double> alternativesValues = criteriaWithAlternativesAndValues.get(c);
-							if (alternativesValues.get(a) != null) {
-								if (pos == 0) {
-									numerator *= alternativesValues.get(a);
-								} else {
-									denominator *= alternativesValues.get(a);
-								}
-							}
-						}
-						double total = 0;
-						total = numerator / denominator;
-
-						for (String month : campaign.getIntervalDate()) {
-							int monthNum = Integer.parseInt(month);
-							if (!serie.isEmpty()) {
-								if (serie.indexOf(monthNum - 1) >= 0) {
-									XYDataItem item = serie.getDataItem(serie.indexOf(monthNum - 1));
-									total += item.getYValue();
-									serie.getDataItem(serie.indexOf(monthNum - 1)).setY(total);
-								} else {
-									serie.addOrUpdate(monthNum - 1, total);
-								}
+				for(Alternative parent: alternativesSelected) {
+					if(parent.hasChildrens()) {
+						for(Alternative children: parent.getChildrens()) {
+	
+							if (!seriesAlreadyAdded.contains(children)) {
+								campaignSerie = new XYSeries(children.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
+								dataset.addSeries(campaignSerie);
+								seriesAlreadyAdded.add(children);
 							} else {
-								serie.addOrUpdate(monthNum - 1, total);
+								try {
+									campaignSerie = dataset.getSeries(children.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
+								} catch (UnknownKeyException e) {
+									campaignSerie = new XYSeries(children.getId() + "_" + campaign.getProvince()); //$NON-NLS-1$
+									dataset.addSeries(campaignSerie);
+									seriesAlreadyAdded.add(children);
+								}
+							}
+							
+							campaignValueMEC = getValueMECAlternative(_mecSelected, campaign, children);
+							campaignValueMECDirect = getValueMECDataAlternative(_mecSelected, campaign, children);
+							
+							campaignValueMEC = (campaignValueMEC == 0) ? 1 : campaignValueMEC;
+							campaignValueMECDirect = (campaignValueMECDirect == 0) ? 1 : campaignValueMECDirect;
+							
+							int numCampaignsData = getNumCampaignsData();
+							if(numCampaignsData == 0) {
+								numCampaignsData = 1;
+							}
+							
+							campaignValueMECDirect /= numCampaignsData;
+							campaignValueMEC *= campaignValueMECDirect;
+		
+							double total = campaignValueMEC;
+							for (String month : campaign.getIntervalDate()) {
+								int monthNum = Integer.parseInt(month);
+								if (!campaignSerie.isEmpty()) {
+									if (campaignSerie.indexOf(monthNum - 1) >= 0) {
+										total += campaignSerie.getDataItem(campaignSerie.indexOf(monthNum - 1)).getYValue();
+										campaignSerie.remove(campaignSerie.indexOf(monthNum - 1));
+									}
+								}
+								campaignSerie.add(monthNum - 1, total);
 							}
 						}
 					}
