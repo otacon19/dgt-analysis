@@ -529,12 +529,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 		if(campaignsSelected.size() == 1) {
 			oneCampaignSelectedCheckButtons(campaignsSelected);
 		} else {
-			if(campaignsSelected.size() == 2 && ((campaignsSelected.get(0).isACampaignData() && !campaignsSelected.get(1).isACampaignData()) || 
-					(!campaignsSelected.get(0).isACampaignData() && campaignsSelected.get(1).isACampaignData()))) {
-				oneCampaignSelectedCheckButtons(campaignsSelected);
-			} else {
-				moreThanOneCampaignsSelected(campaignsSelected);
-			}
+			moreThanOneCampaignsSelected(campaignsSelected);
 		}
 	}
 

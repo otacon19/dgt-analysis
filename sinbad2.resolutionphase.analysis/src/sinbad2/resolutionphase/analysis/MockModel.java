@@ -155,6 +155,7 @@ public class MockModel {
 		
 		Campaign campaign_data = new Campaign("3", "Datos_Enero");
 		campaign_data.addAlternative(a5);
+		campaign_data.addCriterion(c1);
 		campaign_data.addCriterion(c4);
 		campaign_data.addCriterion(c5);
 		campaign_data.addCriterion(c6);
@@ -169,6 +170,8 @@ public class MockModel {
 							value = 200000 / childrens.size();
 						} else if(c.getId().equals("Licencias")) {
 							value = 300000 / childrens.size();
+						} else {
+							value = 100000 / childrens.size();
 						}
 						campaign_data.addValue(c, children, value);
 					}
@@ -205,6 +208,64 @@ public class MockModel {
 		campaign_data.setProvince("Jaén");
 		campaign_data.setDates("02/15", "02/15");
 		elementSet.addCampaign(campaign_data);
+		
+		Campaign campaign_granada = new Campaign("5", "Fin año");
+		for(Criterion cri: elementSet.getCriteria()) {
+			if(!cri.isDirect()) {
+				campaign_granada.addCriterion(cri);
+			}
+		}
+		campaign_granada.setAlternatives(elementSet.getAlternatives());
+		value = 0;
+		for(Criterion c: campaign_granada.getCriteria()) {
+			for(Alternative a: campaign_granada.getAlternatives()) {
+				if(a.hasChildrens()) {
+					List<Alternative> childrens = a.getChildrens();
+					for(Alternative children: childrens) {
+						if(c.getId().equals("Distancia")) {
+							value = 10000 / childrens.size();
+						} else if(c.getId().equals("Tiempo")) {
+							value = 20000 / childrens.size();
+						} else if(c.getId().equals("Desplazamientos")) {
+							value = 30000 / childrens.size();
+						}
+						campaign_granada.addValue(c, children, value);
+					}
+				}
+			}
+		}
+		
+		campaign_data = new Campaign("6", "Datos_Febrero_2");
+		campaign_data.addAlternative(a5);
+		campaign_data.addCriterion(c4);
+		campaign_data.addCriterion(c5);
+		campaign_data.addCriterion(c6);
+		for(Criterion c: campaign_data.getCriteria()) {
+			for(Alternative a: campaign_data.getAlternatives()) {
+				if(a.hasChildrens()) {
+					List<Alternative> childrens = a.getChildrens();
+					for(Alternative children: childrens) {
+						if(c.getId().equals("Habitantes")) {
+							value = 110000 / childrens.size();
+						} else if(c.getId().equals("Censo")) {
+							value = 210000 / childrens.size();
+						} else if(c.getId().equals("Licencias")) {
+							value = 310000 / childrens.size();
+						}
+						campaign_data.addValue(c, children, value);
+					}
+				}
+			}
+		}
+		campaign_data.setProvince("Jaén");
+		campaign_data.setDates("02/15", "02/15");
+		elementSet.addCampaign(campaign_data);
+		
+		//Provincia
+		campaign_granada.setProvince("Granada");
+		//Fecha
+		campaign_granada.setDates("11/15", "12/15");
+		elementSet.addCampaign(campaign_granada);
 		
 		//MECs
 		MEC distancia = new MEC("Distancia");

@@ -245,7 +245,9 @@ public class AddCampaignsDialog extends Dialog {
 						for (Criterion c1 : allCriteria) {
 							for (Criterion c2 : criteria) {
 								if (c1.equals(c2)) {
-									criteriaItems.get(c1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+									if(criteriaItems.containsKey(c1)) {
+										criteriaItems.get(c1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+									}
 								}
 							}
 						}
@@ -323,8 +325,9 @@ public class AddCampaignsDialog extends Dialog {
 										- numCampaignsData);
 						matchingCriterion.addAll(directCriteria);
 						for (Criterion c1 : matchingCriterion) {
-							criteriaItems.get(c1).setForeground(
-									new Color(Display.getCurrent(), 0, 0, 0));
+							if(criteriaItems.containsKey(c1)) {
+								criteriaItems.get(c1).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+							}
 						}
 
 						List<Alternative> directAlternatives = new LinkedList<Alternative>();
