@@ -537,7 +537,9 @@ public class MECChart {
 					
 					campaignValueMECDirect /= numCampaignsData;
 					campaignValueMEC *= campaignValueMECDirect;
-					campaignAcumValueProvince += campaignValueMEC;
+					if(campaignValueMEC != 1) {
+						campaignAcumValueProvince += campaignValueMEC;
+					}
 				}
 				dataset.addValue(campaignAcumValueProvince, _mecSelected.getId(), province);
 			}
@@ -612,7 +614,9 @@ public class MECChart {
 								campaignValueMEC *= campaignValueMECDirect;
 								
 								if(alternativesValues.containsKey(children.getId())) {
-									campaignValueMEC += alternativesValues.get(children.getId());
+									if(alternativesValues.get(children.getId()) != 1) {
+										campaignValueMEC += alternativesValues.get(children.getId());
+									}
 								}
 								
 								alternativesValues.put(children.getId(), campaignValueMEC);
