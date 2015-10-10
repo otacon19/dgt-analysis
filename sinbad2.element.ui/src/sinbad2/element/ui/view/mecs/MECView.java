@@ -44,6 +44,7 @@ import sinbad2.element.campaigns.listener.ICampaignsChangeListener;
 import sinbad2.element.mec.MEC;
 import sinbad2.element.ui.Images;
 import sinbad2.element.ui.nls.Messages;
+import sinbad2.element.ui.view.alternatives.AlternativesView;
 import sinbad2.element.ui.view.campaigns.CampaignsView;
 import sinbad2.element.ui.view.mecs.dialog.NewMeDialog;
 import sinbad2.element.ui.view.mecs.jfreechart.MECChart;
@@ -508,6 +509,7 @@ public class MECView extends ViewPart implements ICampaignsChangeListener, IAlte
 			_changeAggregationButton.setImage(Images.No_aggregation);
 			_chart.initializeBarChart(_chartComposite, _chartComposite.getSize().x, _chartComposite.getSize().y, SWT.CENTER);
 		}
+		AlternativesView.getAlternativesSelected().clear();
 	}
 	
 	@Override
