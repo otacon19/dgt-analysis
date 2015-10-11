@@ -107,11 +107,7 @@ public class Campaign extends ProblemElement {
 		int monthInitialDate = Integer.parseInt(_initialDate.substring(_initialDate.length() - 5, _initialDate.length() - 3));
 		int monthFinalDate = Integer.parseInt(_finalDate.substring(_finalDate.length() - 5, _finalDate.length() - 3));
 		for(int i = monthInitialDate; i <= monthFinalDate; ++i) {
-			if(i <= 9) {
-				months.add("0" + Integer.toString(i));
-			} else {
-				months.add(Integer.toString(i));
-			}
+			months.add(Integer.toString(i));
 		}
 		return months;
 	}

@@ -354,6 +354,7 @@ public class AlternativesView extends ViewPart implements ICampaignsChangeListen
 				break;
 			case REMOVE_CAMPAIGNS_SELECTED:
 				disposeEditors();
+				_alternativesSelected.clear();
 				break;
 			default:
 				break;

@@ -21,6 +21,7 @@ import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -337,6 +338,7 @@ public class MECChart {
 			}
 		};
 		rangeAxis.setTickLabelFont(new java.awt.Font("Cantarell", Font.PLAIN, 10)); //$NON-NLS-1$
+	
 		plot.setDomainAxis(rangeAxis);
 
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer() {
@@ -347,6 +349,8 @@ public class MECChart {
 		};
 		plot.setRenderer(renderer);
 		renderer.setBaseStroke(new BasicStroke(4));
+		renderer.setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());
+		renderer.setBaseItemLabelsVisible(true);
 
 		return chart;
 	}
@@ -614,11 +618,9 @@ public class MECChart {
 								campaignValueMEC *= campaignValueMECDirect;
 								
 								if(alternativesValues.containsKey(children.getId())) {
-									if(alternativesValues.get(children.getId()) != 1) {
-										campaignValueMEC += alternativesValues.get(children.getId());
-									}
+									campaignValueMEC += alternativesValues.get(children.getId());
 								}
-								
+
 								alternativesValues.put(children.getId(), campaignValueMEC);
 								
 								dataset.addValue(campaignValueMEC, children.getId(), parent.getId() + "(" + campaign.getProvince() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -656,12 +658,6 @@ public class MECChart {
 				campaignValueMEC = (campaignValueMEC == 0) ? 1 : campaignValueMEC;
 				campaignValueMECDirect = (campaignValueMECDirect == 0) ? 1 : campaignValueMECDirect;
 				
-				int numCampaignsData = getNumCampaignsData();
-				if(numCampaignsData == 0) {
-					numCampaignsData = 1;
-				}
-				
-				campaignValueMECDirect /= numCampaignsData;
 				campaignValueMEC *= campaignValueMECDirect;
 				
 				double monthValue = 0, total = 0;
@@ -669,7 +665,11 @@ public class MECChart {
 					int monthNum = Integer.parseInt(month);
 					if (monthValues.containsKey(monthNum - 1)) {
 						monthValue = monthValues.get(monthNum - 1);
-						total = campaignValueMEC + monthValue;
+						if(campaign.isACampaignData()) {
+							total = (campaignValueMEC + monthValue) / getNumCampaignsDataSameMonth(campaign, Integer.toString(monthNum - 1));
+						} else {
+							total = campaignValueMEC + monthValue;
+						}
 						monthValues.put(monthNum - 1, total);
 					} else {
 						monthValues.put(monthNum - 1, campaignValueMEC);
@@ -688,6 +688,20 @@ public class MECChart {
 		return dataset;
 	}
 
+	private int getNumCampaignsDataSameMonth(Campaign campaign, String month) {
+		int campaignsSameMonth = 1;
+		for(Campaign c: _campaignsSeries) {
+			if(c.isACampaignData() && !c.equals(campaign)) {
+				List<String> interval = c.getIntervalDate();
+				if(interval.contains(month)) {
+					campaignsSameMonth++;
+				}
+			}
+		}
+		
+		return campaignsSameMonth;
+	}
+
 	private XYDataset createLineChartDatasetSeparateProvinces() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 
@@ -697,15 +711,16 @@ public class MECChart {
 		List<Alternative> alternativesSelected = AlternativesView.getAlternativesSelected();
 
 		if(!alternativesSelected.isEmpty()) {
+			Map<Integer, Double> monthValues = new LinkedHashMap<Integer, Double>();
 			double campaignValueMEC = 0, campaignValueMECDirect = 0;
 			XYSeries campaignSerie = null;
 			for (String province : provinces) {
 				campaignSerie = new XYSeries(_mecSelected.getId() + "(" + province + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 				List<Campaign> campaignsProvinces = campaignsForProvinces.get(province);
-				campaignValueMEC = 0;
-				campaignValueMECDirect = 0;
 				if (!campaignsProvinces.isEmpty()) {
-					for (Campaign campaign : _campaignsSeries) {
+					for (Campaign campaign : campaignsProvinces) {
+						campaignValueMEC = 0;
+						campaignValueMECDirect = 0;
 						for(Alternative parent: alternativesSelected) {
 							if(parent.hasChildrens()) {
 								if(!campaign.isACampaignData()) {
@@ -718,29 +733,31 @@ public class MECChart {
 						
 						campaignValueMEC = (campaignValueMEC == 0) ? 1 : campaignValueMEC;
 						campaignValueMECDirect = (campaignValueMECDirect == 0) ? 1 : campaignValueMECDirect;
-						
-						int numCampaignsData = getNumCampaignsData();
-						if(numCampaignsData == 0) {
-							numCampaignsData = 1;
-						}
-						
-						campaignValueMECDirect /= numCampaignsData;
 						campaignValueMEC *= campaignValueMECDirect;
 						
-						double total = campaignValueMEC;
+						double monthValue = 0, total = 0;
 						for (String month : campaign.getIntervalDate()) {
 							int monthNum = Integer.parseInt(month);
-							if (!campaignSerie.isEmpty()) {
-								if (campaignSerie.indexOf(monthNum - 1) >= 0) {
-									campaignSerie.remove(campaignSerie.indexOf(monthNum - 1));
+							if (monthValues.containsKey(monthNum - 1)) {
+								monthValue = monthValues.get(monthNum - 1);
+								if(campaign.isACampaignData()) {
+									total = (campaignValueMEC + monthValue) / getNumCampaignsDataSameMonth(campaign, Integer.toString(monthNum - 1));
+								} else {
+									total = campaignValueMEC + monthValue;
 								}
+								monthValues.put(monthNum - 1, total);
+							} else {
+								monthValues.put(monthNum - 1, campaignValueMEC);
 							}
-							campaignSerie.add(monthNum - 1, total);
 						}
 					}
 				} 
-				
+
+				for (Integer month : monthValues.keySet()) {
+					campaignSerie.add((int) month, monthValues.get(month));
+				}
 				dataset.addSeries(campaignSerie);
+				monthValues.clear();
 			}
 		}
 
@@ -791,13 +808,6 @@ public class MECChart {
 								
 								campaignValueMEC = (campaignValueMEC == 0) ? 1 : campaignValueMEC;
 								campaignValueMECDirect = (campaignValueMECDirect == 0) ? 1 : campaignValueMECDirect;
-								
-								int numCampaignsData = getNumCampaignsData();
-								if(numCampaignsData == 0) {
-									numCampaignsData = 1;
-								}
-								
-								campaignValueMECDirect /= numCampaignsData;
 								campaignValueMEC *= campaignValueMECDirect;
 			
 								double total = campaignValueMEC;
@@ -808,6 +818,9 @@ public class MECChart {
 											total += campaignSerie.getDataItem(campaignSerie.indexOf(monthNum - 1)).getYValue();
 											campaignSerie.remove(campaignSerie.indexOf(monthNum - 1));
 										}
+									}
+									if(campaign.isACampaignData()) {
+										total /= getNumCampaignsDataSameMonth(campaign, month);
 									}
 									campaignSerie.add(monthNum - 1, total);
 								}
