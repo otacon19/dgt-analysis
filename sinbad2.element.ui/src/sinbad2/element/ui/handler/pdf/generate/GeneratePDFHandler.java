@@ -326,7 +326,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 					cell.setBackgroundColor(COLOR_PARENT_TABLE);
 					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 					table.addCell(cell);
-					cell = new PdfPCell(new Phrase(Double.toString(getTotalAccumulatedValueMEC(mec, a))));
+					cell = new PdfPCell(new Phrase(Double.toString(getTotalAccumulatedValueMECParent(mec, a))));
 					cell.setBackgroundColor(COLOR_PARENT_TABLE);
 					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 					table.addCell(cell);
@@ -350,13 +350,13 @@ public class GeneratePDFHandler extends AbstractHandler {
 	private static double getTotalValueMEC(MEC mec, Campaign campaign, Alternative parent) {
 		double result = 0;
 		for(Alternative children: parent.getChildrens()) {
-			result += getValueMEC(mec, campaign, children);
+			result += getValueMECAlternative(mec, campaign, children);
 		}
 		
 		return result;
 	}
 
-	private static double getValueMEC(MEC mec, Campaign campaign, Alternative alternative) {
+	private static double getValueMECAlternative(MEC mec, Campaign campaign, Alternative alternative) {
 		double numerator = 1, denominator = 1;
 		
 		List<Object> positionAndWeigth;
@@ -368,28 +368,38 @@ public class GeneratePDFHandler extends AbstractHandler {
 				denominator *= campaign.getValue(criterion, alternative) * (Double) positionAndWeigth.get(1);
 			}
 		}
-		
 		return numerator / denominator;
 	}
-	
+
 	private static double getAccumulatedValueMEC(MEC mec, Alternative alternative) {
 		double result = 0;
 		
 		for(Campaign campaign: _campaignsSelected) {
-			result += getValueMEC(mec, campaign, alternative);
+			result += getValueMECAlternative(mec, campaign, alternative);
 		}
 		
 		return result;
 	}
 
-	private static double getTotalAccumulatedValueMEC(MEC mec, Alternative alternative) {
-		double result = 0;
+	private static double getTotalAccumulatedValueMECParent(MEC mec, Alternative parent) {
+		double result = 0, resultDirect = 0;
+		int numCampaignsData = 0;
 		
 		for(Campaign campaign: _campaignsSelected) {
-			result += getTotalValueMEC(mec, campaign, alternative);
+			if(!campaign.isACampaignData()) {
+				result += getTotalValueMEC(mec, campaign, parent);
+			} else {
+				numCampaignsData++;
+				resultDirect += getTotalValueMEC(mec, campaign, parent);
+			}
 		}
 		
-		return result;
+		resultDirect /= numCampaignsData;
+		
+		result = (result == 0) ? 1 : result;
+		resultDirect = (resultDirect == 0) ? 1: resultDirect;
+		
+		return result * resultDirect;
 	}
 	
 	private static void desaggregateCampaigns(Section subCatPart, MEC mec) throws DocumentException {
@@ -429,7 +439,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 						cell = new PdfPCell(new Phrase(alternative.getId(), normalFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 						table.addCell(cell);
-						cell = new PdfPCell(new Phrase(Double.toString(getValueMEC(mec, campaign, alternative)), normalFont));
+						cell = new PdfPCell(new Phrase(Double.toString(getValueMECAlternative(mec, campaign, alternative)), normalFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 						table.addCell(cell);
 					} else {
@@ -457,11 +467,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 		MECChart chart = new MECChart();
 
 		if (_aggregationSelected == 0) {
-			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
-			for (Campaign campaign : _campaignsSelected) {
-				campaigns.add(campaign);
-			}
-			chart.createChartByPDF(campaigns, mec, 0, "combine"); //$NON-NLS-1$
+			chart.createChartByPDF(_campaignsSelected, mec, 0, "combine"); //$NON-NLS-1$
 			JFreeChart barChart = chart.getBarChart();
 			generatePNGChart(barChart, subCatPart);
 		} else {
@@ -514,11 +520,7 @@ public class GeneratePDFHandler extends AbstractHandler {
 		MECChart chart = new MECChart();
 
 		if (_aggregationSelected == 0) {
-			java.util.List<Campaign> campaigns = new LinkedList<Campaign>();
-			for (Campaign campaign : _campaignsSelected) {
-				campaigns.add(campaign);
-			}
-			chart.createChartByPDF(campaigns, mec, 1, "combine"); //$NON-NLS-1$
+			chart.createChartByPDF(_campaignsSelected, mec, 1, "combine"); //$NON-NLS-1$
 			JFreeChart lineChart = chart.getLineChart();
 			generatePNGChart(lineChart, subCatPart);
 		} else {
