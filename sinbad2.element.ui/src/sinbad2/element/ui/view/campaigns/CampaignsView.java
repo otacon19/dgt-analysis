@@ -66,7 +66,6 @@ public class CampaignsView extends ViewPart {
 	
 	private Button _addCampaigns;
 	private Button _removeCampaigns;
-	private Map<Button, TableItem> _tableItems;
 	
 	private ProblemElementsSet _elementsSet; 
 	
@@ -74,7 +73,6 @@ public class CampaignsView extends ViewPart {
 		_campaignsSelected = new LinkedList<Campaign>();
 		_campaignsPreviouslyAdded = new LinkedList<Campaign>();
 		_buttons = new LinkedList<Button>();
-		_tableItems = new HashMap<Button, TableItem>();
 		
 		_comparatorCampaigns = new ComparatorCampaigns();
 		
@@ -265,7 +263,6 @@ public class CampaignsView extends ViewPart {
 				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.CHECK);
 					button.setData("campaign", (Campaign) item.getData());  //$NON-NLS-1$
-					_tableItems.put(button, item);
 					button.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent e) {
@@ -301,12 +298,11 @@ public class CampaignsView extends ViewPart {
 									Campaign c = (Campaign) b.getData("campaign"); //$NON-NLS-1$
 									if(!c.getProvince().equals(dataCampaign.getProvince())) {
 										b.setEnabled(false);
-										_tableItems.get(b).setForeground(new Color(Display.getCurrent(), 211, 211, 211));
 									}
 								}
 							} else {
 								for(Button b: _buttons) {
-									_tableItems.get(b).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+									b.setEnabled(true);
 									if(b.getSelection() && ((Campaign) b.getData("campaign")).isACampaignData()) {
 										checkCompatibleCampaigns((Campaign) b.getData("campaign"), true);
 									}
@@ -320,12 +316,11 @@ public class CampaignsView extends ViewPart {
 									Campaign c = (Campaign) b.getData("campaign"); //$NON-NLS-1$
 									if(!c.getProvince().equals(campaign.getProvince()) && c.isACampaignData()) {
 										b.setEnabled(false);
-										_tableItems.get(b).setForeground(new Color(Display.getCurrent(), 211, 211, 211));
 									}
 								}
 							} else {
 								for(Button b: _buttons) {
-									_tableItems.get(b).setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+									b.setEnabled(true);
 									if(b.getSelection() && !((Campaign) b.getData("campaign")).isACampaignData()) {
 										checkCompatibleDataCampaigns((Campaign) b.getData("campaign"), true);
 									}
