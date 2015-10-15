@@ -93,7 +93,6 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 	public void notifyCampaignsChange(CampaignsChangeEvent event) {
 		switch(event.getChange()) {
 			case FINAL_CAMPAIGNS:	
-				//FIXME cargamos las imágenes de las fórmulas
 				for(MEC m: _elementsSet.getMECs()) {
 					if(m.getFormula() == null) {
 						if(m.getId().equals("Distancia")) { //$NON-NLS-1$
@@ -135,7 +134,7 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 	private void searchMatchingMECs(List<Campaign> campaignsSelected) {
 		TableItem[] tableItems = _tableViewer.getTable().getItems();
 		
-		if(campaignsSelected.size() == 1 && !campaignsSelected.get(0).isACampaignData()) {
+		if(campaignsSelected.size() == 1) {
 			Campaign campaignSelected = campaignsSelected.get(0);
 			List<Criterion> criteria = campaignSelected.getCriteria();
 			for(MEC m: _mecs) {
@@ -175,9 +174,9 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 				}
 			}
 			Map<Criterion, Integer> criteriaRepeat;
-			criteriaRepeat = checkMatchingData(allCriteriaCampaigns, campaignsSelected.size() - numCampaignsData);
+			criteriaRepeat = checkMatchingData(allCriteriaCampaigns, campaignsSelected.size());
 			for(Criterion c: criteriaData) {
-				criteriaRepeat.put(c, campaignsSelected.size() - numCampaignsData);
+				criteriaRepeat.put(c, numCampaignsData);
 			}
 			
 			for(MEC m: _mecs) {
@@ -185,7 +184,7 @@ public class MECContentProvider implements IStructuredContentProvider, IMECsChan
 				for(Criterion mc: mecCriteria) {
 					if(criteriaRepeat.containsKey(mc)) {
 						int rep = criteriaRepeat.get(mc);
-						if(rep == campaignsSelected.size() - numCampaignsData) {
+						if(rep == campaignsSelected.size()) {
 							for(TableItem ti: tableItems) {
 								if(ti.getData().equals(m)) {
 									ti.setForeground(new Color(Display.getCurrent(), 0, 0, 0));

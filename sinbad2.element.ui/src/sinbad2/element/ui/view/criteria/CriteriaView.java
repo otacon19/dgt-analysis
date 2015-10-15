@@ -1,6 +1,5 @@
 package sinbad2.element.ui.view.criteria;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -210,9 +209,7 @@ public class CriteriaView extends ViewPart implements ICampaignsChangeListener {
 								if(!_criteriaSelected.isEmpty()) {
 									_criteriaSelected.remove((Criterion) button.getData("criterion")); //$NON-NLS-1$
 								}
-							}
-							Collections.sort(_criteriaSelected);
-							
+							}						
 							_elementsSet.notifyCriteriaChanges(new CriteriaChangeEvent(ECriteriaChange.CRITERIA_SELECTED_CHANGES, null, _criteriaSelected, false));
 						}
 					});

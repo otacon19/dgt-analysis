@@ -83,11 +83,11 @@ public class MockModel {
 					List<Alternative> childrens = a.getChildrens();
 					for(Alternative children: childrens) {
 						if(c.getId().equals("Distancia")) {
-							value = 10 / childrens.size();
+							value = 10000 / childrens.size();
 						} else if(c.getId().equals("Tiempo")) {
-							value = 20 / childrens.size();
+							value = 20000 / childrens.size();
 						} else if(c.getId().equals("Desplazamientos")) {
-							value = 30 / childrens.size();
+							value = 30000 / childrens.size();
 						}
 						campaign.addValue(c, children, value);
 					}
@@ -194,11 +194,11 @@ public class MockModel {
 					List<Alternative> childrens = a.getChildrens();
 					for(Alternative children: childrens) {
 						if(c.getId().equals("Habitantes")) {
-							value = 11 / childrens.size();
+							value = 110000 / childrens.size();
 						} else if(c.getId().equals("Censo")) {
-							value = 12 / childrens.size();
+							value = 120000 / childrens.size();
 						} else if(c.getId().equals("Licencias")) {
-							value = 13 / childrens.size();
+							value = 130000 / childrens.size();
 						}
 						campaign_data.addValue(c, children, value);
 					}

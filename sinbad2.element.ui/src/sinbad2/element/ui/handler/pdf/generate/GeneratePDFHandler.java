@@ -389,10 +389,12 @@ public class GeneratePDFHandler extends AbstractHandler {
 			if(!campaign.isACampaignData()) {
 				result += getTotalValueMEC(mec, campaign, parent);
 			} else {
-				numCampaignsData++;
 				resultDirect += getTotalValueMEC(mec, campaign, parent);
+				numCampaignsData++;
 			}
 		}
+		
+		numCampaignsData = (numCampaignsData == 0) ? 1: numCampaignsData;
 		
 		resultDirect /= numCampaignsData;
 		
